@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/sgs-0.9.5.1/lib/sgs.jar" sourcepath="/sgs-0.9.5.1/lib/sgs-src-0.9.5.1-r3730.zip"/>
 	<classpathentry kind="lib" path="/sgs-0.9.5.1/lib/sgs-client.jar" sourcepath="/sgs-0.9.5.1/lib/sgs-client-src-0.9.5.1-r3730.zip"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
