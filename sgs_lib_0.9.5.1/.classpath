@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/sgs.jar" sourcepath="lib/sgs-src-0.9.5.1-r3730.zip"/>
+	<classpathentry kind="lib" path="lib/sgs-client.jar" sourcepath="lib/sgs-client-src-0.9.5.1-r3730.zip"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
