@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="services"/>
+	<classpathentry kind="src" path="adminclient"/>
+	<classpathentry kind="src" path="datastructures"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/sgs-0.9.5.1/lib/sgs.jar" sourcepath="/sgs-0.9.5.1/lib/sgs-src-0.9.5.1-r3730.zip"/>
+	<classpathentry kind="lib" path="/sgs-0.9.5.1/lib/sgs-client.jar" sourcepath="/sgs-0.9.5.1/lib/sgs-client-src-0.9.5.1-r3730.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
