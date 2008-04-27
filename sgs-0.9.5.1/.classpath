@@ -3,5 +3,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/sgs.jar" sourcepath="lib/sgs-src-0.9.5.1-r3730.zip"/>
 	<classpathentry kind="lib" path="lib/sgs-client.jar" sourcepath="lib/sgs-client-src-0.9.5.1-r3730.zip"/>
+	<classpathentry kind="lib" path="lib/mina-core-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/bdb/db.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
