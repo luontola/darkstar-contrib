@@ -81,5 +81,18 @@ public class AppProfilingManager implements ProfileProducer
 		}
 		*/
 	}
+
+
+	public void startReport(String report_identifier)
+	{
+		// TODO: we hope it could be done in a smarter way
+		reportOperation("startReport:"+report_identifier);
+	}
+
+
+	public void endReport()
+	{
+		// Currenlty do nothing.
+	}
 }
 
