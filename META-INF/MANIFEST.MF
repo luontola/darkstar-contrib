@@ -3,9 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: darkstar_contrib
 Bundle-SymbolicName: darkstar_contrib
 Bundle-Version: 1.0.0
-Bundle-ClassPath: darkstar-contrib.jar,
- lib/sgs.jar,
- lib/sgs-client.jar
+Bundle-ClassPath: darkstar-contrib.jar
 Export-Package: net.gamalocus.sgs.adminclient,
  net.gamalocus.sgs.adminclient.connection,
  net.gamalocus.sgs.adminclient.messages,
