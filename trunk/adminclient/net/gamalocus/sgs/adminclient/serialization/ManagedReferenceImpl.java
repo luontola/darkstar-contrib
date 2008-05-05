@@ -23,7 +23,7 @@ import com.sun.sgs.app.ManagedReference;
  * @author emanuel
  *
  */
-public class ManagedReferenceImpl implements ManagedReference, Serializable, ResponseListener<ManagedObjectCapsule>
+public class ManagedReferenceImpl implements ManagedReference, Serializable
 {
     /** The version of the serialized form. */
     private static final long serialVersionUID = 1;
@@ -162,21 +162,16 @@ public class ManagedReferenceImpl implements ManagedReference, Serializable, Res
 				if(status == Status.NOT_FETCHED)
 				{
 					status = Status.FETCHING;
-					getConnection().send(
-						new GetManagedObjectFromReference(this), this);
-				}
-				
-				// At this point we might have already failed
-				if(status == Status.FETCHING)
-				{
 					try
 					{
-						System.out.println("Waiting for: "+getId());
-						this.wait(15000);
+						object = getConnection().sendSync(
+							new GetManagedObjectFromReference(this)).object;
+						status = Status.SUCCEEDED;
 					}
-					catch (InterruptedException e)
+					catch (Throwable e)
 					{
-						e.printStackTrace();
+						status = Status.FAILED;
+						logger.log(Level.WARNING, "Could not fetch object["+id+"]", e);
 					}
 				}
 			}
@@ -207,26 +202,5 @@ public class ManagedReferenceImpl implements ManagedReference, Serializable, Res
 			id = BigInteger.valueOf(oid);
 		}
 		return id;
-	}
-	
-	public void remoteSuccess(ManagedObjectCapsule managed_object_capsule)
-	{
-		synchronized (this)
-		{
-			object = managed_object_capsule.object;
-			status = Status.SUCCEEDED;
-			this.notify();
-		}
-	}
-
-	public void remoteFailure(Throwable throwable)
-	{
-		logger.log(Level.SEVERE, "Could not fetch remote object with id "+getId(), throwable);
-		synchronized (this)
-		{
-			object = null;
-			status = Status.FAILED;
-			this.notify();
-		}
 	}
 }

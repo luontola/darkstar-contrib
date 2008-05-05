@@ -32,6 +32,8 @@ import com.sun.sgs.client.simple.SimpleClientListener;
  */
 public class AdminClientConnection implements SimpleClientListener, Serializable
 {
+	private static final long serialVersionUID = 8126759736004631186L;
+
 	/**
 	 * Convenience class when implementing {@link ResponseListener} anonymously.
 	 * @author j0rg3n
@@ -282,6 +284,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 		if(!isConnected())
 			throw new IllegalStateException("We are not connected");
 		
+		logger.info("AdminClientConnection.send("+message+", "+sender+")");
 		try {
 			// TODO Setup a timeout timer thread.
 			synchronized (onReceiveHandlers) {

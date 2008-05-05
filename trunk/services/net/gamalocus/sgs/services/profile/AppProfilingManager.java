@@ -17,6 +17,7 @@ import com.sun.sgs.profile.ProfileRegistrar;
 public class AppProfilingManager implements ProfileProducer
 {
 	private final static Logger logger = Logger.getLogger(AppProfilingManager.class.getName());
+	public static boolean is_enabled = false;
 	/**
 	 * The service backing this manager.
 	 */
@@ -24,8 +25,8 @@ public class AppProfilingManager implements ProfileProducer
 	/**
 	 * An array of operations.
 	 */
-	private Hashtable<String, ProfileOperation> knownOpNames = new Hashtable<String, ProfileOperation>();
-	private ProfileConsumer consumer;
+	private static Hashtable<String, ProfileOperation> knownOpNames = new Hashtable<String, ProfileOperation>();
+	private static ProfileConsumer consumer;
 
 	/**
 	 * This is the constructor of the manager, called by SGS.
@@ -43,7 +44,7 @@ public class AppProfilingManager implements ProfileProducer
 	 * 
 	 * @param opName
 	 */
-	public void reportOperation(String opName)
+	public static void reportOperation(String opName)
 	{
 		ProfileOperation op = knownOpNames.get(opName);
 		if(op == null)
@@ -83,7 +84,7 @@ public class AppProfilingManager implements ProfileProducer
 	}
 
 
-	public void startReport(String report_identifier)
+	public static void startReport(String report_identifier)
 	{
 		// TODO: we hope it could be done in a smarter way
 		reportOperation("startReport:"+report_identifier);
