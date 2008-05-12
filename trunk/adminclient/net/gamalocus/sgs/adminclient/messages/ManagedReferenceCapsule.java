@@ -10,8 +10,8 @@ import com.sun.sgs.app.ManagedReference;
  * @author emanuel
  *
  */
-public class ManagedReferenceCapsule implements Serializable
+public class ManagedReferenceCapsule<T> implements Serializable
 {
 	private static final long serialVersionUID = -3878595522574620947L;
-	public ManagedReference reference;
+	public ManagedReference<T> reference;
 }

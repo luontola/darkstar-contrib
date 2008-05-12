@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import com.sun.sgs.impl.sharedutil.PropertiesWrapper;
 import com.sun.sgs.kernel.ComponentRegistry;
-import com.sun.sgs.kernel.Manageable;
 import com.sun.sgs.service.DataService;
 import com.sun.sgs.service.Service;
 import com.sun.sgs.service.TransactionProxy;
@@ -16,7 +15,7 @@ import com.sun.sgs.service.TransactionProxy;
  * @author Emanuel Greisen
  * 
  */
-public class AppProfilingService implements Service, Manageable
+public class AppProfilingService implements Service
 {
 	/** The name of this class. */
 	static final String CLASSNAME = AppProfilingService.class.getName();

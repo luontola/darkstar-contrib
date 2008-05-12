@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import net.gamalocus.sgs.adminclient.connection.AdminLevel;
 import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 
+import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ManagedReference;
 
 /**
@@ -34,7 +35,7 @@ public abstract class AbstractAdminMessage<RETURN_VALUE extends Serializable> im
 		return requestId;
 	}
 
-	public abstract RETURN_VALUE executeOnServer(AdminSessionListener connection, ManagedReference server) throws Throwable;
+	public abstract RETURN_VALUE executeOnServer(AdminSessionListener connection, ManagedReference<AppListener> server) throws Throwable;
 	
 	/**
 	 * Return a set of admin-levels that are allowed to execute this action.

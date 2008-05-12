@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: 1
-Bundle-SymbolicName: sgs_0.9.5.1
-Bundle-Version: 1.0.0
+Bundle-SymbolicName: sgs
+Bundle-Version: 0.9.6
 Bundle-ClassPath: lib/sgs.jar,
  lib/sgs-client.jar,
  lib/bdb/db.jar,

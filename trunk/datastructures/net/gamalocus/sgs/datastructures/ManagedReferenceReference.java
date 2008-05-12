@@ -17,7 +17,7 @@ import com.sun.sgs.app.ManagedReference;
 public class ManagedReferenceReference<T extends Serializable> implements Serializable
 {
 	private static final long serialVersionUID = 158691317370364659L;
-	ManagedReference reference;
+	ManagedReference<ManagedReferenceHolder<T>> reference;
 
 	public ManagedReferenceReference()
 	{
@@ -34,10 +34,9 @@ public class ManagedReferenceReference<T extends Serializable> implements Serial
 		getRef().set(object);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private ManagedReferenceHolder<T> getRef()
 	{
-		return ((ManagedReferenceHolder<T>)reference.get(Object.class));
+		return reference.get();
 	}
 	/**
 	 * This will destroy the reference reference, and if we own the object destroy it too.
@@ -52,18 +51,18 @@ public class ManagedReferenceReference<T extends Serializable> implements Serial
 class ManagedReferenceHolder<T extends Serializable> implements Serializable, ManagedObject
 {
 	private static final long serialVersionUID = -8356372788817959755L;
-	ManagedReference reference;
+	ManagedReference<T> reference;
 	
 	@SuppressWarnings("unchecked")
 	T get()
 	{
-		return (T) (reference != null ? reference.get(Object.class) : null);
+		return reference != null ? reference.get() : null;
 	}
 
 	public void set(T object)
 	{
 		AppContext.getDataManager().markForUpdate(this);
-		reference = object != null ? AppContext.getDataManager().createReference((ManagedObject) object) : null;
+		reference = object != null ? AppContext.getDataManager().createReference(object) : null;
 	}
 }
 

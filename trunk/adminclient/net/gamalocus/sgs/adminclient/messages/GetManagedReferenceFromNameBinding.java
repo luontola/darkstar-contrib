@@ -7,12 +7,13 @@ import java.util.logging.Logger;
 import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 
 import com.sun.sgs.app.AppContext;
+import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.NameNotBoundException;
 import com.sun.sgs.app.ObjectNotFoundException;
 
-public class GetManagedReferenceFromNameBinding extends AbstractAdminMessage<ManagedReferenceCapsule>
+public class GetManagedReferenceFromNameBinding<T> extends AbstractAdminMessage<ManagedReferenceCapsule<T>>
 {
 	private static final long serialVersionUID = 47693644440628236L;
 	private final static Logger logger = 
@@ -24,12 +25,12 @@ public class GetManagedReferenceFromNameBinding extends AbstractAdminMessage<Man
 	}
 	
 	@Override
-	public ManagedReferenceCapsule executeOnServer(AdminSessionListener connection, ManagedReference server) 
+	public ManagedReferenceCapsule<T> executeOnServer(AdminSessionListener connection, ManagedReference<AppListener> server) 
 		throws IOException, NoSuchFieldException, IllegalAccessException
 	{
-		ManagedReferenceCapsule result = new ManagedReferenceCapsule();
+		ManagedReferenceCapsule<T> result = new ManagedReferenceCapsule();
 		try {
-			ManagedObject obj = AppContext.getDataManager().getBinding(bound_name, ManagedObject.class);
+			T obj = (T)AppContext.getDataManager().getBinding(bound_name);
 			result.reference = AppContext.getDataManager().createReference(obj);
 		} catch(ObjectNotFoundException onfe) {
 			logger.log(Level.WARNING, "Tried to get a non-existing object", onfe);

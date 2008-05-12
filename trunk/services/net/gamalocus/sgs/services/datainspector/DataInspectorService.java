@@ -9,8 +9,6 @@ import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.ObjectNotFoundException;
 import com.sun.sgs.kernel.ComponentRegistry;
-import com.sun.sgs.kernel.Manageable;
-import com.sun.sgs.kernel.ResourceCoordinator;
 import com.sun.sgs.service.DataService;
 import com.sun.sgs.service.Service;
 import com.sun.sgs.service.TransactionProxy;
@@ -21,15 +19,12 @@ import com.sun.sgs.service.TransactionProxy;
  * @author Emanuel Greisen
  * 
  */
-public class DataInspectorService implements Service, Manageable
+public class DataInspectorService implements Service
 {
 	/** The name of this class. */
 	private static final String CLASSNAME = DataInspectorService.class.getName();
 	/** the logger. */
 	private final static Logger logger = Logger.getLogger(DataInspectorService.class.getName());
-
-	// An SGS-instance that we need to spin off our own thread.
-	private ResourceCoordinator resource_coordinator;
 
     // a proxy providing access to the transaction state
     static TransactionProxy transactionProxy = null;
@@ -59,7 +54,6 @@ public class DataInspectorService implements Service, Manageable
 		*/
 		
 		// Get the ResourceCoordinator
-		resource_coordinator = componentRegistry.getComponent(ResourceCoordinator.class);
 		transactionProxy = transProxy;
 		dataService = transProxy.getService(DataService.class);
 	}
@@ -98,8 +92,7 @@ public class DataInspectorService implements Service, Manageable
 	{
 		try
 		{
-			ManagedReference ref = dataService.createReferenceForId(object_id);
-			return ref.get(ManagedObject.class);
+			return (ManagedObject)dataService.createReferenceForId(object_id).get();
 		}
 		catch(ObjectNotFoundException e)
 		{
