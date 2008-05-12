@@ -7,6 +7,7 @@ package net.gamalocus.sgs.adminclient.connection;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,11 +46,11 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 	/**
 	 * The server (AppListener) that we are running under.
 	 */
-	private ManagedReference server;
+	private ManagedReference<AppListener> server;
 	/**
 	 * The client-session.
 	 */
-	private ClientSession session;
+	private ManagedReference<ClientSession> session_ref;
 	/**
 	 * The level of authentication achieved until now.
 	 */
@@ -63,7 +64,7 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 	public AdminSessionListener(AppListener server, ClientSession session)
 	{
 		this.server = AppContext.getDataManager().createReference(server);
-		this.session = session;
+		this.session_ref = AppContext.getDataManager().createReference(session);
 	}
 
 	public void disconnected(boolean graceful)
@@ -83,8 +84,8 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 		
 		try {
 			Packetizer<T> packetizer = new Packetizer<T>(message, MAX_PACKET_SIZE);
-			for (byte[] part : packetizer) {
-				session.send(part);
+			for (ByteBuffer part : packetizer) {
+				getClientSession().send(part);
 			}
 			return true;
 		} catch (IOException ioe) {
@@ -93,7 +94,12 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 		}
 	}
 
-	public void receivedMessage(byte[] message)
+	private ClientSession getClientSession()
+	{
+		return session_ref.get();
+	}
+
+	public void receivedMessage(ByteBuffer message)
 	{
 		packet_assembler.append(message);
 		if (packet_assembler.isComplete()) {

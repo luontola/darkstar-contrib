@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 import com.sun.sgs.impl.sharedutil.PropertiesWrapper;
 import com.sun.sgs.kernel.ComponentRegistry;
-import com.sun.sgs.kernel.Manageable;
-import com.sun.sgs.kernel.ResourceCoordinator;
 import com.sun.sgs.service.DataService;
 import com.sun.sgs.service.Service;
 import com.sun.sgs.service.TransactionProxy;
@@ -22,7 +20,7 @@ import com.sun.sgs.service.TransactionProxy;
  * @author Emanuel Greisen
  * 
  */
-public class HotBackupService implements Service, Manageable
+public class HotBackupService implements Service
 {
 	/** The name of this class. */
 	private static final String CLASSNAME = HotBackupService.class.getName();
@@ -35,7 +33,6 @@ public class HotBackupService implements Service, Manageable
 	
 	
 	// An SGS-instance that we need to spin off our own thread.
-	private ResourceCoordinator resource_coordinator;
 	private boolean enabled;
 	private boolean worker_still_running;
 	private int interval;
@@ -75,7 +72,6 @@ public class HotBackupService implements Service, Manageable
 		data_root = wrappedProps.getProperty("com.sun.sgs.app.root");
 		
 		// Get the ResourceCoordinator
-		resource_coordinator = componentRegistry.getComponent(ResourceCoordinator.class);
 		transactionProxy = transProxy;
 		dataService = transProxy.getService(DataService.class);
 	}

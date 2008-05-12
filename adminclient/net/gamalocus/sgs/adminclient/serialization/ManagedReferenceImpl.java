@@ -23,7 +23,7 @@ import com.sun.sgs.app.ManagedReference;
  * @author emanuel
  *
  */
-public class ManagedReferenceImpl implements ManagedReference, Serializable
+public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializable
 {
     /** The version of the serialized form. */
     private static final long serialVersionUID = 1;
@@ -151,7 +151,7 @@ public class ManagedReferenceImpl implements ManagedReference, Serializable
      * TODO: fetch the object.
      */
 	@SuppressWarnings("unchecked")
-	public <T> T get(Class<T> type) {
+	public T get() {
 		
 		// Fetch it?
 		synchronized (this)
@@ -193,8 +193,8 @@ public class ManagedReferenceImpl implements ManagedReference, Serializable
 	/**
 	 * No difference between for update and normal get on client.
 	 */
-	public <T> T getForUpdate(Class<T> type) {
-		return get(type);
+	public T getForUpdate() {
+		return get();
 	}
 
 	public BigInteger getId() {

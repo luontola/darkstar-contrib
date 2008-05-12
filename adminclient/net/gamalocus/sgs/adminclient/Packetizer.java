@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Iterator;
  *  
  * @author j0rg3n
  */
-public class Packetizer<T extends Serializable> implements Iterable<byte[]>
+public class Packetizer<T extends Serializable> implements Iterable<ByteBuffer>
 {
 	/**
 	 * A single-part packet contains only the tail, while receiving a PART 
@@ -38,9 +39,9 @@ public class Packetizer<T extends Serializable> implements Iterable<byte[]>
 		return out.toByteArray();
 	}
 
-	public Iterator<byte[]> iterator()
+	public Iterator<ByteBuffer> iterator()
 	{
-		return new Iterator<byte[]>() {
+		return new Iterator<ByteBuffer>() {
 
 			protected int packet_number = 0;
 			
@@ -54,7 +55,7 @@ public class Packetizer<T extends Serializable> implements Iterable<byte[]>
 				return packet_number * packet_size;
 			}
 
-			public byte[] next()
+			public ByteBuffer next()
 			{
 				int pos = getPacketStart();
 
@@ -67,16 +68,20 @@ public class Packetizer<T extends Serializable> implements Iterable<byte[]>
 					copy_count = packet_size;
 				}
 				
-				byte[] part = new byte[copy_count + 1];
+				ByteBuffer part = ByteBuffer.wrap(new byte[copy_count + 1]);
 				
 				/// TODO Do optimized array copy?
-				part[0] = tag;
+				part.put(tag);
+				part.put(data, pos, copy_count);
+				/*
 				for (int j = 1; j < copy_count + 1; ++j) {
 					part[j] = data[pos];
 					++pos;
 				}
+				*/
 				
 				++packet_number;
+				part.rewind();
 				return part;
 			}
 

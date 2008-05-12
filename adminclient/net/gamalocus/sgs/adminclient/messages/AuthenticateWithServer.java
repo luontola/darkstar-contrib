@@ -6,6 +6,7 @@ import net.gamalocus.sgs.adminclient.connection.AdminLevel;
 import net.gamalocus.sgs.adminclient.connection.AdminSessionAuthenticator;
 import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 
+import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ManagedReference;
 
 
@@ -40,10 +41,10 @@ public class AuthenticateWithServer extends AbstractAdminMessage<EnumSet<AdminLe
 	 * This should expand the users admin-levels, or throw an exception.
 	 */
 	@Override
-	public EnumSet<AdminLevel> executeOnServer(AdminSessionListener connection, ManagedReference server_ref) throws Throwable
+	public EnumSet<AdminLevel> executeOnServer(AdminSessionListener connection, ManagedReference<AppListener> server_ref) throws Throwable
 	{
 		AdminSessionAuthenticator authenticator = null;
-		Object server = server_ref.get(Object.class);
+		AppListener server = server_ref.get();
 		if (connection instanceof AdminSessionAuthenticator)
 		{
 			authenticator = (AdminSessionAuthenticator) connection;

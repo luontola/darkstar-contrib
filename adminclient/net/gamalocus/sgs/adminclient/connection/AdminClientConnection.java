@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.PasswordAuthentication;
+import java.nio.ByteBuffer;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -298,7 +299,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 			synchronized (simple_client)
 			{
 				Packetizer<T> packetizer = new Packetizer<T>(message, MAX_PACKET_SIZE);
-				for (byte[] part : packetizer) {
+				for (ByteBuffer part : packetizer) {
 					simple_client.send(part);
 				}
 			}
@@ -347,7 +348,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 		throw listener.throwable;		
 	}
 
-	public void receivedMessage(byte[] message)
+	public void receivedMessage(ByteBuffer message)
 	{
 		packet_assembler.append(message);
 		if (packet_assembler.isComplete()) {

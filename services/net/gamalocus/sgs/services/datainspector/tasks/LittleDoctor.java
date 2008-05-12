@@ -25,7 +25,7 @@ public class LittleDoctor implements Task, Serializable
 {
 	private final static Logger logger = Logger.getLogger(LittleDoctor.class.getName());
 	private static final long serialVersionUID = -2647620663793391971L;
-	private final ManagedReference object_ref;
+	private final ManagedReference<ManagedObject> object_ref;
 	private final RemovalSpreadFilter filter;
 	private final String field_url;
 	private final long time_spread;
@@ -48,7 +48,7 @@ public class LittleDoctor implements Task, Serializable
 	{
 		try
 		{
-			ManagedObject obj = object_ref.get(ManagedObject.class);
+			ManagedObject obj = object_ref.get();
 			
 			// Should we shedule little doctors for other reachable objects
 			if(filter != null)
@@ -66,6 +66,7 @@ public class LittleDoctor implements Task, Serializable
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void scheduleLittleDoctors(Object obj, HashSet<Object> handled, String field_url)
 	{
 		// Ensure we don't do this more than once.
@@ -119,7 +120,7 @@ public class LittleDoctor implements Task, Serializable
 			Object val = e.getValue();
 			if(val instanceof ManagedReference)
 			{
-				tryScheduleLittleDoctor((ManagedReference) val, e.getKey());
+				tryScheduleLittleDoctor((ManagedReference<ManagedObject>) val, e.getKey());
 			}
 			else if(val.getClass().isPrimitive() || val.getClass().isEnum())
 			{
@@ -147,11 +148,11 @@ public class LittleDoctor implements Task, Serializable
 		children.put(endKey, child);
 	}
 
-	private void tryScheduleLittleDoctor(ManagedReference other_ref, String child_field_url)
+	private void tryScheduleLittleDoctor(ManagedReference<? extends ManagedObject> other_ref, String child_field_url)
 	{
 		try
 		{
-			ManagedObject other = other_ref.get(ManagedObject.class);
+			ManagedObject other = other_ref.get();
 			if(filter.removeObject(other))
 			{
 				AppContext.getTaskManager().scheduleTask(new LittleDoctor(other, filter, child_field_url, time_spread), (++spawned_tasks)*time_spread);

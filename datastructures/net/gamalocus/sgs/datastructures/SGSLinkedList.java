@@ -87,7 +87,7 @@ public class SGSLinkedList<T extends Serializable> implements Serializable, Mana
 			// If we own the actual list element values we destroy it from the data-store before returning it.
 			if(owner && res instanceof ManagedObject)
 			{
-				AppContext.getDataManager().removeObject((ManagedObject) res);
+				AppContext.getDataManager().removeObject(res);
 			}
 			
 			// Finally return the result.
@@ -108,14 +108,14 @@ class ListElement<T extends Serializable> implements Serializable, ManagedObject
 {
 	private static final long serialVersionUID = -1468269894845172962L;
 	T object;
-	ManagedReference object_ref;
-	ManagedReference next;
+	ManagedReference<T> object_ref;
+	ManagedReference<ListElement<T>> next;
 	
 	public ListElement(T object)
 	{
 		if(object instanceof ManagedReference)
 		{
-			this.object_ref = AppContext.getDataManager().createReference((ManagedObject) object);
+			this.object_ref = AppContext.getDataManager().createReference(object);
 		}
 		else
 		{
@@ -123,16 +123,14 @@ class ListElement<T extends Serializable> implements Serializable, ManagedObject
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public ListElement<T> getNext()
 	{
-		return next != null ? (ListElement<T>) next.get(Object.class) : null;
+		return next != null ? next.get() : null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public T getElement()
 	{
-		return object != null ? object : ((T) object_ref.get(Object.class));
+		return object != null ? object : object_ref.get();
 	}
 
 	public void setNext(ListElement<T> next)
