@@ -1,6 +1,7 @@
 package net.gamalocus.sgs.adminclient.connection;
 
 import java.io.IOException;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.PasswordAuthentication;
@@ -83,7 +84,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
     /**
      * A list to avoid duplicates.
      */
-    private HashMap<BigInteger, ManagedReferenceImpl> reference_map = new HashMap<BigInteger, ManagedReferenceImpl>();
+    private HashMap<BigInteger, ManagedReferenceImpl<?>> reference_map = new HashMap<BigInteger, ManagedReferenceImpl<?>>();
 
 	private Runnable loggedInHandler;
 
@@ -107,7 +108,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 		// Put in some class-swaps
 		//packet_assembler.addClassReplacement("com.sun.sgs.impl.service.data.ManagedReferenceImpl", "net.gamalocus.cotwl2.hallserver.adminmessages.ManagedReferenceImpl");
 		packet_assembler.addClassReplacement("com.sun.sgs.impl.service.data.ManagedReferenceImpl", 
-				ManagedReferenceImpl.class);
+				ObjectStreamClass.lookup(ManagedReferenceImpl.class));
 	}
 	
 	
@@ -116,7 +117,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 		return factory;
 	}
 	
-	public Class<?> addClassReplacement(String fromClass, Class<?> toClass)
+	public ObjectStreamClass addClassReplacement(String fromClass, ObjectStreamClass toClass)
 	{
 		return packet_assembler.addClassReplacement(fromClass, toClass);
 	}
@@ -139,11 +140,11 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 	 * @param ref
 	 * @return
 	 */
-	public ManagedReferenceImpl readResolveReference(BigInteger key, ManagedReferenceImpl ref)
+	public ManagedReferenceImpl<?> readResolveReference(BigInteger key, ManagedReferenceImpl<?> ref)
 	{
 		synchronized (reference_map)
 		{
-	        ManagedReferenceImpl tmp = reference_map.get(key);
+	        ManagedReferenceImpl<?> tmp = reference_map.get(key);
 	        if(tmp == null)
 	        {
 	        	reference_map.put(key, ref);

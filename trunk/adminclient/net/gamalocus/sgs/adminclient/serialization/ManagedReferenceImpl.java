@@ -89,9 +89,9 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
     	status = Status.NOT_FETCHED;
     	
     	// Get our connection
-    	if (in instanceof ClassLoaderOverridingObjectInputStream)
+    	if (in instanceof AdminClientConnectionObjectInputStream)
 		{
-			ClassLoaderOverridingObjectInputStream clooi = (ClassLoaderOverridingObjectInputStream) in;
+			AdminClientConnectionObjectInputStream clooi = (AdminClientConnectionObjectInputStream) in;
 	    	connectionFactory = clooi.getConnection().getFactory();
 		}
     }
