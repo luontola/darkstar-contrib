@@ -89,7 +89,9 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 			}
 			
 			// Finally, use the supplied custom class loader
-			Class<?> class_ = classLoader.loadClass(desc.getName());
+			// Note: We do not use loadClass directly, as it does not handle array classes
+			// well on JDK6.
+			Class<?> class_ = Class.forName(desc.getName(), false, classLoader);
 			try
 			{
 				Field serialVersionUIDField = class_.getDeclaredField("serialVersionUID");
