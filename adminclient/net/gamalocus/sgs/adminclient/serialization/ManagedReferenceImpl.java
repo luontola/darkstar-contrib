@@ -110,10 +110,11 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 	 * @param oid
 	 * @return
 	 */
-	public static ManagedReferenceImpl getInstance(AdminClientConnection connection, long oid)
+	@SuppressWarnings("unchecked")
+	public static <T> ManagedReferenceImpl<T> getInstance(AdminClientConnection connection, long oid)
 	{
-		ManagedReferenceImpl ref = new ManagedReferenceImpl(oid);
-		return connection.readResolveReference(ref.id, ref);
+		ManagedReferenceImpl<T> ref = new ManagedReferenceImpl<T>(oid);
+		return connection != null ? (ManagedReferenceImpl<T>)connection.readResolveReference(ref.id, ref) : ref;
 	}
 	
 	/**
@@ -181,13 +182,7 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 
 	private AdminClientConnection getConnection()
 	{
-		/*
-		if(connection == null)
-		{
-			connection = AdminClientConnection.getAdminClientConnectionPool().getConnection(connection_host, connection_port);
-		}
-		*/
-		return connectionFactory.getConnection();
+		return connectionFactory != null ? connectionFactory.getConnection() : null;
 	}
 
 	/**
