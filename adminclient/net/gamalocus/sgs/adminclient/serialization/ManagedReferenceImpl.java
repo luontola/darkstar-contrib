@@ -179,6 +179,15 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 		}
 		return (T) object;
 	}
+	
+	/**
+	 * @deprecated This method exists solely for backwards 
+	 * compatibility with game snapshots pre-0.9.6 versions of SGS.
+	 */
+	public <T2> T2 get(Class<T2> targetClass)
+	{
+		return (T2)get();
+	}
 
 	private AdminClientConnection getConnection()
 	{
