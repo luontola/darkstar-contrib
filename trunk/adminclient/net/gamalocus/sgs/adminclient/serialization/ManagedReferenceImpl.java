@@ -98,7 +98,17 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
     
     /** Replaces this instance with a canonical instance. */
     private Object readResolve() throws ObjectStreamException {
-    	return getConnection().readResolveReference(getId(), this);
+    	AdminClientConnection connection = getConnection();
+    	if (connection != null)
+    	{
+    		return connection.readResolveReference(getId(), this);
+    	}
+    	else
+    	{
+    		logger.warning(String.format("No connection available to resolve reference %d. " +
+    				"Reference equality may be violated.", getId().longValue()));
+    		return this;
+    	}
     }
     
 	/**
