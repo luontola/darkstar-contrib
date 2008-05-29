@@ -56,74 +56,67 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 	@Override
 	protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException
 	{
-		if (classLoader != null)
+		// First, check if the class should be replaced with a different class.
+		ObjectStreamClass replacementDesc = classReplacements.get(desc.getName());
+		if(replacementDesc != null) 
 		{
-			// First, check if the class should be replaced with a different class.
-			ObjectStreamClass replacementDesc = classReplacements.get(desc.getName());
-			if(replacementDesc != null) 
-			{
-				logger.finer(String.format("Replacing stream class %s with %s.",
-						desc.getName(), replacementDesc.getName()));
-				desc = replacementDesc;
-			}
-
-			// Try to get it first by the default resolve method.
-			// This is important, as this is where the commonly accessible classes will come from,
-			// such as java.lang.*. If we get these from the custom class loader, we can end up
-			// with very odd class cast exceptions.
-			try
-			{
-				return super.resolveClass(desc);
-			}
-			catch (ClassNotFoundException cnfe)
-			{
-				if (classLoader != null)
-				{
-					logger.finest(String.format("Default implementation unable to find class %s.",
-							desc.getName()));
-				}
-				else
-				{
-					throw cnfe;
-				}
-			}
-			
-			// Finally, use the supplied custom class loader
-			// Note: We do not use loadClass directly, as it does not handle array classes
-			// well on JDK6.
-			Class<?> class_ = Class.forName(desc.getName(), false, classLoader);
-			try
-			{
-				Field serialVersionUIDField = class_.getDeclaredField("serialVersionUID");
-				serialVersionUIDField.setAccessible(true);
-				long serialVersionUID = ((Long) serialVersionUIDField.get(null)).longValue();
-				
-				if (serialVersionUID != desc.getSerialVersionUID())
-				{
-					throw new ClassNotFoundException(String.format("Mismatch in " +
-							"%s.serialVersionUID. Expected %d, got %d.", 
-							class_.getName(), 
-							desc.getSerialVersionUID(), 
-							serialVersionUID));
-				}
-			}
-			catch (IllegalAccessException e)
-			{
-				throw new IOException(String.format("Field %s.serialVersionUID not accessible.", class_.getName()), e);
-			}
-			catch (NoSuchFieldException e)
-			{
-				// Do nothing; we cannot verify serialVersionUID if not specified.
-				// FIXME Do this the way that the java serialization does it.
-				logger.log(Level.FINE, 
-						String.format("Unable to verify serialVersionUID of class %s.", desc.getName()), e);
-			}
-			
-			return class_;
+			logger.finer(String.format("Replacing stream class %s with %s.",
+					desc.getName(), replacementDesc.getName()));
+			desc = replacementDesc;
 		}
-		else
+		
+		// Try to get it first by the default resolve method.
+		// This is important, as this is where the commonly accessible classes will come from,
+		// such as java.lang.*. If we get these from the custom class loader, we can end up
+		// with very odd class cast exceptions.
+		try
 		{
 			return super.resolveClass(desc);
 		}
+		catch (ClassNotFoundException cnfe)
+		{
+			if (classLoader != null)
+			{
+				logger.finest(String.format("Default implementation unable to find class %s.",
+						desc.getName()));
+			}
+			else
+			{
+				throw cnfe;
+			}
+		}
+		
+		// Finally, use the supplied custom class loader
+		// Note: We do not use loadClass directly, as it does not handle array classes
+		// well on JDK6.
+		Class<?> class_ = Class.forName(desc.getName(), false, classLoader);
+		try
+		{
+			Field serialVersionUIDField = class_.getDeclaredField("serialVersionUID");
+			serialVersionUIDField.setAccessible(true);
+			long serialVersionUID = ((Long) serialVersionUIDField.get(null)).longValue();
+			
+			if (serialVersionUID != desc.getSerialVersionUID())
+			{
+				throw new ClassNotFoundException(String.format("Mismatch in " +
+						"%s.serialVersionUID. Expected %d, got %d.", 
+						class_.getName(), 
+						desc.getSerialVersionUID(), 
+						serialVersionUID));
+			}
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new IOException(String.format("Field %s.serialVersionUID not accessible.", class_.getName()), e);
+		}
+		catch (NoSuchFieldException e)
+		{
+			// Do nothing; we cannot verify serialVersionUID if not specified.
+			// FIXME Do this the way that the java serialization does it.
+			logger.log(Level.FINE, 
+					String.format("Unable to verify serialVersionUID of class %s.", desc.getName()), e);
+		}
+			
+		return class_;
 	}
 }
