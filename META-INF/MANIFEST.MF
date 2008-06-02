@@ -12,5 +12,6 @@ Export-Package: net.gamalocus.sgs.adminclient,
  net.gamalocus.sgs.services.datainspector,
  net.gamalocus.sgs.services.datainspector.tasks,
  net.gamalocus.sgs.services.hotbackup,
+ net.gamalocus.sgs.services.identity,
  net.gamalocus.sgs.services.profile
 Require-Bundle: sgs
