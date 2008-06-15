@@ -24,8 +24,6 @@
 
 package net.orfjackal.darkstar.rpc;
 
-import net.orfjackal.darkstar.rpc.comm.AbstractMessageSender;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
