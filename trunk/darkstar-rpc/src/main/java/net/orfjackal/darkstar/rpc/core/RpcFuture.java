@@ -39,7 +39,6 @@ public final class RpcFuture<V> extends FutureTask<V> {
         this.request = request;
     }
 
-    @SuppressWarnings({"unchecked"})
     public void markDone(Response response) {
         if (response.requestId != request.requestId) {
             throw new IllegalArgumentException("Wrong requestId");
