@@ -131,7 +131,6 @@ public class RpcClientSpec extends Specification<Object> {
 
         private Future<String> future;
 
-        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         public Object create() {
             future = client.remoteInvoke(42L, "foo", new Class<?>[0], null);
             Throwable t = new IllegalStateException("exception message");
@@ -174,7 +173,6 @@ public class RpcClientSpec extends Specification<Object> {
 
     public class IfACommunicationErrorHappens {
 
-        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         public Object create() throws IOException {
             server = mock(DummySender.class);
             checking(new Expectations() {{
@@ -202,7 +200,6 @@ public class RpcClientSpec extends Specification<Object> {
 
         private Logger log;
 
-        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         public Object create() {
             log = Logger.getLogger(RpcClientImpl.class.getName());
             return null;

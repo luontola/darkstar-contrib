@@ -99,7 +99,6 @@ public class EndToEndSpec extends Specification<Object> {
             specify(value, should.equal("pong!"));
         }
 
-        @SuppressWarnings({"ThrowableInstanceNeverThrown"})
         public void aFutureWillProvideTheException() throws TimeoutException, InterruptedException {
             checking(new Expectations() {{
                 one(fooService).ping("ping?"); will(throwException(new IllegalStateException("exception message")));
