@@ -22,10 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.comm;
-
-import net.orfjackal.darkstar.rpc.MessageReciever;
-import net.orfjackal.darkstar.rpc.MessageSender;
+package net.orfjackal.darkstar.rpc;
 
 import java.io.IOException;
 
