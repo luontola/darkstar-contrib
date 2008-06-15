@@ -30,7 +30,10 @@ import java.nio.ByteBuffer;
  * @author Esko Luontola
  * @since 9.6.2008
  */
-public class ByteBufferUtils {
+public final class ByteBufferUtils {
+
+    private ByteBufferUtils() {
+    }
 
     public static byte[] asByteArray(ByteBuffer buf) {
         byte[] bytes = new byte[buf.remaining()];
