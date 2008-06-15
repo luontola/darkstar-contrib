@@ -29,6 +29,7 @@ import net.orfjackal.darkstar.rpc.core.RpcClientImpl;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
 import net.orfjackal.darkstar.rpc.core.RpcServerImpl;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +40,9 @@ import java.util.concurrent.TimeUnit;
  * @author Esko Luontola
  * @since 15.6.2008
  */
-public class RpcGateway implements RpcServer {
+public class RpcGateway implements RpcServer, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static final byte REQUEST_TO_MASTER = 0;
     public static final byte RESPONSE_FROM_MASTER = 1;

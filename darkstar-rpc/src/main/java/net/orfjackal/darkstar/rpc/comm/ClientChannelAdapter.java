@@ -30,6 +30,7 @@ import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.MessageSender;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
@@ -37,8 +38,9 @@ import java.util.logging.Logger;
  * @author Esko Luontola
  * @since 15.6.2008
  */
-public class ClientChannelAdapter implements ClientChannelListener {
+public class ClientChannelAdapter implements ClientChannelListener, Serializable {
 
+    private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(ClientChannelAdapter.class.getName());
 
     // client-to-server requests
@@ -91,7 +93,9 @@ public class ClientChannelAdapter implements ClientChannelListener {
         channel.send(buf);
     }
 
-    private class MyRequestSender implements MessageSender {
+    private class MyRequestSender implements MessageSender, Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocateDirect(message.length + 1);
@@ -106,7 +110,9 @@ public class ClientChannelAdapter implements ClientChannelListener {
         }
     }
 
-    private class MyResponseSender implements MessageSender {
+    private class MyResponseSender implements MessageSender, Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocateDirect(message.length + 1);

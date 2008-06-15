@@ -44,10 +44,10 @@ import java.util.logging.Logger;
  */
 public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
 
-    private static final long FIRST_SERVICE_ID = 1L;
-
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(RpcServerImpl.class.getName());
+
+    private static final long FIRST_SERVICE_ID = 1L;
 
     private final Map<Long, ServiceHolder<?>> services;
     private final MessageSender responseSender;
