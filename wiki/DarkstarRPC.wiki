@@ -8,3 +8,6 @@ With this library it is possible to call methods on remote objects almost as if 
 All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (value or exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed.
 
 See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/src/test/java/net/orfjackal/darkstar/rpc/comm/DarkstarIntegrationSpec.java DarkstarIntegrationSpec] for an example of how to integrate Darkstar RPC with Darkstar.
+
+
+_Developed by Esko Luontola (Jackal von ÖRF)_
