@@ -1,0 +1,10 @@
+#summary RPC API for simplified communication between Darkstar server and clients
+#labels Phase-Deploy
+
+= Introduction =
+
+With this library it is possible to call methods on remote objects almost as if they were local objects. You need to define an interface for your RPC service and register an instance implementing that interface. Then you can query from the remote side for that service.
+
+All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (value or exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed.
+
+See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/src/test/java/net/orfjackal/darkstar/rpc/comm/DarkstarIntegrationSpec.java DarkstarIntegrationSpec] for an example of how to integrate Darkstar RPC with Darkstar.
