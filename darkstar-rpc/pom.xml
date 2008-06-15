@@ -10,7 +10,7 @@
 
     <name>Darkstar RPC</name>
     <description>RPC library for Project Darkstar clients</description>
-    <url>http://code.google.com/p/darkstar-exp/</url>
+    <url>http://code.google.com/p/darkstar-contrib/wiki/DarkstarRPC</url>
     <inceptionYear>2008</inceptionYear>
 
     <licenses>
@@ -29,9 +29,9 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:http://darkstar-exp.googlecode.com/svn/contrib/darkstar-rpc/trunk</connection>
-        <developerConnection>scm:svn:https://darkstar-exp.googlecode.com/svn/contrib/darkstar-rpc/trunk</developerConnection>
-        <url>http://code.google.com/p/darkstar-exp/source/browse/contrib/darkstar-rpc/trunk</url>
+        <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</connection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</developerConnection>
+        <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc</url>
     </scm>
 
     <distributionManagement>
