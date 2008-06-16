@@ -24,77 +24,34 @@
 
 package net.orfjackal.darkstar.rpc.example.server;
 
-import net.orfjackal.darkstar.rpc.example.GuessResult;
+import com.sun.sgs.app.ManagedObject;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
-
-import java.io.Serializable;
-import java.util.Random;
+import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
+import org.junit.runner.RunWith;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameImpl implements NumberGuessGame, Serializable {
+@RunWith(JDaveRunner.class)
+public class NumberGuessGameServiceSpec extends Specification<Object> {
 
-    private static final long serialVersionUID = 1L;
+    public class ANumberGuessGameService {
 
-    private static final int DEFAULT_MIN = 1;
-    private static final int DEFAULT_MAX = 100;
+        private NumberGuessGame game;
+        private NumberGuessGameService service;
 
-    private final Random random;
-    private int minimum = DEFAULT_MIN;
-    private int maximum = DEFAULT_MAX;
-    private int secret;
-    private int tries;
-
-    public NumberGuessGameImpl() {
-        this(new Random());
-    }
-
-    public NumberGuessGameImpl(Random random) {
-        this.random = random;
-        newGame();
-    }
-
-    public int getMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(int minimum) {
-        this.minimum = minimum;
-        newGame();
-    }
-
-    public int getMaximum() {
-        return maximum;
-    }
-
-    public void setMaximum(int maximum) {
-        this.maximum = maximum;
-        newGame();
-    }
-
-    public void newGame() {
-        secret = random.nextInt(maximum - minimum + 1) + minimum;
-        tries = 0;
-    }
-
-    int secretNumber() {
-        return secret;
-    }
-
-    public GuessResult guess(int guess) {
-        tries++;
-        if (guess < secret) {
-            return GuessResult.TOO_LOW;
-        } else if (guess > secret) {
-            return GuessResult.TOO_HIGH;
-        } else {
-            return GuessResult.SUCCESS;
+        public Object create() {
+            game = mock(NumberGuessGame.class);
+            service = new NumberGuessGameServiceImpl(game);
+            return null;
         }
-    }
 
-    public int tries() {
-        return tries;
+        public void isAManagedObject() {
+            specify(service instanceof ManagedObject);
+        }
+
     }
 }
