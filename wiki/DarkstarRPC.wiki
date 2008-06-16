@@ -12,4 +12,8 @@ See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/
 For now you will need to download the sources from SVN and build them with Maven using the command: mvn verify
 
 
-_Developed by Esko Luontola (Jackal von ÖRF)_
+== Links ==
+
+  * SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/
+  * Original discussion thread: [http://www.projectdarkstar.com/component/option,com_smf/Itemid,99999999/topic,470.0 Remote Procedure Calls (RPC) and Darkstar]
+  * Developer: [http://www.orfjackal.net/ Esko Luontola] (Jackal von ÖRF)
