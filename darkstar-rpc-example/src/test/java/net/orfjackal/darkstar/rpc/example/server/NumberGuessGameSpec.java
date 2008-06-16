@@ -22,10 +22,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example;
+package net.orfjackal.darkstar.rpc.example.server;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.rpc.example.GuessResult;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

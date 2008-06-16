@@ -22,9 +22,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example;
+package net.orfjackal.darkstar.rpc.example.server;
 
 import com.sun.sgs.app.ManagedObject;
+import net.orfjackal.darkstar.rpc.example.GuessResult;
+import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
 
 import java.io.Serializable;
 import java.util.Random;
