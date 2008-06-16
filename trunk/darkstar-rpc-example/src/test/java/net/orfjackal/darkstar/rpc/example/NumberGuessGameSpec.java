@@ -97,6 +97,20 @@ public class NumberGuessGameSpec extends Specification<Object> {
             }
             specify(numbers, should.contain(MAX));
         }
+
+        public void changingTheMinimumWillStartANewGame() {
+            game.guess(10);
+            int previousNumber = game.secretNumber();
+            game.setMinimum(30);
+            specify(game.secretNumber(), should.not().equal(previousNumber));
+        }
+
+        public void changingTheMaximumWillStartANewGame() {
+            game.guess(10);
+            int previousNumber = game.secretNumber();
+            game.setMaximum(70);
+            specify(game.secretNumber(), should.not().equal(previousNumber));
+        }
     }
 
     public class WhenThePlayerTriesToGuessTheNumber {
@@ -126,6 +140,21 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void guessingTooHighWillTellToGuessLower() {
             GuessResult result = game.guess(43);
             specify(result, should.equal(GuessResult.TOO_HIGH));
+        }
+
+        public void theGameWillKeepACountOfTheGuesses() {
+            specify(game.tries(), should.equal(0));
+            game.guess(10);
+            specify(game.tries(), should.equal(1));
+            game.guess(20);
+            specify(game.tries(), should.equal(2));
+        }
+
+        public void theTriesCountWillBeResetOnANewGame() {
+            game.guess(10);
+            specify(game.tries(), should.equal(1));
+            game.newGame();
+            specify(game.tries(), should.equal(0));
         }
     }
 }

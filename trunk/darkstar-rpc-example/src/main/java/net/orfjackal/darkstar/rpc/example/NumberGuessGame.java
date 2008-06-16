@@ -39,6 +39,7 @@ public class NumberGuessGame {
     private int minimum = DEFAULT_MIN;
     private int maximum = DEFAULT_MAX;
     private int secret;
+    private int tries;
 
     public NumberGuessGame() {
         this(new Random());
@@ -55,6 +56,7 @@ public class NumberGuessGame {
 
     public void setMinimum(int minimum) {
         this.minimum = minimum;
+        newGame();
     }
 
     public int getMaximum() {
@@ -63,10 +65,12 @@ public class NumberGuessGame {
 
     public void setMaximum(int maximum) {
         this.maximum = maximum;
+        newGame();
     }
 
     public void newGame() {
         secret = random.nextInt(maximum - minimum + 1) + minimum;
+        tries = 0;
     }
 
     int secretNumber() {
@@ -74,6 +78,7 @@ public class NumberGuessGame {
     }
 
     public GuessResult guess(int guess) {
+        tries++;
         if (guess < secret) {
             return GuessResult.TOO_LOW;
         } else if (guess > secret) {
@@ -81,5 +86,9 @@ public class NumberGuessGame {
         } else {
             return GuessResult.SUCCESS;
         }
+    }
+
+    public int tries() {
+        return tries;
     }
 }
