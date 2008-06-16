@@ -24,77 +24,47 @@
 
 package net.orfjackal.darkstar.rpc.example.server;
 
+import com.sun.sgs.app.ManagedObject;
 import net.orfjackal.darkstar.rpc.example.GuessResult;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
+import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
 
-import java.io.Serializable;
-import java.util.Random;
+import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameImpl implements NumberGuessGame, Serializable {
+public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject {
 
-    private static final long serialVersionUID = 1L;
+    private final NumberGuessGame game;
 
-    private static final int DEFAULT_MIN = 1;
-    private static final int DEFAULT_MAX = 100;
-
-    private final Random random;
-    private int minimum = DEFAULT_MIN;
-    private int maximum = DEFAULT_MAX;
-    private int secret;
-    private int tries;
-
-    public NumberGuessGameImpl() {
-        this(new Random());
+    public NumberGuessGameServiceImpl(NumberGuessGame game) {
+        this.game = game;
     }
 
-    public NumberGuessGameImpl(Random random) {
-        this.random = random;
-        newGame();
-    }
-
-    public int getMinimum() {
-        return minimum;
+    public Future<Integer> getMinimum() {
+        return null;
     }
 
     public void setMinimum(int minimum) {
-        this.minimum = minimum;
-        newGame();
     }
 
-    public int getMaximum() {
-        return maximum;
+    public Future<Integer> getMaximum() {
+        return null;
     }
 
     public void setMaximum(int maximum) {
-        this.maximum = maximum;
-        newGame();
     }
 
     public void newGame() {
-        secret = random.nextInt(maximum - minimum + 1) + minimum;
-        tries = 0;
     }
 
-    int secretNumber() {
-        return secret;
+    public Future<GuessResult> guess(int guess) {
+        return null;
     }
 
-    public GuessResult guess(int guess) {
-        tries++;
-        if (guess < secret) {
-            return GuessResult.TOO_LOW;
-        } else if (guess > secret) {
-            return GuessResult.TOO_HIGH;
-        } else {
-            return GuessResult.SUCCESS;
-        }
-    }
-
-    public int tries() {
-        return tries;
+    public Future<Integer> tries() {
+        return null;
     }
 }
