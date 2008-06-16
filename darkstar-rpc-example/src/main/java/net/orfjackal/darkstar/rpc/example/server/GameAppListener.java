@@ -30,6 +30,8 @@ import com.sun.sgs.app.ClientSessionListener;
 
 import java.io.Serializable;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -38,11 +40,13 @@ import java.util.Properties;
 public class GameAppListener implements AppListener, Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(GameAppListener.class.getName());
 
     public void initialize(Properties props) {
     }
 
     public ClientSessionListener loggedIn(ClientSession session) {
-        return null;
+        logger.log(Level.INFO, "User {0} logged in", session.getName());
+        return new GameClientSessionListener(session);
     }
 }

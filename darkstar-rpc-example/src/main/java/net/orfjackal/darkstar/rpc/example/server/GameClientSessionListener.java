@@ -24,53 +24,53 @@
 
 package net.orfjackal.darkstar.rpc.example.server;
 
-import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
-import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
+import com.sun.sgs.app.*;
+import net.orfjackal.darkstar.rpc.comm.ChannelAdapter;
+import net.orfjackal.darkstar.rpc.comm.RpcGateway;
+import net.orfjackal.darkstar.rpc.example.game.NumberGuessGameImpl;
 import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
 
 import java.io.Serializable;
-import java.util.concurrent.Future;
+import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, Serializable {
+public class GameClientSessionListener implements ClientSessionListener, ManagedObjectRemoval, ManagedObject, Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(GameClientSessionListener.class.getName());
 
-    private final NumberGuessGame game;
+    private final ManagedReference<ClientSession> session;
+    private final RpcGateway gateway;
 
-    public NumberGuessGameServiceImpl(NumberGuessGame game) {
-        this.game = game;
+    public GameClientSessionListener(ClientSession session) {
+        this.session = AppContext.getDataManager().createReference(session);
+        this.gateway = initGateway(session);
+        gateway.registerService(NumberGuessGameService.class,
+                new NumberGuessGameServiceImpl(new NumberGuessGameImpl()));
     }
 
-    public Future<Integer> getMinimum() {
-        return ServiceHelper.wrap(game.getMinimum());
+    private RpcGateway initGateway(ClientSession session) {
+        ChannelAdapter adapter = new ChannelAdapter();
+        Channel channel = AppContext.getChannelManager()
+                .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
+        adapter.setChannel(channel);
+        return adapter.getGateway();
     }
 
-    public void setMinimum(int minimum) {
-        game.setMinimum(minimum);
+    public void receivedMessage(ByteBuffer message) {
     }
 
-    public Future<Integer> getMaximum() {
-        return ServiceHelper.wrap(game.getMaximum());
+    public void disconnected(boolean graceful) {
+        logger.log(Level.INFO, "User {0} disconnected", session.get().getName());
     }
 
-    public void setMaximum(int maximum) {
-        game.setMaximum(maximum);
-    }
-
-    public void newGame() {
-        game.newGame();
-    }
-
-    public Future<GuessResult> guess(int guess) {
-        return ServiceHelper.wrap(game.guess(guess));
-    }
-
-    public Future<Integer> tries() {
-        return ServiceHelper.wrap(game.tries());
+    public void removingObject() {
+        logger.log(Level.INFO, "Removing " + getClass().getName());
+        AppContext.getDataManager().removeObject(session.get());
     }
 }
