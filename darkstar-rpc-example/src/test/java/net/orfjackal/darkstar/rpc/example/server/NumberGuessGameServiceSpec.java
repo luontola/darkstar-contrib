@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.rpc.example.server;
 import com.sun.sgs.app.ManagedObject;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.rpc.example.GuessResult;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
 import org.jmock.Expectations;
@@ -84,6 +85,25 @@ public class NumberGuessGameServiceSpec extends Specification<Object> {
             service.setMaximum(100);
         }
 
+        public void forwardsNewGame() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).newGame();
+            }});
+            service.newGame();
+        }
 
+        public void forwardsGuess() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).guess(42); will(returnValue(GuessResult.SUCCESS));
+            }});
+            specify(service.guess(42).get(), should.equal(GuessResult.SUCCESS));
+        }
+
+        public void forwardsTries() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).tries(); will(returnValue(5));
+            }});
+            specify(service.tries().get(), should.equal(5));
+        }
     }
 }
