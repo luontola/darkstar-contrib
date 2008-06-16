@@ -25,6 +25,7 @@
 package net.orfjackal.darkstar.rpc.example.server;
 
 import com.sun.sgs.app.ManagedObject;
+import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.example.GuessResult;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
@@ -44,17 +45,19 @@ public class NumberGuessGameServiceImpl implements NumberGuessGameService, Manag
     }
 
     public Future<Integer> getMinimum() {
-        return null;
+        return ServiceHelper.wrap(game.getMinimum());
     }
 
     public void setMinimum(int minimum) {
+        game.setMinimum(minimum);
     }
 
     public Future<Integer> getMaximum() {
-        return null;
+        return ServiceHelper.wrap(game.getMaximum());
     }
 
     public void setMaximum(int maximum) {
+        game.setMaximum(maximum);
     }
 
     public void newGame() {
