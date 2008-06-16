@@ -24,62 +24,10 @@
 
 package net.orfjackal.darkstar.rpc.example;
 
-import java.util.Random;
-
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGame {
-
-    private static final int DEFAULT_MIN = 1;
-    private static final int DEFAULT_MAX = 100;
-
-    private final Random random;
-    private int minimum = DEFAULT_MIN;
-    private int maximum = DEFAULT_MAX;
-    private int secret;
-
-    public NumberGuessGame() {
-        this(new Random());
-    }
-
-    public NumberGuessGame(Random random) {
-        this.random = random;
-        newGame();
-    }
-
-    public int getMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(int minimum) {
-        this.minimum = minimum;
-    }
-
-    public int getMaximum() {
-        return maximum;
-    }
-
-    public void setMaximum(int maximum) {
-        this.maximum = maximum;
-    }
-
-    public void newGame() {
-        secret = random.nextInt(maximum - minimum + 1) + minimum;
-    }
-
-    int secretNumber() {
-        return secret;
-    }
-
-    public GuessResult guess(int guess) {
-        if (guess < secret) {
-            return GuessResult.TOO_LOW;
-        } else if (guess > secret) {
-            return GuessResult.TOO_HIGH;
-        } else {
-            return GuessResult.SUCCESS;
-        }
-    }
+public enum GuessResult {
+    SUCCESS, TOO_LOW, TOO_HIGH
 }
