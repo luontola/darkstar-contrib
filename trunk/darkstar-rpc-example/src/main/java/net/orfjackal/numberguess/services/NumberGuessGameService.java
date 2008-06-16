@@ -22,9 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.services;
+package net.orfjackal.numberguess.services;
 
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
+import net.orfjackal.numberguess.game.GuessResult;
 
 import java.util.concurrent.Future;
 

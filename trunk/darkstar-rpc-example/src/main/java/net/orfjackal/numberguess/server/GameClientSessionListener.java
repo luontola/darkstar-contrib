@@ -22,13 +22,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.server;
+package net.orfjackal.numberguess.server;
 
 import com.sun.sgs.app.*;
 import net.orfjackal.darkstar.rpc.comm.ChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
-import net.orfjackal.darkstar.rpc.example.game.NumberGuessGameImpl;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameImpl;
+import net.orfjackal.numberguess.services.NumberGuessGameService;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;

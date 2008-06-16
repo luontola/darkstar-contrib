@@ -22,56 +22,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.server;
-
-import com.sun.sgs.app.ManagedObject;
-import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
-import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
-
-import java.io.Serializable;
-import java.util.concurrent.Future;
+package net.orfjackal.numberguess.game;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject, Serializable {
+public interface NumberGuessGame {
 
-    private static final long serialVersionUID = 1L;
+    int getMinimum();
 
-    private final NumberGuessGame game;
+    void setMinimum(int minimum);
 
-    public NumberGuessGameServiceImpl(NumberGuessGame game) {
-        this.game = game;
-    }
+    int getMaximum();
 
-    public Future<Integer> getMinimum() {
-        return ServiceHelper.wrap(game.getMinimum());
-    }
+    void setMaximum(int maximum);
 
-    public void setMinimum(int minimum) {
-        game.setMinimum(minimum);
-    }
+    void newGame();
 
-    public Future<Integer> getMaximum() {
-        return ServiceHelper.wrap(game.getMaximum());
-    }
+    GuessResult guess(int guess);
 
-    public void setMaximum(int maximum) {
-        game.setMaximum(maximum);
-    }
-
-    public void newGame() {
-        game.newGame();
-    }
-
-    public Future<GuessResult> guess(int guess) {
-        return ServiceHelper.wrap(game.guess(guess));
-    }
-
-    public Future<Integer> tries() {
-        return ServiceHelper.wrap(game.tries());
-    }
+    int tries();
 }

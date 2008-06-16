@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.game;
+package net.orfjackal.numberguess.game;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;

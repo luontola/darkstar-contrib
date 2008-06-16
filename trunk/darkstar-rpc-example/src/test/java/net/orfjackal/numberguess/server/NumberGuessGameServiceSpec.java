@@ -22,14 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.server;
+package net.orfjackal.numberguess.server;
 
 import com.sun.sgs.app.ManagedObject;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
-import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.GuessResult;
+import net.orfjackal.numberguess.game.NumberGuessGame;
+import net.orfjackal.numberguess.services.NumberGuessGameService;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

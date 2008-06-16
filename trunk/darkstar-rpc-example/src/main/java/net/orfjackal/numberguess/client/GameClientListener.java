@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.client;
+package net.orfjackal.numberguess.client;
 
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
@@ -30,7 +30,7 @@ import com.sun.sgs.client.simple.SimpleClient;
 import com.sun.sgs.client.simple.SimpleClientListener;
 import net.orfjackal.darkstar.rpc.comm.ClientChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
+import net.orfjackal.numberguess.services.NumberGuessGameService;
 
 import java.io.IOException;
 import java.net.PasswordAuthentication;

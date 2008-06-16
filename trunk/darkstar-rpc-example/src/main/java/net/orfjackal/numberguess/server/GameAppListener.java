@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.server;
+package net.orfjackal.numberguess.server;
 
 import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ClientSession;
