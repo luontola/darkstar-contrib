@@ -27,9 +27,9 @@ package net.orfjackal.darkstar.rpc.example.server;
 import com.sun.sgs.app.ManagedObject;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.darkstar.rpc.example.GuessResult;
-import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
-import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
+import net.orfjackal.darkstar.rpc.example.game.GuessResult;
+import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
+import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

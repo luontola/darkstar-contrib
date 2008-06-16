@@ -22,7 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example;
+package net.orfjackal.darkstar.rpc.example.services;
+
+import net.orfjackal.darkstar.rpc.example.game.GuessResult;
 
 import java.util.concurrent.Future;
 
