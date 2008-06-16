@@ -51,7 +51,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private MessageReciever requestReciever;
 
     private final RpcGateway gateway;
-    private Channel channel;
+    private Channel channel; // TODO: will not run without TransparentReferences, because Channels are managed objects
 
     public ChannelAdapter() {
         this(10000);

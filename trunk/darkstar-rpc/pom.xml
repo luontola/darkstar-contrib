@@ -61,6 +61,7 @@
 
     <dependencies>
 
+        <!-- TODO: change to darkstar-exp -->
         <dependency>
             <groupId>com.projectdarkstar</groupId>
             <artifactId>darkstar-server</artifactId>
