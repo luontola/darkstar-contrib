@@ -24,13 +24,18 @@
 
 package net.orfjackal.darkstar.rpc.example;
 
+import com.sun.sgs.app.ManagedObject;
+
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGame {
+public class NumberGuessGame implements ManagedObject, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final int DEFAULT_MIN = 1;
     private static final int DEFAULT_MAX = 100;
