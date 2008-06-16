@@ -45,10 +45,10 @@ public class NumberGuessGameSpec extends Specification<Object> {
         private static final int MIN = 10;
         private static final int MAX = 100;
 
-        private NumberGuessGame game;
+        private NumberGuessGameImpl game;
 
         public Object create() {
-            game = new NumberGuessGame(new Random(2));
+            game = new NumberGuessGameImpl(new Random(2));
             game.setMinimum(MIN);
             game.setMaximum(MAX);
             return null;
@@ -115,14 +115,14 @@ public class NumberGuessGameSpec extends Specification<Object> {
 
     public class WhenThePlayerTriesToGuessTheNumber {
 
-        private NumberGuessGame game;
+        private NumberGuessGameImpl game;
 
         public Object create() {
             final Random random = mock(Random.class);
             checking(new Expectations() {{
                 allowing(random).nextInt(100); will(returnValue(41));
             }});
-            game = new NumberGuessGame(random);
+            game = new NumberGuessGameImpl(random);
             specify(game.secretNumber(), should.equal(42));
             return null;
         }
