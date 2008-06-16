@@ -61,18 +61,17 @@
 
     <dependencies>
 
-        <!-- TODO: change to darkstar-exp -->
         <dependency>
-            <groupId>com.projectdarkstar</groupId>
+            <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-server</artifactId>
-            <version>0.9.6</version>
+            <version>0.9.6_0</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.projectdarkstar</groupId>
+            <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-client</artifactId>
-            <version>0.9.6</version>
+            <version>0.9.6_0</version>
             <scope>provided</scope>
         </dependency>
 
