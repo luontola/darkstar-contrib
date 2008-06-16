@@ -61,6 +61,7 @@
 
     <dependencies>
 
+        <!-- TODO: use darkstar-exp instead -->
         <dependency>
             <groupId>com.projectdarkstar</groupId>
             <artifactId>darkstar-server</artifactId>
@@ -72,7 +73,6 @@
             <groupId>com.projectdarkstar</groupId>
             <artifactId>darkstar-client</artifactId>
             <version>0.9.6</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -139,12 +139,20 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <inherited>false</inherited>
                 <configuration>
                     <attach>false</attach>
+                    <archive>
+                        <manifest>
+                            <mainClass>net.orfjackal.darkstar.rpc.example.client.GameMain</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <descriptors>
+                        <descriptor>src/main/assembly/server.xml</descriptor>
                         <descriptor>src/main/assembly/src.xml</descriptor>
                     </descriptors>
                 </configuration>
