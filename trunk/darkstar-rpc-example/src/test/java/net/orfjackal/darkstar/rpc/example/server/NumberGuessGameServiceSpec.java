@@ -29,7 +29,10 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGame;
 import net.orfjackal.darkstar.rpc.example.NumberGuessGameService;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Esko Luontola
@@ -52,6 +55,35 @@ public class NumberGuessGameServiceSpec extends Specification<Object> {
         public void isAManagedObject() {
             specify(service instanceof ManagedObject);
         }
+
+        public void forwardsGetMinimum() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).getMinimum(); will(returnValue(1));
+            }});
+            specify(service.getMinimum().get(), should.equal(1));
+        }
+
+        public void forwardsSetMinimum() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).setMinimum(1);
+            }});
+            service.setMinimum(1);
+        }
+
+        public void forwardsGetMaximum() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).getMaximum(); will(returnValue(100));
+            }});
+            specify(service.getMaximum().get(), should.equal(100));
+        }
+
+        public void forwardsSetMaximum() throws ExecutionException, InterruptedException {
+            checking(new Expectations(){{
+                one(game).setMaximum(100);
+            }});
+            service.setMaximum(100);
+        }
+
 
     }
 }
