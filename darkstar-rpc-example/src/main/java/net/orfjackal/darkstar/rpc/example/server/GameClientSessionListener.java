@@ -44,11 +44,11 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(GameClientSessionListener.class.getName());
 
-    private final ManagedReference<ClientSession> session;
+    private final ClientSession session;
     private final RpcGateway gateway;
 
     public GameClientSessionListener(ClientSession session) {
-        this.session = AppContext.getDataManager().createReference(session);
+        this.session = session;
         this.gateway = initGateway(session);
         gateway.registerService(NumberGuessGameService.class,
                 new NumberGuessGameServiceImpl(new NumberGuessGameImpl()));
@@ -66,11 +66,11 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
     }
 
     public void disconnected(boolean graceful) {
-        logger.log(Level.INFO, "User {0} disconnected", session.get().getName());
+        logger.log(Level.INFO, "User {0} disconnected", session.getName());
     }
 
     public void removingObject() {
         logger.log(Level.INFO, "Removing " + getClass().getName());
-        AppContext.getDataManager().removeObject(session.get());
+        AppContext.getDataManager().removeObject(session);
     }
 }
