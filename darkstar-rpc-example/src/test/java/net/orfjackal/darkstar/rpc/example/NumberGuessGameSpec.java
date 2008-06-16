@@ -26,6 +26,7 @@ package net.orfjackal.darkstar.rpc.example;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
@@ -53,6 +54,16 @@ public class NumberGuessGameSpec extends Specification<Object> {
             return null;
         }
 
+        public void changesWithEveryGame() {
+            List<Integer> numbers = new ArrayList<Integer>();
+            for (int i = 0; i < 10; i++) {
+                game.start();
+                int n = game.secretNumber();
+                specify(numbers, should.not().contain(n));
+                numbers.add(n);
+            }
+        }
+
         public void isAtLeastTheMinimum() {
             specify(game.getMinimum() == MIN);
             for (int i = 0; i < 100; i++) {
@@ -69,14 +80,38 @@ public class NumberGuessGameSpec extends Specification<Object> {
             }
         }
 
-        public void changesOnEveryGame() {
+        public void maySometimesEqualTheMinimum() {
             List<Integer> numbers = new ArrayList<Integer>();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 100; i++) {
                 game.start();
-                int n = game.secretNumber();
-                specify(numbers, should.not().contain(n));
-                numbers.add(n);
+                numbers.add(game.secretNumber());
             }
+            specify(numbers, should.contain(MIN));
         }
+
+        public void maySometimesEqualTheMaximum() {
+            List<Integer> numbers = new ArrayList<Integer>();
+            for (int i = 0; i < 100; i++) {
+                game.start();
+                numbers.add(game.secretNumber());
+            }
+            specify(numbers, should.contain(MAX));
+        }
+    }
+
+    public class WhenThePlayerTriesToGuessTheNumber {
+
+        private NumberGuessGame game;
+
+        public Object create() {
+            final Random random = mock(Random.class);
+            checking(new Expectations() {{
+                allowing(random).nextInt(100); will(returnValue(41));
+            }});
+
+            game = new NumberGuessGame(random);
+            return null;
+        }
+
     }
 }
