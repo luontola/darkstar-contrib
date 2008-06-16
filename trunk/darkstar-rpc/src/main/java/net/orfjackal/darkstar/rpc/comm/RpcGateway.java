@@ -49,13 +49,13 @@ public class RpcGateway implements RpcServer, Serializable {
     public static final byte REQUEST_TO_SLAVE = 2;
     public static final byte RESPONSE_FROM_SLAVE = 3;
 
-    private final long timeout;
+    private final long timeoutMs;
     private final RpcServer server;
     private final RpcProxyFactory proxyFactory;
     private final ServiceProvider serviceProvider;
 
     public RpcGateway(MessageSender requestSender, MessageSender responseSender, long timeoutMs) {
-        this.timeout = timeoutMs;
+        this.timeoutMs = timeoutMs;
         server = new RpcServerImpl(responseSender);
         RpcClient client = new RpcClientImpl(requestSender);
         proxyFactory = new RpcProxyFactory(client);
@@ -78,7 +78,7 @@ public class RpcGateway implements RpcServer, Serializable {
         Set<ServiceReference<T>> refs;
         Future<Set<ServiceReference<T>>> f = serviceProvider.findByType(serviceInterface);
         try {
-            refs = f.get(timeout, TimeUnit.MILLISECONDS);
+            refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +89,7 @@ public class RpcGateway implements RpcServer, Serializable {
         Set<ServiceReference<?>> refs;
         Future<Set<ServiceReference<?>>> f = serviceProvider.findAll();
         try {
-            refs = f.get(timeout, TimeUnit.MILLISECONDS);
+            refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

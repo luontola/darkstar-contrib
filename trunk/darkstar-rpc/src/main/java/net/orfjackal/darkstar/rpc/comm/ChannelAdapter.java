@@ -54,11 +54,11 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private Channel channel;
 
     public ChannelAdapter() {
-        this(1000);
+        this(10000);
     }
 
-    public ChannelAdapter(long timeout) {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), timeout);
+    public ChannelAdapter(long timeoutMs) {
+        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), timeoutMs);
     }
 
     public void setChannel(Channel channel) {
