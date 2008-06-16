@@ -66,6 +66,14 @@ public class GameClientListener implements SimpleClientListener {
         }
     }
 
+    public boolean isConnected() {
+        return client.isConnected();
+    }
+
+    public void logout() {
+        client.logout(false);
+    }
+
     private void initServices(RpcGateway gateway) {
         Set<NumberGuessGameService> numberGuessGame = gateway.remoteFindByType(NumberGuessGameService.class);
         assert numberGuessGame.size() == 1;
