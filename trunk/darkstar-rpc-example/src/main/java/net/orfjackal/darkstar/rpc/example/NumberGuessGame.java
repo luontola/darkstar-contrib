@@ -32,10 +32,12 @@ import java.util.Random;
  */
 public class NumberGuessGame {
 
-    private final Random random;
-    private int minimum;
-    private int maximum;
+    private static final int DEFAULT_MIN = 1;
+    private static final int DEFAULT_MAX = 100;
 
+    private final Random random;
+    private int minimum = DEFAULT_MIN;
+    private int maximum = DEFAULT_MAX;
     private int secret;
 
     public NumberGuessGame() {
@@ -63,7 +65,7 @@ public class NumberGuessGame {
     }
 
     public void start() {
-        secret = random.nextInt(maximum - minimum) + minimum;
+        secret = random.nextInt(maximum - minimum + 1) + minimum;
     }
 
     int secretNumber() {
