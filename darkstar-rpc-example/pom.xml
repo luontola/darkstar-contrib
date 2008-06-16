@@ -145,7 +145,7 @@
                     <attach>false</attach>
                     <archive>
                         <manifest>
-                            <mainClass>net.orfjackal.darkstar.rpc.example.client.GameMain</mainClass>
+                            <mainClass>net.orfjackal.numberguess.client.GameMain</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -22,10 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example.client;
+package net.orfjackal.numberguess.client;
 
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.GuessResult;
+import net.orfjackal.numberguess.services.NumberGuessGameService;
 
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
