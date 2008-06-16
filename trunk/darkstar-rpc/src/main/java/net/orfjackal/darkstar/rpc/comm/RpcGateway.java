@@ -80,7 +80,7 @@ public class RpcGateway implements RpcServer, Serializable {
         try {
             refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Querying for services failed", e);
         }
         return asProxies(refs);
     }
@@ -91,7 +91,7 @@ public class RpcGateway implements RpcServer, Serializable {
         try {
             refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Querying for services failed", e);
         }
         return asProxies(refs);
     }
