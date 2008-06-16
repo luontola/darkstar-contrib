@@ -24,6 +24,7 @@
 
 package net.orfjackal.darkstar.rpc.example.server;
 
+import com.sun.sgs.app.ManagedObject;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.example.game.GuessResult;
 import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
@@ -36,7 +37,7 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, Serializable {
+public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject, Serializable {
 
     private static final long serialVersionUID = 1L;
 
