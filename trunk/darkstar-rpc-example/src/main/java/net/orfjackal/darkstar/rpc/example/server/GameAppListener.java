@@ -24,51 +24,25 @@
 
 package net.orfjackal.darkstar.rpc.example.server;
 
-import com.sun.sgs.app.ManagedObject;
-import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.darkstar.rpc.example.game.GuessResult;
-import net.orfjackal.darkstar.rpc.example.game.NumberGuessGame;
-import net.orfjackal.darkstar.rpc.example.services.NumberGuessGameService;
+import com.sun.sgs.app.AppListener;
+import com.sun.sgs.app.ClientSession;
+import com.sun.sgs.app.ClientSessionListener;
 
-import java.util.concurrent.Future;
+import java.io.Serializable;
+import java.util.Properties;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject {
+public class GameAppListener implements AppListener, Serializable {
 
-    private final NumberGuessGame game;
+    private static final long serialVersionUID = 1L;
 
-    public NumberGuessGameServiceImpl(NumberGuessGame game) {
-        this.game = game;
+    public void initialize(Properties props) {
     }
 
-    public Future<Integer> getMinimum() {
-        return ServiceHelper.wrap(game.getMinimum());
-    }
-
-    public void setMinimum(int minimum) {
-        game.setMinimum(minimum);
-    }
-
-    public Future<Integer> getMaximum() {
-        return ServiceHelper.wrap(game.getMaximum());
-    }
-
-    public void setMaximum(int maximum) {
-        game.setMaximum(maximum);
-    }
-
-    public void newGame() {
-        game.newGame();
-    }
-
-    public Future<GuessResult> guess(int guess) {
-        return ServiceHelper.wrap(game.guess(guess));
-    }
-
-    public Future<Integer> tries() {
-        return ServiceHelper.wrap(game.tries());
+    public ClientSessionListener loggedIn(ClientSession session) {
+        return null;
     }
 }

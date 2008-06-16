@@ -22,12 +22,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.example;
+package net.orfjackal.darkstar.rpc.example.game;
 
 /**
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public enum GuessResult {
-    SUCCESS, TOO_LOW, TOO_HIGH
+public interface NumberGuessGame {
+
+    int getMinimum();
+
+    void setMinimum(int minimum);
+
+    int getMaximum();
+
+    void setMaximum(int maximum);
+
+    void newGame();
+
+    GuessResult guess(int guess);
+
+    int tries();
 }
