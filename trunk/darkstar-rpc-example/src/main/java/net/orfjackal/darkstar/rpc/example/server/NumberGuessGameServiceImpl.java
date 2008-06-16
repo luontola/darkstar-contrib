@@ -61,13 +61,14 @@ public class NumberGuessGameServiceImpl implements NumberGuessGameService, Manag
     }
 
     public void newGame() {
+        game.newGame();
     }
 
     public Future<GuessResult> guess(int guess) {
-        return null;
+        return ServiceHelper.wrap(game.guess(guess));
     }
 
     public Future<Integer> tries() {
-        return null;
+        return ServiceHelper.wrap(game.tries());
     }
 }
