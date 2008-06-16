@@ -53,11 +53,11 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
     private ClientChannel channel;
 
     public ClientChannelAdapter() {
-        this(1000);
+        this(10000);
     }
 
-    public ClientChannelAdapter(int timeout) {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), timeout);
+    public ClientChannelAdapter(int timeoutMs) {
+        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), timeoutMs);
     }
 
     public RpcGateway getGateway() {
