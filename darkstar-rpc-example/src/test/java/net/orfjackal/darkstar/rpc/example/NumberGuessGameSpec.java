@@ -57,7 +57,7 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void changesWithEveryGame() {
             List<Integer> numbers = new ArrayList<Integer>();
             for (int i = 0; i < 10; i++) {
-                game.start();
+                game.newGame();
                 int n = game.secretNumber();
                 specify(numbers, should.not().contain(n));
                 numbers.add(n);
@@ -67,7 +67,7 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void isAtLeastTheMinimum() {
             specify(game.getMinimum() == MIN);
             for (int i = 0; i < 100; i++) {
-                game.start();
+                game.newGame();
                 specify(game.secretNumber() >= MIN);
             }
         }
@@ -75,7 +75,7 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void isAtMostTheMaximum() {
             specify(game.getMaximum() == MAX);
             for (int i = 0; i < 100; i++) {
-                game.start();
+                game.newGame();
                 specify(game.secretNumber() <= MAX);
             }
         }
@@ -83,7 +83,7 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void maySometimesEqualTheMinimum() {
             List<Integer> numbers = new ArrayList<Integer>();
             for (int i = 0; i < 100; i++) {
-                game.start();
+                game.newGame();
                 numbers.add(game.secretNumber());
             }
             specify(numbers, should.contain(MIN));
@@ -92,7 +92,7 @@ public class NumberGuessGameSpec extends Specification<Object> {
         public void maySometimesEqualTheMaximum() {
             List<Integer> numbers = new ArrayList<Integer>();
             for (int i = 0; i < 100; i++) {
-                game.start();
+                game.newGame();
                 numbers.add(game.secretNumber());
             }
             specify(numbers, should.contain(MAX));
@@ -108,10 +108,24 @@ public class NumberGuessGameSpec extends Specification<Object> {
             checking(new Expectations() {{
                 allowing(random).nextInt(100); will(returnValue(41));
             }});
-
             game = new NumberGuessGame(random);
+            specify(game.secretNumber(), should.equal(42));
             return null;
         }
 
+        public void correctAnswerWillEndTheGame() {
+            GuessResult result = game.guess(42);
+            specify(result, should.equal(GuessResult.SUCCESS));
+        }
+
+        public void guessingTooLowWillTellToGuessHigher() {
+            GuessResult result = game.guess(41);
+            specify(result, should.equal(GuessResult.TOO_LOW));
+        }
+
+        public void guessingTooHighWillTellToGuessLower() {
+            GuessResult result = game.guess(43);
+            specify(result, should.equal(GuessResult.TOO_HIGH));
+        }
     }
 }
