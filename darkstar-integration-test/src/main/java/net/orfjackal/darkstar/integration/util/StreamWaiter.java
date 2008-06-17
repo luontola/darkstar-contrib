@@ -66,6 +66,35 @@ public class StreamWaiter {
         return end - start;
     }
 
+    public long waitForBytes(byte[] needle, int timeout) {
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() < start + timeout
+                && !contains(needle, stream.toByteArray())) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        return end - start;
+    }
+
+    private static boolean contains(byte[] needle, byte[] haystack) {
+        for (int h = 0; h < haystack.length; h++) {
+            int matches = 0;
+            for (int n = 0; n < needle.length && h + n < haystack.length; n++) {
+                if (haystack[h + n] == needle[n]) {
+                    matches++;
+                }
+            }
+            if (matches == needle.length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class WaiterRunnable implements Runnable {
 
         private final int timeout;

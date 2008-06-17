@@ -164,4 +164,54 @@ public class StreamWaiterSpec extends Specification<Object> {
             specify(waitTime, should.equal(150, DELTA));
         }
     }
+
+    public class WhenWaitingForTheOccurrenceOfBytesInTheStream {
+
+        public Object create() {
+            return null;
+        }
+
+        public void nothingIsWrittenToStreamThenWaitingIsTimedOut() {
+            long waitTime = waiter.waitForBytes("hello".getBytes(), 200);
+            specify(waitTime, should.equal(200, DELTA));
+        }
+
+        public void ifOnlyWrongBytesAppearThenTheWaitingIsTimeOut() {
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            Thread.sleep(10);
+                            stream.write("hell".getBytes());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            t.start();
+            long waitTime = waiter.waitForBytes("hello".getBytes(), 200);
+            specify(waitTime, should.equal(200, DELTA));
+        }
+
+        public void ifTheRightBytesAppearThenTheWaitingEndsImmediately() {
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Thread.sleep(100);
+                        stream.write("Hi, hello.".getBytes());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+            long waitTime = waiter.waitForBytes("hello".getBytes(), 200);
+            specify(waitTime, should.equal(100, DELTA));
+        }
+    }
 }
