@@ -39,8 +39,8 @@ import java.io.IOException;
 @RunWith(JDaveRunner.class)
 public class TempDirectorySpec extends Specification<Object> {
 
-    private static final File EXPECTED_DIR_1 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".1");
-    private static final File EXPECTED_DIR_2 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".2");
+    private static final File EXPECTED_DIR_1 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.PREFIX + "1");
+    private static final File EXPECTED_DIR_2 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.PREFIX + "2");
 
     public class WhenATempDirectoryIsCreated {
 
