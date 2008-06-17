@@ -24,6 +24,7 @@
 
 package net.orfjackal.darkstar.integration;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 /**
@@ -64,15 +65,20 @@ public class JavaProcessExecutor {
         this.vmOptions = vmOptions;
     }
 
-    public void exec(Class<?> mainClass, String... args) {
-        executor.exec((
-                java() +
-                        optional(vmOptions) +
-                        optional(java_io_tmpdir()) +
-                        java_library_path() +
-                        classpath() +
-                        " " + mainClass.getName() + " " + quoteAll(args)
-        ).trim());
+    public ProcessResult exec(Class<?> mainClass, String... args) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        executor.exec(commandFor(mainClass, args).trim(), out, err);
+        return new ProcessResult(out.toString(), err.toString());
+    }
+
+    private String commandFor(Class<?> mainClass, String[] args) {
+        return java() +
+                optional(vmOptions) +
+                optional(java_io_tmpdir()) +
+                java_library_path() +
+                classpath() +
+                " " + mainClass.getName() + " " + quoteAll(args);
     }
 
     private String java() {
