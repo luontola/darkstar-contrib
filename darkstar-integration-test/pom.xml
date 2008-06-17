@@ -127,6 +127,7 @@
                     <!--<useSystemClassLoader>false</useSystemClassLoader>-->
                     <systemProperties>
                         <property>
+                            <!-- HACK: the 'libdb_java45' library is assumed to be in this project's base directory -->
                             <name>java.library.path</name>
                             <value>.</value>
                         </property>
