@@ -32,10 +32,12 @@ public class ProcessResult {
 
     private final String systemOut;
     private final String systemErr;
+    private final int exitValue;
 
-    public ProcessResult(String systemOut, String systemErr) {
+    public ProcessResult(String systemOut, String systemErr, int exitValue) {
         this.systemOut = systemOut;
         this.systemErr = systemErr;
+        this.exitValue = exitValue;
     }
 
     public String getSystemOut() {
@@ -44,5 +46,9 @@ public class ProcessResult {
 
     public String getSystemErr() {
         return systemErr;
+    }
+
+    public int getExitValue() {
+        return exitValue;
     }
 }
