@@ -45,6 +45,9 @@ import java.util.Properties;
 @RunWith(JDaveRunner.class)
 public class DarkstarServerSpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 10000;
+    private static final byte[] APPLICATION_READY_MSG = "application is ready".getBytes();
+
     public class WhenTheServerHasNotBeenStarted {
 
         private TempDirectory tempDirectory;
@@ -78,16 +81,19 @@ public class DarkstarServerSpec extends Specification<Object> {
 
         private TempDirectory tempDirectory;
         private DarkstarServer server;
+        private StreamWaiter waiter;
 
-        public Object create() {
+        public Object create() throws InterruptedException {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
             server.start("HelloWorld", HelloWorld.class);
+            waiter = new StreamWaiter(server.getSystemErr());
             return null;
         }
 
         public void destroy() {
+            waiter.dispose();
             server.shutdown();
             tempDirectory.dispose();
         }
@@ -102,7 +108,7 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void itPrintsSomeLogMessages() throws InterruptedException {
-            Thread.sleep(2000);
+            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
 
             String out = server.getSystemOut().toString();
             String err = server.getSystemErr().toString();
@@ -111,9 +117,7 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
-            long waited = new StreamWaiter(server.getSystemErr()).waitForSilenceOf(500);
-            System.out.println("waited = " + waited);
-            System.out.println(server.getSystemErr());
+            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
 
             File dir = tempDirectory.getDirectory();
             File appProps = new File(dir, "HelloWorld.properties");
@@ -138,18 +142,22 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void itCanBeRestarted() throws InterruptedException {
-            // the "application is ready" message comes only on when starting with an empty data store
-            Thread.sleep(1000);
+            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
             server.shutdown();
             specify(!server.isRunning());
-            specify(server.getSystemErr().toString().contains("The Kernel is ready"));
-            specify(server.getSystemErr().toString().contains("HelloWorld: application is ready"));
+            String log1 = server.getSystemErr().toString();
+            specify(log1.contains("The Kernel is ready"));
+            specify(log1.contains("HelloWorld: application is ready"));
+            specify(!log1.contains("recovering for node"));
 
             server.start("HelloWorld", HelloWorld.class);
-            Thread.sleep(1000);
+            waiter.setStream(server.getSystemErr());
+            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
             specify(server.isRunning());
-            specify(server.getSystemErr().toString().contains("The Kernel is ready"));
-            specify(!server.getSystemErr().toString().contains("HelloWorld: application is ready"));
+            String log2 = server.getSystemErr().toString();
+            specify(log2.contains("The Kernel is ready"));
+            specify(log2.contains("HelloWorld: application is ready"));
+            specify(log2.contains("recovering for node"));
         }
     }
 
