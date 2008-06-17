@@ -38,7 +38,7 @@ import java.io.IOException;
 @RunWith(JDaveRunner.class)
 public class StreamWaiterSpec extends Specification<Object> {
 
-    private static final int DELTA = 40;
+    private static final int DELTA = 50;
 
     private ByteArrayOutputStream stream;
     private StreamWaiter waiter;
