@@ -65,16 +65,11 @@ public class JavaProcessExecutor {
         this.tempDirectory = tempDirectory;
     }
 
-    public ProcessResult exec(Class<?> mainClass, String... args) {
+    public ProcessHolder exec(Class<?> mainClass, String... args) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        int exitValue = 0;
-        try {
-            exitValue = executor.exec(commandFor(mainClass, args).trim(), out, err).waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return new ProcessResult(out.toString(), err.toString(), exitValue);
+        Process process = executor.exec(commandFor(mainClass, args).trim(), out, err);
+        return new ProcessHolder(process, out, err);
     }
 
     private String commandFor(Class<?> mainClass, String[] args) {

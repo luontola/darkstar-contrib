@@ -24,31 +24,33 @@
 
 package net.orfjackal.darkstar.integration.util;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * @author Esko Luontola
  * @since 17.6.2008
  */
-public class ProcessResult {
+public class ProcessHolder {
 
-    private final String systemOut;
-    private final String systemErr;
-    private final int exitValue;
+    private final Process process;
+    private final ByteArrayOutputStream systemOut;
+    private final ByteArrayOutputStream systemErr;
 
-    public ProcessResult(String systemOut, String systemErr, int exitValue) {
+    public ProcessHolder(Process process, ByteArrayOutputStream systemOut, ByteArrayOutputStream systemErr) {
+        this.process = process;
         this.systemOut = systemOut;
         this.systemErr = systemErr;
-        this.exitValue = exitValue;
     }
 
-    public String getSystemOut() {
+    public Process getProcess() {
+        return process;
+    }
+
+    public ByteArrayOutputStream getSystemOut() {
         return systemOut;
     }
 
-    public String getSystemErr() {
+    public ByteArrayOutputStream getSystemErr() {
         return systemErr;
-    }
-
-    public int getExitValue() {
-        return exitValue;
     }
 }

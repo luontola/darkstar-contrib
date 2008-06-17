@@ -114,34 +114,38 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             return null;
         }
 
-        public void systemOutCanBeRead() {
-            ProcessResult result = javaExecutor.exec(HelloWorld.class);
-            specify(result.getSystemOut().trim(), should.equal("Hello world!"));
+        public void systemOutCanBeRead() throws InterruptedException {
+            ProcessHolder p = javaExecutor.exec(HelloWorld.class);
+            p.getProcess().waitFor();
+            specify(p.getSystemOut().toString().trim(), should.equal("Hello world!"));
         }
 
-        public void systemErrCanBeRead() {
-            ProcessResult result = javaExecutor.exec(WazzupWorld.class);
-            specify(result.getSystemErr().trim(), should.equal("Wazzup world!"));
+        public void systemErrCanBeRead() throws InterruptedException {
+            ProcessHolder p = javaExecutor.exec(WazzupWorld.class);
+            p.getProcess().waitFor();
+            specify(p.getSystemErr().toString().trim(), should.equal("Wazzup world!"));
         }
 
-        public void exitValueCanBeRead() {
-            ProcessResult ok = javaExecutor.exec(HelloWorld.class);
-            specify(ok.getExitValue(), should.equal(0));
-            ProcessResult fail = javaExecutor.exec(WazzupWorld.class);
-            specify(fail.getExitValue(), should.equal(1));
+        public void exitValueCanBeRead() throws InterruptedException {
+            ProcessHolder ok = javaExecutor.exec(HelloWorld.class);
+            specify(ok.getProcess().waitFor(), should.equal(0));
+            ProcessHolder fail = javaExecutor.exec(WazzupWorld.class);
+            specify(fail.getProcess().waitFor(), should.equal(1));
         }
 
-        public void programArgumentsAreTransmittedCorrectly() {
-            ProcessResult result = javaExecutor.exec(HelloWorld.class, "foobar");
-            specify(result.getSystemOut().contains("foobar"));
+        public void programArgumentsAreTransmittedCorrectly() throws InterruptedException {
+            ProcessHolder p = javaExecutor.exec(HelloWorld.class, "foobar");
+            p.getProcess().waitFor();
+            specify(p.getSystemOut().toString().contains("foobar"));
         }
 
-        public void systemPropertiesAreTransmittedCorrectly() throws IOException {
+        public void systemPropertiesAreTransmittedCorrectly() throws IOException, InterruptedException {
             javaExecutor.setVmOptions("-DtestProperty=foobar");
-            ProcessResult result = javaExecutor.exec(SystemPropertiesPrinter.class);
+            ProcessHolder p = javaExecutor.exec(SystemPropertiesPrinter.class);
+            p.getProcess().waitFor();
 
             Properties child = new Properties();
-            child.load(new ByteArrayInputStream(result.getSystemOut().getBytes()));
+            child.load(new ByteArrayInputStream(p.getSystemOut().toByteArray()));
 
             specify(child.getProperty("testProperty"), should.equal("foobar"));
             specify(child.getProperty("java.home"), should.equal(System.getProperty("java.home")));
