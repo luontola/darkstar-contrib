@@ -37,14 +37,17 @@ import java.io.ByteArrayOutputStream;
 @RunWith(JDaveRunner.class)
 public class StreamWaiterSpec extends Specification<Object> {
 
+    private ByteArrayOutputStream stream;
+    private StreamWaiter waiter;
+
+    public StreamWaiterSpec() {
+        stream = new ByteArrayOutputStream();
+        waiter = new StreamWaiter(stream);
+    }
+
     public class IfThereIsNoActivityInTheStream {
 
-        private ByteArrayOutputStream stream;
-        private StreamWaiter waiter;
-
         public Object create() {
-            stream = new ByteArrayOutputStream();
-            waiter = new StreamWaiter(stream);
             return null;
         }
 
@@ -54,8 +57,32 @@ public class StreamWaiterSpec extends Specification<Object> {
             long end = System.currentTimeMillis();
             specify(end - start, should.equal(100, 10));
         }
+    }
 
-        
+    public class IfThereIsSomeActivityInTheStream {
 
+        public Object create() {
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            Thread.sleep(10);
+                            stream.write(i);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            t.start();
+            return null;
+        }
+
+//        public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
+//            long start = System.currentTimeMillis();
+//            waiter.waitFor(100);
+//            long end = System.currentTimeMillis();
+//            specify(end - start, should.equal(200, 10));
+//        }
     }
 }
