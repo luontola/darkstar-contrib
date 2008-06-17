@@ -29,6 +29,7 @@ import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * @author Esko Luontola
@@ -120,6 +121,61 @@ public class StreamWaiterSpec extends Specification<Object> {
             stream.write(1);
             long waitTime = waiter.waitForSilenceOf(200);
             specify(waitTime, should.equal(50, DELTA));
+        }
+    }
+
+    public class WhenTheStreamBeingMonitoredIsChanged {
+
+        public Object create() {
+            return null;
+        }
+
+        public void theActivityTimerWillBeReset() throws InterruptedException {
+            Thread.sleep(100);
+            long waitTime1 = waiter.waitForSilenceOf(100);
+            specify(waitTime1, should.equal(0, DELTA));
+
+            waiter.setStream(new ByteArrayOutputStream());
+            long waitTime2 = waiter.waitForSilenceOf(100);
+            specify(waitTime2, should.equal(100, DELTA));
+        }
+
+        public void theNewStreamWillBeMonitored() throws IOException, InterruptedException {
+            stream.write(new byte[10]);
+            Thread.sleep(50);
+
+            final ByteArrayOutputStream newStream = new ByteArrayOutputStream();
+            waiter.setStream(newStream);
+
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            Thread.sleep(10);
+                            newStream.write(i);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            t.start();
+            long waitTime = waiter.waitForSilenceOf(50);
+            specify(waitTime, should.equal(150, DELTA));
+        }
+
+        public void activityWillBeNoticedWhenTheNewStreamIsSmaller() throws IOException, InterruptedException {
+            stream.write(new byte[10]);
+            Thread.sleep(100);
+
+            final ByteArrayOutputStream newStream = new ByteArrayOutputStream();
+            waiter.setStream(newStream);
+            Thread.sleep(100);
+
+            newStream.write(1);
+            Thread.sleep(20);
+            long waitTime = waiter.waitForSilenceOf(50);
+            specify(waitTime, should.equal(30, DELTA));
         }
     }
 }
