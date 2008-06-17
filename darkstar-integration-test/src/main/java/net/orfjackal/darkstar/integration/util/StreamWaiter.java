@@ -38,7 +38,8 @@ public class StreamWaiter {
         this.out = out;
     }
 
-    public void waitForSilenceOf(int millis) {
+    public long waitForSilenceOf(int millis) {
+        long start = System.currentTimeMillis();
         Thread t = new Thread(new WaiterRunnable(millis));
         t.start();
         try {
@@ -46,6 +47,8 @@ public class StreamWaiter {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        long end = System.currentTimeMillis();
+        return end - start;
     }
 
     private static void sleep(int millis) {
