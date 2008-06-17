@@ -37,17 +37,45 @@ public class JavaProcessExecutor {
     private static final String LIBRARY_PATH = System.getProperty("java.library.path");
 
     private final ProcessExecutor executor;
+    private String vmOptions;
+    private File tempDirectory;
+
+    public JavaProcessExecutor() {
+        this(new ProcessExecutorImpl());
+    }
 
     public JavaProcessExecutor(ProcessExecutor executor) {
         this.executor = executor;
     }
 
+    public File getTempDirectory() {
+        return tempDirectory;
+    }
+
+    public void setTempDirectory(File tempDirectory) {
+        this.tempDirectory = tempDirectory;
+    }
+
+    public String getVmOptions() {
+        return vmOptions;
+    }
+
+    public void setVmOptions(String vmOptions) {
+        this.vmOptions = vmOptions;
+    }
+
     public void exec(Class<?> mainClass, String... args) {
         String java = quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
         executor.exec((java +
+                optional(vmOptions) +
+                optional(java_io_tmpdir(tempDirectory)) +
                 " -Djava.library.path=" + quote(LIBRARY_PATH) +
                 " -classpath " + quote(CLASSPATH) +
                 " " + mainClass.getName() + " " + quoteAll(args)).trim());
+    }
+
+    private String optional(String s) {
+        return (s != null ? " " + s : "");
     }
 
     private static String quote(String s) {
@@ -60,5 +88,12 @@ public class JavaProcessExecutor {
             sb.append(quote(s)).append(" ");
         }
         return sb.toString();
+    }
+
+    private static String java_io_tmpdir(File tmpdir) {
+        if (tmpdir == null) {
+            return null;
+        }
+        return "-Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
     }
 }
