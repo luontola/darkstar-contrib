@@ -32,16 +32,20 @@ import java.io.ByteArrayOutputStream;
  */
 public class StreamWaiter {
 
-    private final ByteArrayOutputStream stream;
     private final Thread monitor;
+    private volatile ByteArrayOutputStream stream;
     private volatile long lastActivity;
 
     public StreamWaiter(ByteArrayOutputStream stream) {
-        this.stream = stream;
-        lastActivity = System.currentTimeMillis();
+        setStream(stream);
         monitor = new Thread(new MonitorRunnable());
         monitor.setDaemon(true);
         monitor.start();
+    }
+
+    public void setStream(ByteArrayOutputStream stream) {
+        this.stream = stream;
+        lastActivity = System.currentTimeMillis();
     }
 
     public void dispose() {
