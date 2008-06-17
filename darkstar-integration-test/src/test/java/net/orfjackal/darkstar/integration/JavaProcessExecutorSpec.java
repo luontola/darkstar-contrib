@@ -88,6 +88,7 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             javaExecutor.setVmOptions("-ea -server");
             javaExecutor.exec(HelloWorld.class);
             specify(dummyExecutor.lastCommand.contains(" -ea -server "));
+            specify(javaExecutor.getVmOptions(), should.equal("-ea -server"));
         }
 
         public void tempDirectoryMayBeSpecified() {
@@ -100,6 +101,7 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             javaExecutor.setTempDirectory(dir);
             javaExecutor.exec(HelloWorld.class);
             specify(dummyExecutor.lastCommand.contains(" -Djava.io.tmpdir=\"" + dir + "\" "));
+            specify(javaExecutor.getTempDirectory(), should.equal(dir));
         }
     }
 
@@ -122,7 +124,7 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             specify(result.getSystemErr().trim(), should.equal("Wazzup world!"));
         }
 
-        public void programArgumentsCanBeGiven() {
+        public void programArgumentsAreTransmittedCorrectly() {
             ProcessResult result = javaExecutor.exec(HelloWorld.class, "foobar");
             specify(result.getSystemOut().contains("foobar"));
         }
