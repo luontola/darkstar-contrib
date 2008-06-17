@@ -29,4 +29,7 @@ package net.orfjackal.darkstar.integration;
  * @since 17.6.2008
  */
 public class DarkstarServerRunner {
+
+    public static final String MAIN_CLASS = "com.sun.sgs.impl.kernel.Kernel";
+
 }
