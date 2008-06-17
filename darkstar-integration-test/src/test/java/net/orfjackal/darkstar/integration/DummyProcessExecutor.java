@@ -47,16 +47,18 @@ public class DummyProcessExecutor implements ProcessExecutor {
         this.printCommand = printCommand;
     }
 
-    public void exec(String command) {
+    public int exec(String command) {
         lastCommand = command;
         if (printCommand) {
             System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
             System.out.print(lineWrap(command));
         }
+        return 0;
     }
 
-    public void exec(String command, OutputStream stdout, OutputStream stderr) {
+    public int exec(String command, OutputStream stdout, OutputStream stderr) {
         exec(command);
+        return 0;
     }
 
     private static String lineWrap(String text) {

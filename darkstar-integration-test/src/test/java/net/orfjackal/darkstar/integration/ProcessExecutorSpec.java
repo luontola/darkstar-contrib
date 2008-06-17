@@ -72,5 +72,12 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
             specify(stdout.toString(), should.equal(""));
             specify(stderr.toString(), should.equal("bar\r\n"));
         }
+
+        public void shouldReturnTheExitValue() {
+            int ok = executor.exec("cmd /c echo foo", stdout, stderr);
+            int fail = executor.exec("cmd /c dir doesNotExist", stdout, stderr);
+            specify(ok, should.equal(0));
+            specify(fail, should.equal(1));
+        }
     }
 }
