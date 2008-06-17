@@ -39,10 +39,29 @@ public class StreamWaiter {
     }
 
     public void waitFor(int millis) {
+        Thread t = new Thread(new WaiterRunnable(millis));
+        t.start();
         try {
-            Thread.sleep(millis);
+            t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static class WaiterRunnable implements Runnable {
+
+        private final int millis;
+
+        public WaiterRunnable(int millis) {
+            this.millis = millis;
+        }
+
+        public void run() {
+            try {
+                Thread.sleep(millis);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
