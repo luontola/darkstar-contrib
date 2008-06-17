@@ -28,8 +28,10 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * @author Esko Luontola
@@ -119,6 +121,24 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             ProcessResult result = javaExecutor.exec(WazzupWorld.class);
             specify(result.getSystemErr().trim(), should.equal("Wazzup world!"));
         }
+
+        public void programArgumentsCanBeGiven() {
+            ProcessResult result = javaExecutor.exec(HelloWorld.class, "foobar");
+            specify(result.getSystemOut().contains("foobar"));
+        }
+
+        public void systemPropertiesAreTransmittedCorrectly() throws IOException {
+            javaExecutor.setVmOptions("-DtestProperty=foobar");
+            ProcessResult result = javaExecutor.exec(SystemPropertiesPrinter.class);
+
+            Properties child = new Properties();
+            child.load(new ByteArrayInputStream(result.getSystemOut().getBytes()));
+
+            specify(child.getProperty("testProperty"), should.equal("foobar"));
+            specify(child.getProperty("java.home"), should.equal(System.getProperty("java.home")));
+            specify(child.getProperty("java.class.path"), should.equal(System.getProperty("java.class.path")));
+            specify(child.getProperty("java.library.path"), should.equal(System.getProperty("java.library.path")));
+        }
     }
 
     private static class HelloWorld {
@@ -136,15 +156,21 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
         }
     }
 
-    private static void debugSystemProperties() {
-        Properties properties = System.getProperties();
-        List<String> pairs = new ArrayList<String>();
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            pairs.add(entry.getKey() + "\t= " + entry.getValue());
-        }
-        Collections.sort(pairs);
-        for (String pair : pairs) {
-            System.err.println(pair);
+    private static class SystemPropertiesPrinter {
+        public static void main(String[] args) throws IOException {
+            System.getProperties().store(System.out, null);
         }
     }
+
+//    private static void debugSystemProperties() {
+//        Properties properties = System.getProperties();
+//        List<String> pairs = new ArrayList<String>();
+//        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+//            pairs.add(entry.getKey() + "\t= " + entry.getValue());
+//        }
+//        Collections.sort(pairs);
+//        for (String pair : pairs) {
+//            System.err.println(pair);
+//        }
+//    }
 }
