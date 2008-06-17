@@ -82,6 +82,8 @@ public class StreamWaiter {
             for (int n = 0; n < needle.length && h + n < haystack.length; n++) {
                 if (haystack[h + n] == needle[n]) {
                     matches++;
+                } else {
+                    break;
                 }
             }
             if (matches == needle.length) {
