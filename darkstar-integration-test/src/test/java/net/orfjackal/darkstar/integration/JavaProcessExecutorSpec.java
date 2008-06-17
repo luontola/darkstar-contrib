@@ -62,6 +62,12 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             specify(dummyExecutor.lastCommand.contains("-classpath \"" + classpath + "\""));
         }
 
+        public void launchesAJavaProcessWithTheSameLibraryPath() {
+            javaExecutor.exec(HelloWorld.class);
+            String libraryPath = System.getProperty("java.library.path");
+            specify(dummyExecutor.lastCommand.contains("-Djava.library.path=\"" + libraryPath + "\""));
+        }
+
         public void usesTheSpecifiedMainClass() {
             javaExecutor.exec(HelloWorld.class);
             specify(dummyExecutor.lastCommand.contains(HelloWorld.class.getName()));
@@ -73,7 +79,7 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
         }
     }
 
-    public static class HelloWorld {
+    private static class HelloWorld {
         public static void main(String[] args) {
             System.out.println("Hello world!");
             for (String arg : args) {

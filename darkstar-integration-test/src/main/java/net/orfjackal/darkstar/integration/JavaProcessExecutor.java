@@ -34,6 +34,7 @@ public class JavaProcessExecutor {
 
     private static final String JAVA_HOME = System.getProperty("java.home");
     private static final String CLASSPATH = System.getProperty("java.class.path");
+    private static final String LIBRARY_PATH = System.getProperty("java.library.path");
 
     private final ProcessExecutor executor;
 
@@ -43,8 +44,10 @@ public class JavaProcessExecutor {
 
     public void exec(Class<?> mainClass, String... args) {
         String java = quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
-        String classpath = quote(CLASSPATH);
-        executor.exec(java + " -classpath " + classpath + " " + mainClass.getName() + " " + quoteAll(args));
+        executor.exec(java +
+                " -Djava.library.path=" + quote(LIBRARY_PATH) +
+                " -classpath " + quote(CLASSPATH) +
+                " " + mainClass.getName() + " " + quoteAll(args));
     }
 
     private static String quote(String s) {
