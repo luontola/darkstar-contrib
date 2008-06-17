@@ -53,7 +53,7 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public void theWaiterWillStopWaitingAfterTheTimeout() {
             long waitTime = waiter.waitForSilenceOf(100);
-            specify(waitTime, should.equal(100, 20));
+            specify(waitTime, should.equal(100, 50));
         }
     }
 
@@ -78,7 +78,7 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
             long waitTime = waiter.waitForSilenceOf(100);
-            specify(waitTime, should.equal(200, 20));
+            specify(waitTime, should.equal(200, 50));
         }
     }
 }
