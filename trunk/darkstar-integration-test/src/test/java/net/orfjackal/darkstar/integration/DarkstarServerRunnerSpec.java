@@ -34,4 +34,19 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JDaveRunner.class)
 public class DarkstarServerRunnerSpec extends Specification<Object> {
+
+    public class WhenTheServerIsStarted {
+
+        public Object create() {
+            return null;
+        }
+
+        public void itPrintsSomeLogMessages() {
+            // TODO
+        }
+
+        public void itCanBeShutDown() {
+            // TODO
+        }
+    }
 }
