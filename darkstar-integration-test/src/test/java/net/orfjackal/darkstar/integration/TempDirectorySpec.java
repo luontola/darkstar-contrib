@@ -38,42 +38,41 @@ import java.io.File;
 @RunWith(JDaveRunner.class)
 public class TempDirectorySpec extends Specification<Object> {
 
+    private static final File EXPECTED_DIR_1 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".1");
+    private static final File EXPECTED_DIR_2 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".2");
+
     public class WhenATempDirectoryIsCreated {
 
         private TempDirectory tempDirectory;
-        private File expectedDir1;
-        private File expectedDir2;
 
         public Object create() {
             tempDirectory = new TempDirectory();
-            expectedDir1 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".1");
-            expectedDir2 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + ".2");
             return null;
         }
 
         public void destroy() {
-            expectedDir1.delete();
-            expectedDir2.delete();
+            EXPECTED_DIR_1.delete();
+            EXPECTED_DIR_2.delete();
         }
 
         public void atFirstTheDirectoryDoesNotExists() {
-            specify(!expectedDir1.exists());
+            specify(!EXPECTED_DIR_1.exists());
         }
 
         public void afterCreationTheDirectoryExists() {
             tempDirectory.create();
-            specify(expectedDir1.exists());
-            specify(tempDirectory.getDirectory(), should.equal(expectedDir1));
+            specify(EXPECTED_DIR_1.exists());
+            specify(tempDirectory.getDirectory(), should.equal(EXPECTED_DIR_1));
         }
 
         public void ifTheDirectoryAlreadyExistedADifferentNameIsUsed() {
-            expectedDir1.mkdir();
-            specify(expectedDir1.exists());
-            specify(!expectedDir2.exists());
+            EXPECTED_DIR_1.mkdir();
+            specify(EXPECTED_DIR_1.exists());
+            specify(!EXPECTED_DIR_2.exists());
             tempDirectory.create();
-            specify(expectedDir1.exists());
-            specify(expectedDir2.exists());
-            specify(tempDirectory.getDirectory(), should.equal(expectedDir2));
+            specify(EXPECTED_DIR_1.exists());
+            specify(EXPECTED_DIR_2.exists());
+            specify(tempDirectory.getDirectory(), should.equal(EXPECTED_DIR_2));
         }
 
         public void creatingTwiseIsNotAllowed() {
@@ -83,8 +82,18 @@ public class TempDirectorySpec extends Specification<Object> {
                     tempDirectory.create();
                 }
             }, should.raise(IllegalStateException.class));
-            specify(expectedDir1.exists());
-            specify(!expectedDir2.exists());
+            specify(EXPECTED_DIR_1.exists());
+            specify(!EXPECTED_DIR_2.exists());
         }
+    }
+
+    public class WhenATempDirectoryIsDisposed {
+
+        private TempDirectory tempDirectory;
+
+        public Object create() {
+            return null;
+        }
+
     }
 }
