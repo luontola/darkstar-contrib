@@ -24,6 +24,7 @@
 
 package net.orfjackal.darkstar.integration;
 
+import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
@@ -73,6 +74,17 @@ public class TempDirectorySpec extends Specification<Object> {
             specify(expectedDir1.exists());
             specify(expectedDir2.exists());
             specify(tempDirectory.getDirectory(), should.equal(expectedDir2));
+        }
+
+        public void creatingTwiseIsNotAllowed() {
+            tempDirectory.create();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tempDirectory.create();
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(expectedDir1.exists());
+            specify(!expectedDir2.exists());
         }
     }
 }
