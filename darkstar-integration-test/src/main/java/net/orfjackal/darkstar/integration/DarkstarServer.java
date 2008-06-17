@@ -45,11 +45,30 @@ public class DarkstarServer {
 
     private final JavaProcessExecutor executor = new JavaProcessExecutor();
     private final File workingDir;
-    private int port = 1139;
     private ProcessHolder process;
+
+    private String appName;
+    private Class<? extends AppListener> appListener;
+    private int port = 1139;
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public Class<? extends AppListener> getAppListener() {
+        return appListener;
+    }
+
+    public void setAppListener(Class<? extends AppListener> appListener) {
+        this.appListener = appListener;
     }
 
     public int getPort() {
@@ -60,15 +79,21 @@ public class DarkstarServer {
         this.port = port;
     }
 
-    public void start(String appName, Class<? extends AppListener> appListener) {
+    public void start() {
         if (isRunning()) {
             throw new IllegalStateException("Already started");
         }
-        File config = prepareAppConfig(appName, appListener);
-        process = executor.exec(mainClass(), config.getAbsolutePath());
+        File config = prepareAppConfig();
+        process = executor.exec(getMainClass(), config.getAbsolutePath());
     }
 
-    private File prepareAppConfig(String appName, Class<? extends AppListener> appListener) {
+    private File prepareAppConfig() {
+        if (appName == null) {
+            throw new IllegalArgumentException("appName is null");
+        }
+        if (appListener == null) {
+            throw new IllegalArgumentException("appListener is null");
+        }
         File appRoot = prepareAppRoot(appName);
 
         Properties appProps = new Properties();
@@ -78,7 +103,9 @@ public class DarkstarServer {
         appProps.setProperty(StandardProperties.APP_PORT, Integer.toString(port));
         //appProps.setProperty(StandardProperties.MANAGERS, "");
 
-        return writeToFile(appName, appProps);
+        File appConfig = new File(workingDir, appName + ".properties");
+        writeToFile(appConfig, appProps);
+        return appConfig;
     }
 
     private File prepareAppRoot(String appName) {
@@ -91,32 +118,22 @@ public class DarkstarServer {
         return appRoot;
     }
 
-    private File writeToFile(String appName, Properties appProps) {
-        File file = new File(workingDir, appName + ".properties");
+    private static void writeToFile(File file, Properties properties) {
         try {
             FileOutputStream out = new FileOutputStream(file);
-            appProps.store(out, null);
+            properties.store(out, null);
             out.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return file;
     }
 
-    private static Class<?> mainClass() {
+    private static Class<?> getMainClass() {
         try {
             return DarkstarServer.class.getClassLoader().loadClass(MAIN_CLASS);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public ByteArrayOutputStream getSystemOut() {
-        return process.getSystemOut();
-    }
-
-    public ByteArrayOutputStream getSystemErr() {
-        return process.getSystemErr();
     }
 
     public void shutdown() {
@@ -142,5 +159,13 @@ public class DarkstarServer {
             // exitValue throws an exception if the process is running
             return true;
         }
+    }
+
+    public ByteArrayOutputStream getSystemOut() {
+        return process.getSystemOut();
+    }
+
+    public ByteArrayOutputStream getSystemErr() {
+        return process.getSystemErr();
     }
 }
