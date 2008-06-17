@@ -30,6 +30,7 @@ import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Esko Luontola
@@ -90,10 +91,43 @@ public class TempDirectorySpec extends Specification<Object> {
     public class WhenATempDirectoryIsDisposed {
 
         private TempDirectory tempDirectory;
+        private File directory;
 
         public Object create() {
+            tempDirectory = new TempDirectory();
+            tempDirectory.create();
+            directory = tempDirectory.getDirectory();
+            specify(directory.exists());
+            specify(directory.equals(EXPECTED_DIR_1));
             return null;
         }
 
+        public void destroy() {
+            EXPECTED_DIR_1.delete();
+        }
+
+        public void theDirectoryIsDeleted() {
+            tempDirectory.dispose();
+            specify(!directory.exists());
+        }
+
+        public void allFilesInThatDirectoryAreDeleted() throws IOException {
+            File f = new File(directory, "test.txt");
+            f.createNewFile();
+            specify(f.exists());
+            tempDirectory.dispose();
+            specify(!directory.exists());
+        }
+
+        public void allFilesInSubDirectoriesAreDeleted() throws IOException {
+            File subdir = new File(directory, "subdir");
+            subdir.mkdir();
+            specify(subdir.exists());
+            File f = new File(subdir, "test.txt");
+            f.createNewFile();
+            specify(f.exists());
+            tempDirectory.dispose();
+            specify(!directory.exists());
+        }
     }
 }
