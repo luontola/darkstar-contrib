@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.integration;
 import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ClientSession;
 import com.sun.sgs.app.ClientSessionListener;
+import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
@@ -42,6 +43,35 @@ import java.util.Properties;
  */
 @RunWith(JDaveRunner.class)
 public class DarkstarServerRunnerSpec extends Specification<Object> {
+
+    public class WhenTheServerHasNotBeenStarted {
+
+        private TempDirectory tempDirectory;
+        private DarkstarServerRunner server;
+
+        public Object create() {
+            tempDirectory = new TempDirectory();
+            tempDirectory.create();
+            server = new DarkstarServerRunner(tempDirectory.getDirectory());
+            return null;
+        }
+
+        public void destroy() {
+            tempDirectory.dispose();
+        }
+
+        public void itIsNotRunning() {
+            specify(!server.isRunning());
+        }
+
+        public void itCanNotBeShutDown() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    server.shutdown();
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+    }
 
     public class WhenTheServerIsStarted {
 
@@ -94,6 +124,29 @@ public class DarkstarServerRunnerSpec extends Specification<Object> {
                 totalSize += file.length();
             }
             specify(totalSize > 10 * MB);
+        }
+
+        public void itCanNotBeStartedWithoutFirstShuttingItDown() {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    server.start("HelloWorld", HelloWorld.class);
+                }
+            }, should.raise(IllegalStateException.class));
+        }
+
+        public void itCanBeRestarted() throws InterruptedException {
+            // the "application is ready" message comes only on when starting with an empty data store
+            Thread.sleep(1000);
+            server.shutdown();
+            specify(!server.isRunning());
+            specify(server.getSystemErr().toString().contains("The Kernel is ready"));
+            specify(server.getSystemErr().toString().contains("HelloWorld: application is ready"));
+
+            server.start("HelloWorld", HelloWorld.class);
+            Thread.sleep(1000);
+            specify(server.isRunning());
+            specify(server.getSystemErr().toString().contains("The Kernel is ready"));
+            specify(!server.getSystemErr().toString().contains("HelloWorld: application is ready"));
         }
     }
 

@@ -53,6 +53,9 @@ public class DarkstarServerRunner {
     }
 
     public void start(String appName, Class<? extends AppListener> appListener) {
+        if (isRunning()) {
+            throw new IllegalStateException("Already started");
+        }
         File config = prepareAppConfig(appName, appListener);
         process = executor.exec(mainClass(), config.getAbsolutePath());
     }
@@ -73,7 +76,6 @@ public class DarkstarServerRunner {
     private File prepareAppRoot(String appName) {
         File appRoot = new File(workingDir, "data" + File.separator + appName);
         File dataDir = new File(appRoot, "dsdb");
-        assert !dataDir.exists();
         dataDir.mkdirs();
         if (!dataDir.isDirectory()) {
             throw new RuntimeException("Unable to create data directory: " + dataDir);
@@ -110,6 +112,9 @@ public class DarkstarServerRunner {
     }
 
     public void shutdown() {
+        if (process == null) {
+            throw new IllegalStateException("Not started");
+        }
         Process p = process.getProcess();
         p.destroy();
         try {
@@ -120,9 +125,10 @@ public class DarkstarServerRunner {
     }
 
     public boolean isRunning() {
-        Process p = process.getProcess();
         try {
-            p.exitValue();
+            if (process != null) {
+                process.getProcess().exitValue();
+            }
             return false;
         } catch (IllegalThreadStateException e) {
             // exitValue throws an exception if the process is running
