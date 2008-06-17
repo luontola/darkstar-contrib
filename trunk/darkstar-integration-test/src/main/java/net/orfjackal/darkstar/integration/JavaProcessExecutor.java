@@ -49,20 +49,20 @@ public class JavaProcessExecutor {
         this.executor = executor;
     }
 
-    public File getTempDirectory() {
-        return tempDirectory;
-    }
-
-    public void setTempDirectory(File tempDirectory) {
-        this.tempDirectory = tempDirectory;
-    }
-
     public String getVmOptions() {
         return vmOptions;
     }
 
     public void setVmOptions(String vmOptions) {
         this.vmOptions = vmOptions;
+    }
+
+    public File getTempDirectory() {
+        return tempDirectory;
+    }
+
+    public void setTempDirectory(File tempDirectory) {
+        this.tempDirectory = tempDirectory;
     }
 
     public ProcessResult exec(Class<?> mainClass, String... args) {
@@ -73,12 +73,12 @@ public class JavaProcessExecutor {
     }
 
     private String commandFor(Class<?> mainClass, String[] args) {
-        return java() +
-                optional(vmOptions) +
-                optional(java_io_tmpdir()) +
-                java_library_path() +
-                classpath() +
-                " " + mainClass.getName() + " " + quoteAll(args);
+        return java()
+                + optional(vmOptions)
+                + optional(java_io_tmpdir())
+                + java_library_path()
+                + classpath()
+                + " " + mainClass.getName() + " " + quoteAll(args);
     }
 
     private String java() {
