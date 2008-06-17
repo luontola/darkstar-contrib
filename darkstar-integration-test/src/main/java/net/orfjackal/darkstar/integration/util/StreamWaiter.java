@@ -38,7 +38,7 @@ public class StreamWaiter {
         this.out = out;
     }
 
-    public void waitFor(int millis) {
+    public void waitForSilenceOf(int millis) {
         Thread t = new Thread(new WaiterRunnable(millis));
         t.start();
         try {
@@ -48,20 +48,33 @@ public class StreamWaiter {
         }
     }
 
-    private static class WaiterRunnable implements Runnable {
+    private static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-        private final int millis;
+    private class WaiterRunnable implements Runnable {
 
-        public WaiterRunnable(int millis) {
-            this.millis = millis;
+        private final int timeout;
+
+        public WaiterRunnable(int timeout) {
+            this.timeout = timeout;
         }
 
         public void run() {
-            try {
-                Thread.sleep(millis);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            int lastSize;
+            long lastActivity = System.currentTimeMillis();
+            do {
+                lastSize = out.size();
+                sleep(5);
+                if (out.size() > lastSize) {
+                    // has grown during the last sleep, reset timeout
+                    lastActivity = System.currentTimeMillis();
+                }
+            } while (System.currentTimeMillis() < lastActivity + timeout);
         }
     }
 }

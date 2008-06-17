@@ -53,9 +53,9 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public void theWaiterWillStopWaitingAfterTheTimeout() {
             long start = System.currentTimeMillis();
-            waiter.waitFor(100);
+            waiter.waitForSilenceOf(100);
             long end = System.currentTimeMillis();
-            specify(end - start, should.equal(100, 10));
+            specify(end - start, should.equal(100, 20));
         }
     }
 
@@ -78,11 +78,11 @@ public class StreamWaiterSpec extends Specification<Object> {
             return null;
         }
 
-//        public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
-//            long start = System.currentTimeMillis();
-//            waiter.waitFor(100);
-//            long end = System.currentTimeMillis();
-//            specify(end - start, should.equal(200, 10));
-//        }
+        public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
+            long start = System.currentTimeMillis();
+            waiter.waitForSilenceOf(100);
+            long end = System.currentTimeMillis();
+            specify(end - start, should.equal(200, 20));
+        }
     }
 }
