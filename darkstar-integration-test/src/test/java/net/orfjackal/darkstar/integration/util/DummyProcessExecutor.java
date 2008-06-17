@@ -22,55 +22,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.integration;
+package net.orfjackal.darkstar.integration.util;
 
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Executes a shell command. Prints the output of the command.
+ * For debugging purposes, does not execute anything - only prints the command.
  *
  * @author Esko Luontola
  * @since 1.12.2007
  */
-public class ProcessExecutorImpl implements ProcessExecutor {
+public class DummyProcessExecutor implements ProcessExecutor {
+
+    private static final int LINE_LENGTH = 120;
+
+    private final boolean printCommand;
+    public String lastCommand;
+
+    public DummyProcessExecutor() {
+        this(false);
+    }
+
+    public DummyProcessExecutor(boolean printCommand) {
+        this.printCommand = printCommand;
+    }
 
     public int exec(String command) {
-        return exec(command, System.out, System.err);
+        lastCommand = command;
+        if (printCommand) {
+            System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
+            System.out.print(lineWrap(command));
+        }
+        return 0;
     }
 
     public int exec(String command, OutputStream stdout, OutputStream stderr) {
-        try {
-            Process process = Runtime.getRuntime().exec(command);
-            redirect(process.getInputStream(), stdout);
-            redirect(process.getErrorStream(), stderr);
-            process.waitFor();
-            return process.exitValue();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        exec(command);
+        return 0;
     }
 
-    private static void redirect(final InputStream from, final OutputStream to) {
-        Thread t = new Thread() {
-            public void run() {
-                byte[] buf = new byte[1024];
-                int len;
-                try {
-                    while ((len = from.read(buf)) > 0) {
-                        to.write(buf, 0, len);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.setDaemon(true);
-        t.start();
+    private static String lineWrap(String text) {
+        StringBuilder wrapped = new StringBuilder();
+        for (int begin = 0; begin < text.length(); begin += LINE_LENGTH) {
+            int end = Math.min(begin + LINE_LENGTH, text.length());
+            wrapped.append(text.substring(begin, end));
+            wrapped.append("\n");
+        }
+        return wrapped.toString();
     }
 }

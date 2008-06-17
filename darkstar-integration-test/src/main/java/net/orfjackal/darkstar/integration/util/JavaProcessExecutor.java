@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.integration;
+package net.orfjackal.darkstar.integration.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

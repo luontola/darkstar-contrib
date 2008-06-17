@@ -22,54 +22,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.integration;
-
-import java.io.File;
+package net.orfjackal.darkstar.integration.util;
 
 /**
  * @author Esko Luontola
  * @since 17.6.2008
  */
-public class TempDirectory {
+public class ProcessResult {
 
-    public static final String PREFIX = TempDirectory.class.getName() + ".";
+    private final String systemOut;
+    private final String systemErr;
+    private final int exitValue;
 
-    private File directory;
-
-    public File getDirectory() {
-        return directory;
+    public ProcessResult(String systemOut, String systemErr, int exitValue) {
+        this.systemOut = systemOut;
+        this.systemErr = systemErr;
+        this.exitValue = exitValue;
     }
 
-    public void create() {
-        if (directory != null) {
-            throw new IllegalStateException("Directory already created: " + directory);
-        }
-        directory = nonExistingTempDir();
-        if (!directory.mkdir()) {
-            throw new IllegalStateException("Unable to create directory: " + directory);
-        }
+    public String getSystemOut() {
+        return systemOut;
     }
 
-    private static File nonExistingTempDir() {
-        int i = 0;
-        File dir;
-        do {
-            i++;
-            dir = new File(System.getProperty("java.io.tmpdir"), PREFIX + i);
-        } while (dir.exists());
-        return dir;
+    public String getSystemErr() {
+        return systemErr;
     }
 
-    public void dispose() {
-        deleteRecursively(directory);
-    }
-
-    private static void deleteRecursively(File file) {
-        if (file.isDirectory()) {
-            for (File contained : file.listFiles()) {
-                deleteRecursively(contained);
-            }
-        }
-        file.delete();
+    public int getExitValue() {
+        return exitValue;
     }
 }

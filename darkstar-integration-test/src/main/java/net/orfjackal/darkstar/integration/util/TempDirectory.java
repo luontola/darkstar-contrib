@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Esko Luontola. All Rights Reserved.
+ * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -22,52 +22,54 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.integration;
+package net.orfjackal.darkstar.integration.util;
 
-import java.io.OutputStream;
+import java.io.File;
 
 /**
- * For debugging purposes, does not execute anything - only prints the command.
- *
  * @author Esko Luontola
- * @since 1.12.2007
+ * @since 17.6.2008
  */
-public class DummyProcessExecutor implements ProcessExecutor {
+public class TempDirectory {
 
-    private static final int LINE_LENGTH = 120;
+    public static final String PREFIX = TempDirectory.class.getName() + ".";
 
-    private final boolean printCommand;
-    public String lastCommand;
+    private File directory;
 
-    public DummyProcessExecutor() {
-        this(false);
+    public File getDirectory() {
+        return directory;
     }
 
-    public DummyProcessExecutor(boolean printCommand) {
-        this.printCommand = printCommand;
-    }
-
-    public int exec(String command) {
-        lastCommand = command;
-        if (printCommand) {
-            System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
-            System.out.print(lineWrap(command));
+    public void create() {
+        if (directory != null) {
+            throw new IllegalStateException("Directory already created: " + directory);
         }
-        return 0;
-    }
-
-    public int exec(String command, OutputStream stdout, OutputStream stderr) {
-        exec(command);
-        return 0;
-    }
-
-    private static String lineWrap(String text) {
-        StringBuilder wrapped = new StringBuilder();
-        for (int begin = 0; begin < text.length(); begin += LINE_LENGTH) {
-            int end = Math.min(begin + LINE_LENGTH, text.length());
-            wrapped.append(text.substring(begin, end));
-            wrapped.append("\n");
+        directory = nonExistingTempDir();
+        if (!directory.mkdir()) {
+            throw new IllegalStateException("Unable to create directory: " + directory);
         }
-        return wrapped.toString();
+    }
+
+    private static File nonExistingTempDir() {
+        int i = 0;
+        File dir;
+        do {
+            i++;
+            dir = new File(System.getProperty("java.io.tmpdir"), PREFIX + i);
+        } while (dir.exists());
+        return dir;
+    }
+
+    public void dispose() {
+        deleteRecursively(directory);
+    }
+
+    private static void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            for (File contained : file.listFiles()) {
+                deleteRecursively(contained);
+            }
+        }
+        file.delete();
     }
 }

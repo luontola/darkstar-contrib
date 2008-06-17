@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
+ * Copyright (c) 2007, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -22,33 +22,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.integration;
+package net.orfjackal.darkstar.integration.util;
+
+import java.io.OutputStream;
 
 /**
+ * Executes a shell command.
+ *
  * @author Esko Luontola
- * @since 17.6.2008
+ * @since 30.11.2007
  */
-public class ProcessResult {
+public interface ProcessExecutor {
 
-    private final String systemOut;
-    private final String systemErr;
-    private final int exitValue;
+    /**
+     * Executes the command and redirects stdout and stderr to System.out and System.err.
+     */
+    int exec(String command);
 
-    public ProcessResult(String systemOut, String systemErr, int exitValue) {
-        this.systemOut = systemOut;
-        this.systemErr = systemErr;
-        this.exitValue = exitValue;
-    }
-
-    public String getSystemOut() {
-        return systemOut;
-    }
-
-    public String getSystemErr() {
-        return systemErr;
-    }
-
-    public int getExitValue() {
-        return exitValue;
-    }
+    /**
+     * Executes the command and redirects stdout and stderr to the specified streams.
+     */
+    int exec(String command, OutputStream stdout, OutputStream stderr);
 }
