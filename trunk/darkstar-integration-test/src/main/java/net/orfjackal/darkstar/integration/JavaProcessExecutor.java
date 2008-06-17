@@ -24,15 +24,41 @@
 
 package net.orfjackal.darkstar.integration;
 
+import java.io.File;
+
 /**
  * @author Esko Luontola
  * @since 17.6.2008
  */
 public class JavaProcessExecutor {
 
+    private static final String JAVA_HOME = System.getProperty("java.home");
+    private static final String CLASSPATH = System.getProperty("java.class.path");
+
     private final ProcessExecutor executor;
 
     public JavaProcessExecutor(ProcessExecutor executor) {
         this.executor = executor;
+    }
+
+    public void exec(Class<?> mainClass, String... args) {
+        String java = quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
+        String classpath = quote(CLASSPATH);
+        executor.exec(java + " -classpath " + classpath + " " + mainClass.getName() + " " + quoteAll(args));
+    }
+
+    private static String quote(String s) {
+        return '"' + s + '"';
+    }
+
+    private String quoteAll(String[] strings) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : strings) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(quote(s));
+        }
+        return sb.toString();
     }
 }

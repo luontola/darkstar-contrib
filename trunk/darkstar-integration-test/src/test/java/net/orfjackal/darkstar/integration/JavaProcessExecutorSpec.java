@@ -28,6 +28,8 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
+import java.util.*;
+
 /**
  * @author Esko Luontola
  * @since 17.6.2008
@@ -43,9 +45,52 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
         public Object create() {
             dummyExecutor = new DummyProcessExecutor();
             javaExecutor = new JavaProcessExecutor(dummyExecutor);
+            debugSystemProperties();
             return null;
         }
 
+        public void launchesAJavaProcessWithTheSameJre() {
+            javaExecutor.exec(HelloWorld.class);
+            String javaHome = System.getProperty("java.home");
+            String sep = System.getProperty("file.separator");
+            specify(dummyExecutor.lastCommand.contains("\"" + javaHome + sep + "bin" + sep + "java\""));
+        }
 
+        public void launchesAJavaProcessWithTheSameClasspath() {
+            javaExecutor.exec(HelloWorld.class);
+            String classpath = System.getProperty("java.class.path");
+            specify(dummyExecutor.lastCommand.contains("-classpath \"" + classpath + "\""));
+        }
+
+        public void usesTheSpecifiedMainClass() {
+            javaExecutor.exec(HelloWorld.class);
+            specify(dummyExecutor.lastCommand.contains(HelloWorld.class.getName()));
+        }
+
+        public void usesTheSpecifiedProgramArguments() {
+            javaExecutor.exec(HelloWorld.class, "foo", "bar");
+            specify(dummyExecutor.lastCommand.contains("\"foo\" \"bar\""));
+        }
+    }
+
+    public static class HelloWorld {
+        public static void main(String[] args) {
+            System.out.println("Hello world!");
+            for (String arg : args) {
+                System.out.println(arg);
+            }
+        }
+    }
+
+    private static void debugSystemProperties() {
+        Properties properties = System.getProperties();
+        List<String> pairs = new ArrayList<String>();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            pairs.add(entry.getKey() + "\t= " + entry.getValue());
+        }
+        Collections.sort(pairs);
+        for (String pair : pairs) {
+            System.err.println(pair);
+        }
     }
 }
