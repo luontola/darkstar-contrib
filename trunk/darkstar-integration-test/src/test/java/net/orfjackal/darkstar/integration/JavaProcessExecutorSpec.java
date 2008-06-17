@@ -37,7 +37,7 @@ import java.util.*;
 @RunWith(JDaveRunner.class)
 public class JavaProcessExecutorSpec extends Specification<Object> {
 
-    public class WhenAChildJavaProcessIsLaunched {
+    public class InTheCommandForLaunchingTheChildJavaProcess {
 
         private DummyProcessExecutor dummyExecutor;
         private JavaProcessExecutor javaExecutor;
@@ -51,12 +51,12 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
 
         public void theSpecifiedMainClassIsUsed() {
             javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.contains(HelloWorld.class.getName()));
+            specify(dummyExecutor.lastCommand.endsWith(HelloWorld.class.getName()));
         }
 
         public void theSpecifiedProgramArgumentsAreUsed() {
             javaExecutor.exec(HelloWorld.class, "foo", "bar");
-            specify(dummyExecutor.lastCommand.contains("\"foo\" \"bar\""));
+            specify(dummyExecutor.lastCommand.endsWith("\"foo\" \"bar\""));
         }
 
         public void jreIsTheSameAsInTheParent() {
