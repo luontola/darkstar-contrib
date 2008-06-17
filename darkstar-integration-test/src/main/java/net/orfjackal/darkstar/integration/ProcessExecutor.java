@@ -24,6 +24,8 @@
 
 package net.orfjackal.darkstar.integration;
 
+import java.io.OutputStream;
+
 /**
  * Executes a shell command.
  *
@@ -32,5 +34,13 @@ package net.orfjackal.darkstar.integration;
  */
 public interface ProcessExecutor {
 
+    /**
+     * Executes the command and redirects stdout and stderr to System.out and System.err.
+     */
     void exec(String command);
+
+    /**
+     * Executes the command and redirects stdout and stderr to the specified streams.
+     */
+    void exec(String command, OutputStream stdout, OutputStream stderr);
 }
