@@ -46,7 +46,6 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
         public Object create() {
             dummyExecutor = new DummyProcessExecutor();
             javaExecutor = new JavaProcessExecutor(dummyExecutor);
-            debugSystemProperties();
             return null;
         }
 
@@ -102,12 +101,38 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
         }
     }
 
+    public class WhenTheChildJavaProcessIsExecuted {
+
+        private JavaProcessExecutor javaExecutor;
+
+        public Object create() {
+            javaExecutor = new JavaProcessExecutor();
+            return null;
+        }
+
+        public void theSystemOutCanBeRead() {
+            ProcessResult result = javaExecutor.exec(HelloWorld.class);
+            specify(result.getSystemOut().trim(), should.equal("Hello world!"));
+        }
+
+        public void theSystemErrCanBeRead() {
+            ProcessResult result = javaExecutor.exec(WazzupWorld.class);
+            specify(result.getSystemErr().trim(), should.equal("Wazzup world!"));
+        }
+    }
+
     private static class HelloWorld {
         public static void main(String[] args) {
             System.out.println("Hello world!");
             for (String arg : args) {
                 System.out.println(arg);
             }
+        }
+    }
+
+    private static class WazzupWorld {
+        public static void main(String[] args) {
+            System.err.println("Wazzup world!");
         }
     }
 
