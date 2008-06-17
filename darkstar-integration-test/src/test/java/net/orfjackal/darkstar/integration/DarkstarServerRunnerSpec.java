@@ -24,9 +24,17 @@
 
 package net.orfjackal.darkstar.integration;
 
+import com.sun.sgs.app.AppListener;
+import com.sun.sgs.app.ClientSession;
+import com.sun.sgs.app.ClientSessionListener;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.Properties;
 
 /**
  * @author Esko Luontola
@@ -37,16 +45,67 @@ public class DarkstarServerRunnerSpec extends Specification<Object> {
 
     public class WhenTheServerIsStarted {
 
+        private TempDirectory tempDirectory;
+        private DarkstarServerRunner server;
+
         public Object create() {
+            tempDirectory = new TempDirectory();
+            tempDirectory.create();
+            server = new DarkstarServerRunner(tempDirectory.getDirectory());
+            server.start("HelloWorld", HelloWorld.class);
             return null;
         }
 
-        public void itPrintsSomeLogMessages() {
-            // TODO
+        public void destroy() {
+            server.shutdown();
+            tempDirectory.dispose();
+        }
+
+        public void itIsRunning() {
+            specify(server.isRunning());
         }
 
         public void itCanBeShutDown() {
-            // TODO
+            server.shutdown();
+            specify(!server.isRunning());
+        }
+
+        public void itPrintsSomeLogMessages() throws InterruptedException {
+            Thread.sleep(2000);
+            String out = server.getSystemOut().toString();
+            String err = server.getSystemErr().toString();
+            specify(err.contains("HelloWorld: application is ready"));
+            specify(out.contains("Howdy ho!"));
+        }
+
+        public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
+            Thread.sleep(1000);
+            File dir = tempDirectory.getDirectory();
+            File appProps = new File(dir, "HelloWorld.properties");
+            File dataDir = new File(dir, "data" + File.separator + "HelloWorld" + File.separator + "dsdb");
+
+            final long MB = 1024 * 1024;
+            long totalSize = 0;
+            for (File file : dataDir.listFiles()) {
+                totalSize += file.length();
+            }
+
+            specify(appProps.isFile());
+            specify(dataDir.isDirectory());
+            specify(totalSize > 10 * MB);
+        }
+    }
+
+    public static class HelloWorld implements AppListener, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        public void initialize(Properties props) {
+            System.out.println("Howdy ho!");
+        }
+
+        public ClientSessionListener loggedIn(ClientSession session) {
+            return null;
         }
     }
 }
