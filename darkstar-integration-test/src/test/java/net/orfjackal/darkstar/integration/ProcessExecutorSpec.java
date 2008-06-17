@@ -57,6 +57,7 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
             executor.exec("cmd /c mkdir testExecuter.tmp");
             specify(f.exists());
             specify(f.isDirectory());
+            specify(f.delete());
         }
 
         public void shouldRedirectStdout() {
