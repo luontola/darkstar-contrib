@@ -70,11 +70,7 @@ public class StreamWaiter {
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() < start + timeout
                 && !contains(needle, stream.toByteArray())) {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            sleep(5);
         }
         long end = System.currentTimeMillis();
         return end - start;
@@ -95,6 +91,14 @@ public class StreamWaiter {
         return false;
     }
 
+    private static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private class WaiterRunnable implements Runnable {
 
         private final int timeout;
@@ -106,11 +110,7 @@ public class StreamWaiter {
         public void run() {
             assert Thread.currentThread().isDaemon();
             while (System.currentTimeMillis() < lastActivity + timeout) {
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                sleep(5);
             }
         }
     }
