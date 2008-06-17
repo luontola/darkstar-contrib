@@ -28,6 +28,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -51,31 +52,53 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
 
         public void theSpecifiedMainClassIsUsed() {
             javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.endsWith(HelloWorld.class.getName()));
+            specify(dummyExecutor.lastCommand.endsWith(" " + HelloWorld.class.getName()));
         }
 
         public void theSpecifiedProgramArgumentsAreUsed() {
             javaExecutor.exec(HelloWorld.class, "foo", "bar");
-            specify(dummyExecutor.lastCommand.endsWith("\"foo\" \"bar\""));
+            specify(dummyExecutor.lastCommand.endsWith(" \"foo\" \"bar\""));
         }
 
         public void jreIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String javaHome = System.getProperty("java.home");
             String sep = System.getProperty("file.separator");
-            specify(dummyExecutor.lastCommand.contains("\"" + javaHome + sep + "bin" + sep + "java\""));
+            specify(dummyExecutor.lastCommand.startsWith("\"" + javaHome + sep + "bin" + sep + "java\" "));
         }
 
         public void classpathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String classpath = System.getProperty("java.class.path");
-            specify(dummyExecutor.lastCommand.contains("-classpath \"" + classpath + "\""));
+            specify(dummyExecutor.lastCommand.contains(" -classpath \"" + classpath + "\" "));
         }
 
         public void libraryPathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String libraryPath = System.getProperty("java.library.path");
-            specify(dummyExecutor.lastCommand.contains("-Djava.library.path=\"" + libraryPath + "\""));
+            specify(dummyExecutor.lastCommand.contains(" -Djava.library.path=\"" + libraryPath + "\" "));
+        }
+
+        public void vmOptionsMayBeSpecified() {
+            javaExecutor.exec(HelloWorld.class);
+            specify(!dummyExecutor.lastCommand.contains("-ea -server"));
+            specify(!dummyExecutor.lastCommand.contains("null"));
+
+            javaExecutor.setVmOptions("-ea -server");
+            javaExecutor.exec(HelloWorld.class);
+            specify(dummyExecutor.lastCommand.contains(" -ea -server "));
+        }
+
+        public void tempDirectoryMayBeSpecified() {
+            File dir = new File(System.getProperty("java.io.tmpdir"), "CustomTemp.tmp");
+
+            javaExecutor.exec(HelloWorld.class);
+            specify(!dummyExecutor.lastCommand.contains("CustomTemp.tmp"));
+            specify(!dummyExecutor.lastCommand.contains("null"));
+
+            javaExecutor.setTempDirectory(dir);
+            javaExecutor.exec(HelloWorld.class);
+            specify(dummyExecutor.lastCommand.contains(" -Djava.io.tmpdir=\"" + dir + "\" "));
         }
     }
 
