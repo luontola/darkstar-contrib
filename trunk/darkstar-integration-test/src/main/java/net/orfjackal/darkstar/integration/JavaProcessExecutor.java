@@ -65,17 +65,41 @@ public class JavaProcessExecutor {
     }
 
     public void exec(Class<?> mainClass, String... args) {
-        String java = quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
-        executor.exec((java +
-                optional(vmOptions) +
-                optional(java_io_tmpdir(tempDirectory)) +
-                " -Djava.library.path=" + quote(LIBRARY_PATH) +
-                " -classpath " + quote(CLASSPATH) +
-                " " + mainClass.getName() + " " + quoteAll(args)).trim());
+        executor.exec((
+                java(JAVA_HOME) +
+                        optional(vmOptions) +
+                        optional(java_io_tmpdir(tempDirectory)) +
+                        required(java_library_path(LIBRARY_PATH)) +
+                        required(classpath(CLASSPATH)) +
+                        " " + mainClass.getName() + " " + quoteAll(args)
+        ).trim());
+    }
+
+    private static String java(String javaHome) {
+        return quote(new File(new File(javaHome, "bin"), "java").getAbsolutePath());
+    }
+
+    private static String classpath(String classpath) {
+        return "-classpath " + quote(classpath);
+    }
+
+    private static String java_library_path(String libraryPath) {
+        return "-Djava.library.path=" + quote(libraryPath);
+    }
+
+    private static String java_io_tmpdir(File tmpdir) {
+        if (tmpdir == null) {
+            return null;
+        }
+        return "-Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
     }
 
     private String optional(String s) {
-        return (s != null ? " " + s : "");
+        return (s != null ? required(s) : "");
+    }
+
+    private String required(String s) {
+        return " " + s;
     }
 
     private static String quote(String s) {
@@ -88,12 +112,5 @@ public class JavaProcessExecutor {
             sb.append(quote(s)).append(" ");
         }
         return sb.toString();
-    }
-
-    private static String java_io_tmpdir(File tmpdir) {
-        if (tmpdir == null) {
-            return null;
-        }
-        return "-Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
     }
 }
