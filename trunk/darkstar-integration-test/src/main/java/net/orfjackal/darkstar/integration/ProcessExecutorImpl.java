@@ -37,19 +37,11 @@ import java.io.OutputStream;
  */
 public class ProcessExecutorImpl implements ProcessExecutor {
 
-    private final OutputStream stdout;
-    private final OutputStream stderr;
-
-    public ProcessExecutorImpl() {
-        this(System.out, System.err);
-    }
-
-    public ProcessExecutorImpl(OutputStream redirectStdout, OutputStream redirectStderr) {
-        this.stdout = redirectStdout;
-        this.stderr = redirectStderr;
-    }
-
     public void exec(String command) {
+        exec(command, System.out, System.err);
+    }
+
+    public void exec(String command, OutputStream stdout, OutputStream stderr) {
         try {
             Process process = Runtime.getRuntime().exec(command);
             redirect(process.getInputStream(), stdout);

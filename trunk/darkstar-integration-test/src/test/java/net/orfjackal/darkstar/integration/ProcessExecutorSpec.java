@@ -40,14 +40,14 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
 
     public class AProcessExecutor {
 
-        private ProcessExecutor executor;
         private ByteArrayOutputStream stdout;
         private ByteArrayOutputStream stderr;
+        private ProcessExecutor executor;
 
         public ProcessExecutor create() {
             stdout = new ByteArrayOutputStream();
             stderr = new ByteArrayOutputStream();
-            executor = new ProcessExecutorImpl(stdout, stderr);
+            executor = new ProcessExecutorImpl();
             return executor;
         }
 
@@ -62,13 +62,13 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
 
         public void shouldRedirectStdout() {
             // "cmd /c" is required by Windows because "echo" is not a file (unlike in Linux) but a shell command
-            executor.exec("cmd /c echo foo");
+            executor.exec("cmd /c echo foo", stdout, stderr);
             specify(stdout.toString(), should.equal("foo\r\n"));
             specify(stderr.toString(), should.equal(""));
         }
 
         public void shouldRedirectStderr() {
-            executor.exec("cmd /c echo bar>&2");
+            executor.exec("cmd /c echo bar>&2", stdout, stderr);
             specify(stdout.toString(), should.equal(""));
             specify(stderr.toString(), should.equal("bar\r\n"));
         }
