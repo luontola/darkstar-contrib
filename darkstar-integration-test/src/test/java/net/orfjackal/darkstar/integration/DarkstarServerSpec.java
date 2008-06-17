@@ -35,7 +35,9 @@ import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.Properties;
 
 /**
@@ -87,6 +89,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
+            server.setPort(12345);
             server.start("HelloWorld", HelloWorld.class);
             waiter = new StreamWaiter(server.getSystemErr());
             return null;
@@ -114,6 +117,12 @@ public class DarkstarServerSpec extends Specification<Object> {
             String err = server.getSystemErr().toString();
             specify(err.contains("HelloWorld: application is ready"));
             specify(out.contains("Howdy ho!"));
+        }
+
+        public void itListensToTheSpecifiedPort() throws IOException {
+            Socket clientSocket = new Socket("localhost", 12345);
+            specify(clientSocket.isConnected());
+            clientSocket.close();
         }
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
