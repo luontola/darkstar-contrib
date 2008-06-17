@@ -72,6 +72,7 @@ public class DarkstarServerRunnerSpec extends Specification<Object> {
 
         public void itPrintsSomeLogMessages() throws InterruptedException {
             Thread.sleep(2000);
+
             String out = server.getSystemOut().toString();
             String err = server.getSystemErr().toString();
             specify(err.contains("HelloWorld: application is ready"));
@@ -80,18 +81,18 @@ public class DarkstarServerRunnerSpec extends Specification<Object> {
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
             Thread.sleep(1000);
+
             File dir = tempDirectory.getDirectory();
             File appProps = new File(dir, "HelloWorld.properties");
             File dataDir = new File(dir, "data" + File.separator + "HelloWorld" + File.separator + "dsdb");
+            specify(appProps.isFile());
+            specify(dataDir.isDirectory());
 
             final long MB = 1024 * 1024;
             long totalSize = 0;
             for (File file : dataDir.listFiles()) {
                 totalSize += file.length();
             }
-
-            specify(appProps.isFile());
-            specify(dataDir.isDirectory());
             specify(totalSize > 10 * MB);
         }
     }

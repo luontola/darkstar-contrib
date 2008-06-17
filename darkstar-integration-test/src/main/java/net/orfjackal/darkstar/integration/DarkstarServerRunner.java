@@ -53,28 +53,44 @@ public class DarkstarServerRunner {
     }
 
     public void start(String appName, Class<? extends AppListener> appListener) {
+        File config = prepareAppConfig(appName, appListener);
+        process = executor.exec(mainClass(), config.getAbsolutePath());
+    }
+
+    private File prepareAppConfig(String appName, Class<? extends AppListener> appListener) {
+        File appRoot = prepareAppRoot(appName);
+
+        Properties appProps = new Properties();
+        appProps.setProperty(StandardProperties.APP_NAME, appName);
+        appProps.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
+        appProps.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
+        appProps.setProperty(StandardProperties.APP_PORT, "1139");
+        //appProps.setProperty(StandardProperties.MANAGERS, "");
+
+        return writeToFile(appName, appProps);
+    }
+
+    private File prepareAppRoot(String appName) {
         File appRoot = new File(workingDir, "data" + File.separator + appName);
-        File dsdb = new File(appRoot, "dsdb");
-        dsdb.mkdirs();
-        assert dsdb.isDirectory() : "Not a directory: " + dsdb;
+        File dataDir = new File(appRoot, "dsdb");
+        assert !dataDir.exists();
+        dataDir.mkdirs();
+        if (!dataDir.isDirectory()) {
+            throw new RuntimeException("Unable to create data directory: " + dataDir);
+        }
+        return appRoot;
+    }
 
-        Properties prop = new Properties();
-        prop.setProperty(StandardProperties.APP_NAME, appName);
-        prop.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
-        prop.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
-        prop.setProperty(StandardProperties.APP_PORT, "1139");
-        //prop.setProperty(StandardProperties.MANAGERS, "");
-
-        File propertiesFile = new File(workingDir, appName + ".properties");
+    private File writeToFile(String appName, Properties appProps) {
+        File file = new File(workingDir, appName + ".properties");
         try {
-            FileOutputStream out = new FileOutputStream(propertiesFile);
-            prop.store(out, null);
+            FileOutputStream out = new FileOutputStream(file);
+            appProps.store(out, null);
             out.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        process = executor.exec(mainClass(), propertiesFile.getAbsolutePath());
+        return file;
     }
 
     private static Class<?> mainClass() {
@@ -109,6 +125,7 @@ public class DarkstarServerRunner {
             p.exitValue();
             return false;
         } catch (IllegalThreadStateException e) {
+            // exitValue throws an exception if the process is running
             return true;
         }
     }
