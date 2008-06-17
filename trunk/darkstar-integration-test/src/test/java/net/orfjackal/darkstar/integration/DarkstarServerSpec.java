@@ -42,17 +42,17 @@ import java.util.Properties;
  * @since 17.6.2008
  */
 @RunWith(JDaveRunner.class)
-public class DarkstarServerRunnerSpec extends Specification<Object> {
+public class DarkstarServerSpec extends Specification<Object> {
 
     public class WhenTheServerHasNotBeenStarted {
 
         private TempDirectory tempDirectory;
-        private DarkstarServerRunner server;
+        private DarkstarServer server;
 
         public Object create() {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
-            server = new DarkstarServerRunner(tempDirectory.getDirectory());
+            server = new DarkstarServer(tempDirectory.getDirectory());
             return null;
         }
 
@@ -76,12 +76,12 @@ public class DarkstarServerRunnerSpec extends Specification<Object> {
     public class WhenTheServerIsStarted {
 
         private TempDirectory tempDirectory;
-        private DarkstarServerRunner server;
+        private DarkstarServer server;
 
         public Object create() {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
-            server = new DarkstarServerRunner(tempDirectory.getDirectory());
+            server = new DarkstarServer(tempDirectory.getDirectory());
             server.start("HelloWorld", HelloWorld.class);
             return null;
         }

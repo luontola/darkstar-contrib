@@ -39,7 +39,7 @@ import java.util.Properties;
  * @author Esko Luontola
  * @since 17.6.2008
  */
-public class DarkstarServerRunner {
+public class DarkstarServer {
 
     public static final String MAIN_CLASS = "com.sun.sgs.impl.kernel.Kernel";
 
@@ -48,7 +48,7 @@ public class DarkstarServerRunner {
 
     private ProcessHolder process;
 
-    public DarkstarServerRunner(File workingDir) {
+    public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
     }
 
@@ -97,7 +97,7 @@ public class DarkstarServerRunner {
 
     private static Class<?> mainClass() {
         try {
-            return DarkstarServerRunner.class.getClassLoader().loadClass(MAIN_CLASS);
+            return DarkstarServer.class.getClassLoader().loadClass(MAIN_CLASS);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
