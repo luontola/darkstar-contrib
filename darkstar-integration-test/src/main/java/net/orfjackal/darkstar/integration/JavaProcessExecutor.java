@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Esko Luontola. All Rights Reserved.
+ * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -25,30 +25,14 @@
 package net.orfjackal.darkstar.integration;
 
 /**
- * For debugging purposes, does not execute anything - only prints the command.
- *
  * @author Esko Luontola
- * @since 1.12.2007
+ * @since 17.6.2008
  */
-public class DummyProcessExecutor implements ProcessExecutor {
+public class JavaProcessExecutor {
 
-    private static final int LINE_LENGTH = 120;
+    private final ProcessExecutor executor;
 
-    public String lastCommand;
-
-    public void exec(String command) {
-        lastCommand = command;
-        System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
-        System.out.print(lineWrap(command));
-    }
-
-    private static String lineWrap(String text) {
-        StringBuilder wrapped = new StringBuilder();
-        for (int begin = 0; begin < text.length(); begin += LINE_LENGTH) {
-            int end = Math.min(begin + LINE_LENGTH, text.length());
-            wrapped.append(text.substring(begin, end));
-            wrapped.append("\n");
-        }
-        return wrapped.toString();
+    public JavaProcessExecutor(ProcessExecutor executor) {
+        this.executor = executor;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Esko Luontola. All Rights Reserved.
+ * Copyright (c) 2008, Esko Luontola. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -24,31 +24,28 @@
 
 package net.orfjackal.darkstar.integration;
 
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
+
 /**
- * For debugging purposes, does not execute anything - only prints the command.
- *
  * @author Esko Luontola
- * @since 1.12.2007
+ * @since 17.6.2008
  */
-public class DummyProcessExecutor implements ProcessExecutor {
+@RunWith(JDaveRunner.class)
+public class JavaProcessExecutorSpec extends Specification<Object> {
 
-    private static final int LINE_LENGTH = 120;
+    public class AJavaProcessExecutor {
 
-    public String lastCommand;
+        private DummyProcessExecutor dummyExecutor;
+        private JavaProcessExecutor javaExecutor;
 
-    public void exec(String command) {
-        lastCommand = command;
-        System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
-        System.out.print(lineWrap(command));
-    }
-
-    private static String lineWrap(String text) {
-        StringBuilder wrapped = new StringBuilder();
-        for (int begin = 0; begin < text.length(); begin += LINE_LENGTH) {
-            int end = Math.min(begin + LINE_LENGTH, text.length());
-            wrapped.append(text.substring(begin, end));
-            wrapped.append("\n");
+        public Object create() {
+            dummyExecutor = new DummyProcessExecutor();
+            javaExecutor = new JavaProcessExecutor(dummyExecutor);
+            return null;
         }
-        return wrapped.toString();
+
+
     }
 }
