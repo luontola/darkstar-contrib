@@ -66,35 +66,35 @@ public class JavaProcessExecutor {
 
     public void exec(Class<?> mainClass, String... args) {
         executor.exec((
-                java(JAVA_HOME) +
+                java() +
                         optional(vmOptions) +
-                        optional(java_io_tmpdir(tempDirectory)) +
-                        java_library_path(LIBRARY_PATH) +
-                        classpath(CLASSPATH) +
+                        optional(java_io_tmpdir()) +
+                        java_library_path() +
+                        classpath() +
                         " " + mainClass.getName() + " " + quoteAll(args)
         ).trim());
     }
 
-    private static String java(String javaHome) {
-        return quote(new File(new File(javaHome, "bin"), "java").getAbsolutePath());
+    private String java() {
+        return quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
     }
 
-    private static String classpath(String classpath) {
-        return " -classpath " + quote(classpath);
+    private String classpath() {
+        return " -classpath " + quote(CLASSPATH);
     }
 
-    private static String java_library_path(String libraryPath) {
-        return " -Djava.library.path=" + quote(libraryPath);
+    private String java_library_path() {
+        return " -Djava.library.path=" + quote(LIBRARY_PATH);
     }
 
-    private static String java_io_tmpdir(File tmpdir) {
-        if (tmpdir == null) {
+    private String java_io_tmpdir() {
+        if (tempDirectory == null) {
             return null;
         }
-        return " -Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
+        return " -Djava.io.tmpdir=" + quote(tempDirectory.getAbsolutePath());
     }
 
-    private String optional(String s) {
+    private static String optional(String s) {
         return (s != null ? " " + s.trim() : "");
     }
 
