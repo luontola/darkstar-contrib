@@ -44,10 +44,10 @@ public class JavaProcessExecutor {
 
     public void exec(Class<?> mainClass, String... args) {
         String java = quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
-        executor.exec(java +
+        executor.exec((java +
                 " -Djava.library.path=" + quote(LIBRARY_PATH) +
                 " -classpath " + quote(CLASSPATH) +
-                " " + mainClass.getName() + " " + quoteAll(args));
+                " " + mainClass.getName() + " " + quoteAll(args)).trim());
     }
 
     private static String quote(String s) {
@@ -57,10 +57,7 @@ public class JavaProcessExecutor {
     private String quoteAll(String[] strings) {
         StringBuilder sb = new StringBuilder();
         for (String s : strings) {
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append(quote(s));
+            sb.append(quote(s)).append(" ");
         }
         return sb.toString();
     }
