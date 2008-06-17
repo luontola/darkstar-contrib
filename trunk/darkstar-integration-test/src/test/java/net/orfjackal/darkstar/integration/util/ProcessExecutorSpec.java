@@ -51,31 +51,34 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
             return executor;
         }
 
-        public void shouldExecuteTheSystemCommand() {
+        public void shouldExecuteTheSystemCommand() throws InterruptedException {
             File f = new File("testExecuter.tmp");
             specify(!f.exists());
-            executor.exec("cmd /c mkdir testExecuter.tmp");
+            Process p = executor.exec("cmd /c mkdir testExecuter.tmp");
+            p.waitFor();
             specify(f.exists());
             specify(f.isDirectory());
             specify(f.delete());
         }
 
-        public void shouldRedirectStdout() {
+        public void shouldRedirectStdout() throws InterruptedException {
             // "cmd /c" is required by Windows because "echo" is not a file (unlike in Linux) but a shell command
-            executor.exec("cmd /c echo foo", stdout, stderr);
+            Process p = executor.exec("cmd /c echo foo", stdout, stderr);
+            p.waitFor();
             specify(stdout.toString(), should.equal("foo\r\n"));
             specify(stderr.toString(), should.equal(""));
         }
 
-        public void shouldRedirectStderr() {
-            executor.exec("cmd /c echo bar>&2", stdout, stderr);
+        public void shouldRedirectStderr() throws InterruptedException {
+            Process p = executor.exec("cmd /c echo bar>&2", stdout, stderr);
+            p.waitFor();
             specify(stdout.toString(), should.equal(""));
             specify(stderr.toString(), should.equal("bar\r\n"));
         }
 
-        public void shouldReturnTheExitValue() {
-            int ok = executor.exec("cmd /c echo foo", stdout, stderr);
-            int fail = executor.exec("cmd /c dir doesNotExist", stdout, stderr);
+        public void shouldReturnTheExitValue() throws InterruptedException {
+            int ok = executor.exec("cmd /c echo foo", stdout, stderr).waitFor();
+            int fail = executor.exec("cmd /c dir doesNotExist", stdout, stderr).waitFor();
             specify(ok, should.equal(0));
             specify(fail, should.equal(1));
         }

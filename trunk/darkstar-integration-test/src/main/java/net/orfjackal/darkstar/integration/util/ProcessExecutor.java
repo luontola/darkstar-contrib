@@ -37,10 +37,10 @@ public interface ProcessExecutor {
     /**
      * Executes the command and redirects stdout and stderr to System.out and System.err.
      */
-    int exec(String command);
+    Process exec(String command);
 
     /**
      * Executes the command and redirects stdout and stderr to the specified streams.
      */
-    int exec(String command, OutputStream stdout, OutputStream stderr);
+    Process exec(String command, OutputStream stdout, OutputStream stderr);
 }

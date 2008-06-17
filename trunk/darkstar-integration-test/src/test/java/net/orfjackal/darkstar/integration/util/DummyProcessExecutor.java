@@ -24,6 +24,7 @@
 
 package net.orfjackal.darkstar.integration.util;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -47,18 +48,18 @@ public class DummyProcessExecutor implements ProcessExecutor {
         this.printCommand = printCommand;
     }
 
-    public int exec(String command) {
+    public Process exec(String command) {
         lastCommand = command;
         if (printCommand) {
             System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
             System.out.print(lineWrap(command));
         }
-        return 0;
+        return new DummyProcess();
     }
 
-    public int exec(String command, OutputStream stdout, OutputStream stderr) {
+    public Process exec(String command, OutputStream stdout, OutputStream stderr) {
         exec(command);
-        return 0;
+        return new DummyProcess();
     }
 
     private static String lineWrap(String text) {
@@ -69,5 +70,31 @@ public class DummyProcessExecutor implements ProcessExecutor {
             wrapped.append("\n");
         }
         return wrapped.toString();
+    }
+
+    private static class DummyProcess extends Process {
+
+        public OutputStream getOutputStream() {
+            return null;
+        }
+
+        public InputStream getInputStream() {
+            return null;
+        }
+
+        public InputStream getErrorStream() {
+            return null;
+        }
+
+        public int waitFor() throws InterruptedException {
+            return 0;
+        }
+
+        public int exitValue() {
+            return 0;
+        }
+
+        public void destroy() {
+        }
     }
 }
