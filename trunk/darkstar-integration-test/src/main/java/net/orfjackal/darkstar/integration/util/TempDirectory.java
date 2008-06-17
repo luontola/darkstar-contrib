@@ -75,7 +75,20 @@ public class TempDirectory {
         }
         if (!file.delete()) {
             log.warning("Unable to delete file: " + file);
-            file.deleteOnExit();
+            anotherDeleteAttempt(file);
+        }
+    }
+
+    private static void anotherDeleteAttempt(File file) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        file.delete();
+        file.deleteOnExit();
+        if (!file.exists()) {
+            log.info("File was deleted on a second try: " + file);
         }
     }
 }
