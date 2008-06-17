@@ -35,6 +35,9 @@ public class TempDirectory {
     private File directory;
 
     public void create() {
+        if (directory != null) {
+            throw new IllegalStateException("Directory already created: " + directory);
+        }
         directory = nonExistingTempDir();
         if (!directory.mkdir()) {
             throw new IllegalStateException("Unable to create directory: " + directory);
