@@ -37,7 +37,7 @@ import java.util.*;
 @RunWith(JDaveRunner.class)
 public class JavaProcessExecutorSpec extends Specification<Object> {
 
-    public class AJavaProcessExecutor {
+    public class WhenAChildJavaProcessIsLaunched {
 
         private DummyProcessExecutor dummyExecutor;
         private JavaProcessExecutor javaExecutor;
@@ -49,33 +49,33 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             return null;
         }
 
-        public void launchesAJavaProcessWithTheSameJre() {
+        public void theSpecifiedMainClassIsUsed() {
+            javaExecutor.exec(HelloWorld.class);
+            specify(dummyExecutor.lastCommand.contains(HelloWorld.class.getName()));
+        }
+
+        public void theSpecifiedProgramArgumentsAreUsed() {
+            javaExecutor.exec(HelloWorld.class, "foo", "bar");
+            specify(dummyExecutor.lastCommand.contains("\"foo\" \"bar\""));
+        }
+
+        public void jreIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String javaHome = System.getProperty("java.home");
             String sep = System.getProperty("file.separator");
             specify(dummyExecutor.lastCommand.contains("\"" + javaHome + sep + "bin" + sep + "java\""));
         }
 
-        public void launchesAJavaProcessWithTheSameClasspath() {
+        public void classpathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String classpath = System.getProperty("java.class.path");
             specify(dummyExecutor.lastCommand.contains("-classpath \"" + classpath + "\""));
         }
 
-        public void launchesAJavaProcessWithTheSameLibraryPath() {
+        public void libraryPathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String libraryPath = System.getProperty("java.library.path");
             specify(dummyExecutor.lastCommand.contains("-Djava.library.path=\"" + libraryPath + "\""));
-        }
-
-        public void usesTheSpecifiedMainClass() {
-            javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.contains(HelloWorld.class.getName()));
-        }
-
-        public void usesTheSpecifiedProgramArguments() {
-            javaExecutor.exec(HelloWorld.class, "foo", "bar");
-            specify(dummyExecutor.lastCommand.contains("\"foo\" \"bar\""));
         }
     }
 
