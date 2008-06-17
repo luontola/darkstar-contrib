@@ -45,7 +45,7 @@ public class StreamWaiterSpec extends Specification<Object> {
         waiter = new StreamWaiter(stream);
     }
 
-    public class IfThereIsNoActivityInTheStream {
+    public class WhenThereIsNoActivityInTheStream {
 
         public Object create() {
             return null;
@@ -57,7 +57,7 @@ public class StreamWaiterSpec extends Specification<Object> {
         }
     }
 
-    public class IfThereIsSomeActivityInTheStream {
+    public class WhenThereIsSomeActivityWhileWaiting {
 
         public Object create() {
             Thread t = new Thread(new Runnable() {
@@ -80,5 +80,23 @@ public class StreamWaiterSpec extends Specification<Object> {
             long waitTime = waiter.waitForSilenceOf(100);
             specify(waitTime, should.equal(200, 50));
         }
+    }
+
+    public class WhenThereWasSomeActivityBeforeWaitingStarted {
+
+        public Object create() {
+            stream.write(1);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+//        public void theWaiterMeasureTimeoutFromThePastActivity() {
+//            long waitTime = waiter.waitForSilenceOf(200);
+//            specify(waitTime, should.equal(100, 50));
+//        }
     }
 }

@@ -41,6 +41,7 @@ public class StreamWaiter {
     public long waitForSilenceOf(int millis) {
         long start = System.currentTimeMillis();
         Thread t = new Thread(new WaiterRunnable(millis));
+        t.setDaemon(true);
         t.start();
         try {
             t.join();
