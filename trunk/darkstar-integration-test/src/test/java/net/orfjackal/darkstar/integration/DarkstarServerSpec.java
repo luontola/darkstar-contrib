@@ -77,6 +77,24 @@ public class DarkstarServerSpec extends Specification<Object> {
                 }
             }, should.raise(IllegalStateException.class));
         }
+
+        public void appNameMustBeSetBeforeStarting() {
+            server.setAppListener(HelloWorld.class);
+            specify(new Block() {
+                public void run() throws Throwable {
+                    server.start();
+                }
+            }, should.raise(IllegalArgumentException.class, "appName is null"));
+        }
+
+        public void appListenerMustBeSetBeforeStarting() {
+            server.setAppName("HelloWorld");
+            specify(new Block() {
+                public void run() throws Throwable {
+                    server.start();
+                }
+            }, should.raise(IllegalArgumentException.class, "appListener is null"));
+        }
     }
 
     public class WhenTheServerIsStarted {
@@ -89,8 +107,10 @@ public class DarkstarServerSpec extends Specification<Object> {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
+            server.setAppName("HelloWorld");
+            server.setAppListener(HelloWorld.class);
             server.setPort(12345);
-            server.start("HelloWorld", HelloWorld.class);
+            server.start();
             waiter = new StreamWaiter(server.getSystemErr());
             return null;
         }
@@ -145,7 +165,7 @@ public class DarkstarServerSpec extends Specification<Object> {
         public void itCanNotBeStartedWithoutFirstShuttingItDown() {
             specify(new Block() {
                 public void run() throws Throwable {
-                    server.start("HelloWorld", HelloWorld.class);
+                    server.start();
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -159,7 +179,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             specify(log1.contains("HelloWorld: application is ready"));
             specify(!log1.contains("recovering for node"));
 
-            server.start("HelloWorld", HelloWorld.class);
+            server.start();
             waiter.setStream(server.getSystemErr());
             waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
             specify(server.isRunning());
