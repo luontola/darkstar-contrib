@@ -32,10 +32,20 @@ import java.io.ByteArrayOutputStream;
  */
 public class StreamWaiter {
 
-    private final ByteArrayOutputStream out;
+    private final ByteArrayOutputStream stream;
+    private final Thread monitor;
+    private volatile long lastActivity;
 
-    public StreamWaiter(ByteArrayOutputStream out) {
-        this.out = out;
+    public StreamWaiter(ByteArrayOutputStream stream) {
+        this.stream = stream;
+        lastActivity = System.currentTimeMillis();
+        monitor = new Thread(new MonitorRunnable());
+        monitor.setDaemon(true);
+        monitor.start();
+    }
+
+    public void dispose() {
+        monitor.interrupt();
     }
 
     public long waitForSilenceOf(int millis) {
@@ -52,14 +62,6 @@ public class StreamWaiter {
         return end - start;
     }
 
-    private static void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     private class WaiterRunnable implements Runnable {
 
         private final int timeout;
@@ -69,16 +71,39 @@ public class StreamWaiter {
         }
 
         public void run() {
-            int lastSize;
-            long lastActivity = System.currentTimeMillis();
-            do {
-                lastSize = out.size();
-                sleep(5);
-                if (out.size() > lastSize) {
-                    // has grown during the last sleep, reset timeout
-                    lastActivity = System.currentTimeMillis();
+            assert Thread.currentThread().isDaemon();
+            while (System.currentTimeMillis() < lastActivity + timeout) {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } while (System.currentTimeMillis() < lastActivity + timeout);
+            }
+        }
+    }
+
+    private class MonitorRunnable implements Runnable {
+
+        public void run() {
+            assert Thread.currentThread().isDaemon();
+            try {
+                int lastSize = 0;
+                do {
+                    lastSize = checkForActivity(lastSize);
+                    Thread.sleep(5);
+                } while (!Thread.currentThread().isInterrupted());
+
+            } catch (InterruptedException e) {
+                // stop monitoring
+            }
+        }
+
+        private int checkForActivity(int lastSize) {
+            int currentSize = stream.size();
+            if (currentSize > lastSize) {
+                lastActivity = System.currentTimeMillis();
+            }
+            return currentSize;
         }
     }
 }

@@ -37,6 +37,8 @@ import java.io.ByteArrayOutputStream;
 @RunWith(JDaveRunner.class)
 public class StreamWaiterSpec extends Specification<Object> {
 
+    private static final int DELTA = 40;
+
     private ByteArrayOutputStream stream;
     private StreamWaiter waiter;
 
@@ -53,7 +55,7 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public void theWaiterWillStopWaitingAfterTheTimeout() {
             long waitTime = waiter.waitForSilenceOf(100);
-            specify(waitTime, should.equal(100, 50));
+            specify(waitTime, should.equal(100, DELTA));
         }
     }
 
@@ -78,7 +80,7 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
             long waitTime = waiter.waitForSilenceOf(100);
-            specify(waitTime, should.equal(200, 50));
+            specify(waitTime, should.equal(200, DELTA));
         }
     }
 
@@ -94,9 +96,30 @@ public class StreamWaiterSpec extends Specification<Object> {
             return null;
         }
 
-//        public void theWaiterMeasureTimeoutFromThePastActivity() {
-//            long waitTime = waiter.waitForSilenceOf(200);
-//            specify(waitTime, should.equal(100, 50));
-//        }
+        public void theWaiterMeasuresTheTimeoutSinceThePastActivity() {
+            long waitTime = waiter.waitForSilenceOf(200);
+            specify(waitTime, should.equal(100, DELTA));
+        }
+    }
+
+    public class WhenTheMonitorIsDisposed {
+
+        public Object create() {
+            stream.write(1);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public void theStreamWillNotAnymoreBeMonitoredByADaemonThread() throws InterruptedException {
+            waiter.dispose();
+            Thread.sleep(50);
+            stream.write(1);
+            long waitTime = waiter.waitForSilenceOf(200);
+            specify(waitTime, should.equal(50, DELTA));
+        }
     }
 }
