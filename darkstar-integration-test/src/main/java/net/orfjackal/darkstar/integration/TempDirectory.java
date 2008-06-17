@@ -34,6 +34,10 @@ public class TempDirectory {
 
     private File directory;
 
+    public File getDirectory() {
+        return directory;
+    }
+
     public void create() {
         if (directory != null) {
             throw new IllegalStateException("Directory already created: " + directory);
@@ -54,7 +58,16 @@ public class TempDirectory {
         return dir;
     }
 
-    public File getDirectory() {
-        return directory;
+    public void dispose() {
+        deleteRecursively(directory);
+    }
+
+    private static void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            for (File contained : file.listFiles()) {
+                deleteRecursively(contained);
+            }
+        }
+        file.delete();
     }
 }
