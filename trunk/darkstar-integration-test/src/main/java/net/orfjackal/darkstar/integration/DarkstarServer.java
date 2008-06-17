@@ -45,11 +45,19 @@ public class DarkstarServer {
 
     private final JavaProcessExecutor executor = new JavaProcessExecutor();
     private final File workingDir;
-
+    private int port = 1139;
     private ProcessHolder process;
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public void start(String appName, Class<? extends AppListener> appListener) {
@@ -67,7 +75,7 @@ public class DarkstarServer {
         appProps.setProperty(StandardProperties.APP_NAME, appName);
         appProps.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
         appProps.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
-        appProps.setProperty(StandardProperties.APP_PORT, "1139");
+        appProps.setProperty(StandardProperties.APP_PORT, Integer.toString(port));
         //appProps.setProperty(StandardProperties.MANAGERS, "");
 
         return writeToFile(appName, appProps);
