@@ -48,10 +48,18 @@ public class StreamWaiterSpec extends Specification<Object> {
         waiter = new StreamWaiter(stream);
     }
 
+    private void destroyParent() {
+        waiter.dispose();
+    }
+
     public class WhenThereIsNoActivityInTheStream {
 
         public Object create() {
             return null;
+        }
+
+        public void destroy() {
+            destroyParent();
         }
 
         public void theWaiterWillStopWaitingAfterTheTimeout() {
@@ -79,6 +87,10 @@ public class StreamWaiterSpec extends Specification<Object> {
             return null;
         }
 
+        public void destroy() {
+            destroyParent();
+        }
+
         public void theWaiterWillWaitUntilThereHasBeenNoActivityForTheTimeoutsLength() {
             long waitTime = waiter.waitForSilenceOf(100);
             specify(waitTime, should.equal(200, DELTA));
@@ -95,6 +107,10 @@ public class StreamWaiterSpec extends Specification<Object> {
                 e.printStackTrace();
             }
             return null;
+        }
+
+        public void destroy() {
+            destroyParent();
         }
 
         public void theWaiterMeasuresTheTimeoutSinceThePastActivity() {
@@ -115,6 +131,10 @@ public class StreamWaiterSpec extends Specification<Object> {
             return null;
         }
 
+        public void destroy() {
+            destroyParent();
+        }
+
         public void theStreamWillNotAnymoreBeMonitoredByADaemonThread() throws InterruptedException {
             waiter.dispose();
             Thread.sleep(50);
@@ -128,6 +148,10 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public Object create() {
             return null;
+        }
+
+        public void destroy() {
+            destroyParent();
         }
 
         public void theActivityTimerWillBeReset() throws InterruptedException {
@@ -169,6 +193,10 @@ public class StreamWaiterSpec extends Specification<Object> {
 
         public Object create() {
             return null;
+        }
+
+        public void destroy() {
+            destroyParent();
         }
 
         public void nothingIsWrittenToStreamThenWaitingIsTimedOut() {
