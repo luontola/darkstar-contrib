@@ -69,8 +69,8 @@ public class JavaProcessExecutor {
                 java(JAVA_HOME) +
                         optional(vmOptions) +
                         optional(java_io_tmpdir(tempDirectory)) +
-                        required(java_library_path(LIBRARY_PATH)) +
-                        required(classpath(CLASSPATH)) +
+                        java_library_path(LIBRARY_PATH) +
+                        classpath(CLASSPATH) +
                         " " + mainClass.getName() + " " + quoteAll(args)
         ).trim());
     }
@@ -80,26 +80,22 @@ public class JavaProcessExecutor {
     }
 
     private static String classpath(String classpath) {
-        return "-classpath " + quote(classpath);
+        return " -classpath " + quote(classpath);
     }
 
     private static String java_library_path(String libraryPath) {
-        return "-Djava.library.path=" + quote(libraryPath);
+        return " -Djava.library.path=" + quote(libraryPath);
     }
 
     private static String java_io_tmpdir(File tmpdir) {
         if (tmpdir == null) {
             return null;
         }
-        return "-Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
+        return " -Djava.io.tmpdir=" + quote(tmpdir.getAbsolutePath());
     }
 
     private String optional(String s) {
-        return (s != null ? required(s) : "");
-    }
-
-    private String required(String s) {
-        return " " + s;
+        return (s != null ? " " + s.trim() : "");
     }
 
     private static String quote(String s) {
