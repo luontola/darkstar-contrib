@@ -32,6 +32,8 @@ import java.io.File;
  */
 public class TempDirectory {
 
+    public static final String PREFIX = TempDirectory.class.getName() + ".";
+
     private File directory;
 
     public File getDirectory() {
@@ -53,7 +55,7 @@ public class TempDirectory {
         File dir;
         do {
             i++;
-            dir = new File(System.getProperty("java.io.tmpdir"), TempDirectory.class.getName() + "." + i);
+            dir = new File(System.getProperty("java.io.tmpdir"), PREFIX + i);
         } while (dir.exists());
         return dir;
     }
