@@ -163,19 +163,5 @@ public class StreamWaiterSpec extends Specification<Object> {
             long waitTime = waiter.waitForSilenceOf(50);
             specify(waitTime, should.equal(150, DELTA));
         }
-
-        public void activityWillBeNoticedWhenTheNewStreamIsSmaller() throws IOException, InterruptedException {
-            stream.write(new byte[10]);
-            Thread.sleep(100);
-
-            final ByteArrayOutputStream newStream = new ByteArrayOutputStream();
-            waiter.setStream(newStream);
-            Thread.sleep(100);
-
-            newStream.write(1);
-            Thread.sleep(20);
-            long waitTime = waiter.waitForSilenceOf(50);
-            specify(waitTime, should.equal(30, DELTA));
-        }
     }
 }
