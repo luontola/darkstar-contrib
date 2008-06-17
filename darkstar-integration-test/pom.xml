@@ -30,7 +30,8 @@
 
     <scm>
         <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test</connection>
-        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test</developerConnection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test
+        </developerConnection>
         <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test</url>
     </scm>
 
@@ -114,12 +115,21 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4.3</version>
                 <configuration>
                     <includes>
                         <include>**/*Spec.java</include>
                     </includes>
+                    <!-- If there are classpath problems, see http://maven.apache.org/plugins/maven-surefire-plugin/examples/class-loading.html -->
+                    <!--<argLine>-server</argLine>-->
+                    <!--<forkMode>always</forkMode>-->
+                    <!--<useManifestOnlyJar>false</useManifestOnlyJar>-->
+                    <!--<useSystemClassLoader>false</useSystemClassLoader>-->
                     <systemProperties>
+                        <property>
+                            <name>java.library.path</name>
+                            <value>.</value>
+                        </property>
                         <property>
                             <name>jdave.tools.specdox.format</name>
                             <value>txt</value>
