@@ -30,6 +30,7 @@ import com.sun.sgs.app.ClientSessionListener;
 import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
 
@@ -110,7 +111,9 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
-            Thread.sleep(1000);
+            long waited = new StreamWaiter(server.getSystemErr()).waitForSilenceOf(500);
+            System.out.println("waited = " + waited);
+            System.out.println(server.getSystemErr());
 
             File dir = tempDirectory.getDirectory();
             File appProps = new File(dir, "HelloWorld.properties");
