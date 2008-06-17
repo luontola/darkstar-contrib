@@ -25,12 +25,15 @@
 package net.orfjackal.darkstar.integration.util;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
  * @since 17.6.2008
  */
 public class TempDirectory {
+
+    private static final Logger log = Logger.getLogger(TempDirectory.class.getName());
 
     public static final String PREFIX = TempDirectory.class.getName() + ".";
 
@@ -70,6 +73,9 @@ public class TempDirectory {
                 deleteRecursively(contained);
             }
         }
-        file.delete();
+        if (!file.delete()) {
+            log.warning("Unable to delete file: " + file);
+            file.deleteOnExit();
+        }
     }
 }
