@@ -114,14 +114,21 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             return null;
         }
 
-        public void theSystemOutCanBeRead() {
+        public void systemOutCanBeRead() {
             ProcessResult result = javaExecutor.exec(HelloWorld.class);
             specify(result.getSystemOut().trim(), should.equal("Hello world!"));
         }
 
-        public void theSystemErrCanBeRead() {
+        public void systemErrCanBeRead() {
             ProcessResult result = javaExecutor.exec(WazzupWorld.class);
             specify(result.getSystemErr().trim(), should.equal("Wazzup world!"));
+        }
+
+        public void exitValueCanBeRead() {
+            ProcessResult ok = javaExecutor.exec(HelloWorld.class);
+            specify(ok.getExitValue(), should.equal(0));
+            ProcessResult fail = javaExecutor.exec(WazzupWorld.class);
+            specify(fail.getExitValue(), should.equal(1));
         }
 
         public void programArgumentsAreTransmittedCorrectly() {
@@ -149,12 +156,14 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
             for (String arg : args) {
                 System.out.println(arg);
             }
+            System.exit(0);
         }
     }
 
     private static class WazzupWorld {
         public static void main(String[] args) {
             System.err.println("Wazzup world!");
+            System.exit(1);
         }
     }
 

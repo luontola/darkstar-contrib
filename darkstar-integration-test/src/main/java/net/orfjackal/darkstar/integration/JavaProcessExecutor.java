@@ -68,8 +68,8 @@ public class JavaProcessExecutor {
     public ProcessResult exec(Class<?> mainClass, String... args) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        executor.exec(commandFor(mainClass, args).trim(), out, err);
-        return new ProcessResult(out.toString(), err.toString());
+        int exitValue = executor.exec(commandFor(mainClass, args).trim(), out, err);
+        return new ProcessResult(out.toString(), err.toString(), exitValue);
     }
 
     private String commandFor(Class<?> mainClass, String[] args) {
