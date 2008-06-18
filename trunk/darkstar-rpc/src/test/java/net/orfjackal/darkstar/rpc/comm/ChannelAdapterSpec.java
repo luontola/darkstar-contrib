@@ -46,7 +46,7 @@ import java.util.concurrent.TimeoutException;
  * @since 10.6.2008
  */
 @RunWith(JDaveRunner.class)
-public class DarkstarIntegrationSpec extends Specification<Object> {
+public class ChannelAdapterSpec extends Specification<Object> {
 
     public class WhenThereIsAChannelForRpcBetweenOneClient {
 
