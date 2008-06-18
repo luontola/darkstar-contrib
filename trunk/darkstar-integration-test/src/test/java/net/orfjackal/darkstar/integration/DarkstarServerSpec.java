@@ -270,8 +270,6 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            System.out.println(server.getSystemOut());
-            System.err.println(server.getSystemErr());
             waiter.dispose();
             server.shutdown();
         }
