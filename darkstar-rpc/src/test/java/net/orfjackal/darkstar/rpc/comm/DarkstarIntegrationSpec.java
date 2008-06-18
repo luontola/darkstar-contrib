@@ -86,8 +86,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             }
 
             // needed to avoid blocking in client.events.take()
-            testTimeouter = new Thread(new CurrentThreadInterrupter(TIMEOUT));
-            testTimeouter.start();
+            testTimeouter = TimeoutInterrupter.start(Thread.currentThread(), TIMEOUT);
             return null;
         }
 
@@ -230,31 +229,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public Future<String> echo(String s) {
             return ServiceHelper.wrap(s + ", " + s);
-        }
-    }
-
-    // Utilities
-    // TODO: move utilities to a utility project and write tests for them
-
-    private class CurrentThreadInterrupter implements Runnable {
-
-        private final int timeout;
-        private final Thread threadToInterrupt;
-
-        public CurrentThreadInterrupter(int timeout) {
-            this.timeout = timeout;
-            threadToInterrupt = Thread.currentThread();
-        }
-
-        public void run() {
-            try {
-                Thread.sleep(timeout);
-                if (!Thread.currentThread().isInterrupted()) {
-                    threadToInterrupt.interrupt();
-                }
-            } catch (InterruptedException e) {
-                // this interrupter was itself interrupted - do nothing
-            }
         }
     }
 }
