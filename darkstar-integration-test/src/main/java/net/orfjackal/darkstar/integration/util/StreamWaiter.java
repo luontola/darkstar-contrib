@@ -72,6 +72,7 @@ public class StreamWaiter {
                 && !contains(needle, stream.toByteArray())) {
             sleep(5);
         }
+        // TODO: throw a timeout exception if the bytes are not found
         long end = System.currentTimeMillis();
         return end - start;
     }
