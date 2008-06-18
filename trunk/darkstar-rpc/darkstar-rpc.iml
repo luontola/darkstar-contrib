@@ -18,28 +18,28 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="net.orfjackal.darkstar-exp:darkstar-server:0.9.6_0">
+      <library name="com.projectdarkstar:darkstar-server:0.9.6">
         <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_0/darkstar-server-0.9.6_0.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_0/darkstar-server-0.9.6_0-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_0/darkstar-server-0.9.6_0-sources.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="net.orfjackal.darkstar-exp:darkstar-shared:0.9.6_0">
+      <library name="com.projectdarkstar:darkstar-shared:0.9.6">
         <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_0/darkstar-shared-0.9.6_0.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-shared/0.9.6/darkstar-shared-0.9.6.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_0/darkstar-shared-0.9.6_0-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-shared/0.9.6/darkstar-shared-0.9.6-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_0/darkstar-shared-0.9.6_0-sources.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-shared/0.9.6/darkstar-shared-0.9.6-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -122,15 +122,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="net.orfjackal.darkstar-exp:darkstar-client:0.9.6_0">
+      <library name="com.projectdarkstar:darkstar-client:0.9.6">
         <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-client/0.9.6_0/darkstar-client-0.9.6_0.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-client/0.9.6_0/darkstar-client-0.9.6_0-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-client/0.9.6_0/darkstar-client-0.9.6_0-sources.jar!/" />
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
