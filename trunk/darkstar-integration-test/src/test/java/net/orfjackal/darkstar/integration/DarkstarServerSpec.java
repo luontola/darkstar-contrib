@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
@@ -48,8 +49,9 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class DarkstarServerSpec extends Specification<Object> {
 
-    private static final int TIMEOUT = 10000;
+    //private static final byte[] KERNEL_READY_MSG = "Kernel is ready".getBytes();
     private static final byte[] APPLICATION_READY_MSG = "application is ready".getBytes();
+    private static final int TIMEOUT = 10000;
 
     public class WhenTheServerHasNotBeenStarted {
 
@@ -77,6 +79,14 @@ public class DarkstarServerSpec extends Specification<Object> {
                     server.shutdown();
                 }
             }, should.raise(IllegalStateException.class));
+        }
+
+        public void itIsNotListeningToTheSpecifiedPort() throws IOException {
+            specify(new Block() {
+                public void run() throws Throwable {
+                    new Socket("localhost", server.getPort());
+                }
+            }, should.raise(ConnectException.class));
         }
 
         public void appNameMustBeSetBeforeStarting() {
