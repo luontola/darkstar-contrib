@@ -63,14 +63,19 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private DarkstarServer server;
         private StreamWaiter waiter;
         private RpcTestClient client;
+        private Thread testTimeouter;
 
         public Object create() throws TimeoutException {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
+
             server = new DarkstarServer(tempDirectory.getDirectory());
             server.setAppName("RpcTest");
             server.setAppListener(RpcTestAppListener.class);
             server.start();
+            client = new RpcTestClient("localhost", server.getPort());
+
+            // wait for the server to start up before running the tests
             waiter = new StreamWaiter(server.getSystemOut());
             try {
                 waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
@@ -79,7 +84,10 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
                 System.err.println(server.getSystemErr());
                 throw e;
             }
-            client = new RpcTestClient("localhost", server.getPort());
+
+            // needed to avoid blocking in client.events.take()
+            testTimeouter = new Thread(new CurrentThreadInterrupter(TIMEOUT));
+            testTimeouter.start();
             return null;
         }
 
@@ -90,18 +98,15 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             System.out.println(server.getSystemOut());
             System.err.println("Server Log:");
             System.err.println(server.getSystemErr());
+            testTimeouter.interrupt();
             server.shutdown();
             tempDirectory.dispose();
         }
 
         public void theClientCanLogin() throws InterruptedException {
             client.login();
-            Thread t = new Thread(new CurrentThreadInterrupter(TIMEOUT));
-            t.start();
             String event = client.events.take();
-            System.out.println("event = " + event);
             specify(event, event.startsWith(RpcTestClient.LOGGED_IN));
-            t.interrupt();
         }
     }
 
@@ -122,11 +127,11 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
     private static class RpcTestClientSessionListener implements ClientSessionListener, ManagedObject, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final ClientSession session;
+        private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
 
         public RpcTestClientSessionListener(ClientSession session) {
-            this.session = session;
+            this.session = AppContext.getDataManager().createReference(session);
             gateway = initGateway(session);
             gateway.registerService(Echo.class, new EchoImpl());
         }
