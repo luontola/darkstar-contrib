@@ -55,14 +55,14 @@ import java.util.concurrent.TimeoutException;
 public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static final String STARTUP_MSG = "RpcTest has started";
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 5000;
 
     public class WhenUsingARealDarkstarServer {
 
         private TempDirectory tempDirectory;
         private DarkstarServer server;
         private StreamWaiter waiter;
-        private RpcTestClientListener client;
+        private RpcTestClient client;
 
         public Object create() throws TimeoutException {
             tempDirectory = new TempDirectory();
@@ -72,8 +72,14 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             server.setAppListener(RpcTestAppListener.class);
             server.start();
             waiter = new StreamWaiter(server.getSystemOut());
-            waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
-            client = new RpcTestClientListener("localhost", server.getPort());
+            try {
+                waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
+            } catch (TimeoutException e) {
+                System.out.println(server.getSystemOut());
+                System.err.println(server.getSystemErr());
+                throw e;
+            }
+            client = new RpcTestClient("localhost", server.getPort());
             return null;
         }
 
@@ -90,8 +96,12 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public void theClientCanLogin() throws InterruptedException {
             client.login();
-            Thread.sleep(1000);
-            // TODO
+            Thread t = new Thread(new CurrentThreadInterrupter(TIMEOUT));
+            t.start();
+            String event = client.events.take();
+            System.out.println("event = " + event);
+            specify(event, event.startsWith(RpcTestClient.LOGGED_IN));
+            t.interrupt();
         }
     }
 
@@ -136,7 +146,14 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
     }
 
-    private static class RpcTestClientListener implements SimpleClientListener {
+    private static class RpcTestClient implements SimpleClientListener {
+
+        public static final String LOGGED_IN = "loggedIn";
+        public static final String LOGIN_FAILED = "loginFailed";
+        public static final String RECONNECTING = "reconnecting";
+        public static final String RECONNECTED = "reconnected";
+        public static final String DISCONNECTED = "disconnected";
+        public static final String JOINED_CHANNEL = "joinedChannel";
 
         public final BlockingQueue<String> events = new LinkedBlockingQueue<String>();
         public final BlockingQueue<String> messages = new LinkedBlockingQueue<String>();
@@ -145,7 +162,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private final int port;
         private final SimpleClient client;
 
-        public RpcTestClientListener(String host, int port) {
+        public RpcTestClient(String host, int port) {
             this.host = host;
             this.port = port;
             this.client = new SimpleClient(this);
@@ -168,7 +185,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public ClientChannelListener joinedChannel(ClientChannel channel) {
-            events.add("joinedChannel: " + channel);
+            events.add(JOINED_CHANNEL + ": " + channel);
             return null;
         }
 
@@ -177,23 +194,23 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void loggedIn() {
-            events.add("loggedIn");
+            events.add(LOGGED_IN);
         }
 
         public void loginFailed(String reason) {
-            events.add("loginFailed: " + reason);
+            events.add(LOGIN_FAILED + ": " + reason);
         }
 
         public void reconnecting() {
-            events.add("reconnecting");
+            events.add(RECONNECTING);
         }
 
         public void reconnected() {
-            events.add("reconnected");
+            events.add(RECONNECTED);
         }
 
         public void disconnected(boolean graceful, String reason) {
-            events.add("disconnected: " + graceful + ", " + reason);
+            events.add(DISCONNECTED + ": " + graceful + ", " + reason);
         }
     }
 
@@ -208,6 +225,31 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public Future<String> echo(String s) {
             return ServiceHelper.wrap(s + ", " + s);
+        }
+    }
+
+    // Utilities
+    // TODO: move utilities to a utility project and write tests for them
+
+    private class CurrentThreadInterrupter implements Runnable {
+
+        private final int timeout;
+        private final Thread threadToInterrupt;
+
+        public CurrentThreadInterrupter(int timeout) {
+            this.timeout = timeout;
+            threadToInterrupt = Thread.currentThread();
+        }
+
+        public void run() {
+            try {
+                Thread.sleep(timeout);
+                if (!Thread.currentThread().isInterrupted()) {
+                    threadToInterrupt.interrupt();
+                }
+            } catch (InterruptedException e) {
+                // this interrupter was itself interrupted - do nothing
+            }
         }
     }
 }
