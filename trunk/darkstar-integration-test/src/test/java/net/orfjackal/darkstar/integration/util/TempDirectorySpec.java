@@ -42,6 +42,12 @@ public class TempDirectorySpec extends Specification<Object> {
     private static final File EXPECTED_DIR_1 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.PREFIX + "1");
     private static final File EXPECTED_DIR_2 = new File(System.getProperty("java.io.tmpdir"), TempDirectory.PREFIX + "2");
 
+    public void destroy() {
+        EXPECTED_DIR_1.delete();
+        EXPECTED_DIR_2.delete();
+    }
+
+
     public class WhenATempDirectoryIsCreated {
 
         private TempDirectory tempDirectory;
@@ -49,11 +55,6 @@ public class TempDirectorySpec extends Specification<Object> {
         public Object create() {
             tempDirectory = new TempDirectory();
             return null;
-        }
-
-        public void destroy() {
-            EXPECTED_DIR_1.delete();
-            EXPECTED_DIR_2.delete();
         }
 
         public void atFirstTheDirectoryDoesNotExists() {
@@ -100,10 +101,6 @@ public class TempDirectorySpec extends Specification<Object> {
             specify(directory.exists());
             specify(directory.equals(EXPECTED_DIR_1));
             return null;
-        }
-
-        public void destroy() {
-            EXPECTED_DIR_1.delete();
         }
 
         public void theDirectoryIsDeleted() {
