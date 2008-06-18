@@ -39,17 +39,27 @@ public class TempDirectory {
 
     private File directory;
 
+    public TempDirectory() {
+        this(null);
+    }
+
+    public TempDirectory(File directory) {
+        this.directory = directory;
+    }
+
     public File getDirectory() {
         return directory;
     }
 
     public void create() {
-        if (directory != null) {
-            throw new IllegalStateException("Directory already created: " + directory);
+        if (directory == null) {
+            directory = nonExistingTempDir();
         }
-        directory = nonExistingTempDir();
+        if (directory.exists()) {
+            throw new IllegalArgumentException("Already exists: " + directory);
+        }
         if (!directory.mkdir()) {
-            throw new IllegalStateException("Unable to create directory: " + directory);
+            throw new RuntimeException("Unable to create directory: " + directory);
         }
     }
 

@@ -83,7 +83,7 @@ public class TempDirectorySpec extends Specification<Object> {
                 public void run() throws Throwable {
                     tempDirectory.create();
                 }
-            }, should.raise(IllegalStateException.class));
+            }, should.raise(IllegalArgumentException.class));
             specify(EXPECTED_DIR_1.exists());
             specify(!EXPECTED_DIR_2.exists());
         }
@@ -125,6 +125,59 @@ public class TempDirectorySpec extends Specification<Object> {
             specify(f.exists());
             tempDirectory.dispose();
             specify(!directory.exists());
+        }
+    }
+
+    public class WhenATempDirectoryIsCreatedWithAPredefinedPath {
+
+        private File predefined;
+        private TempDirectory tempDirectory;
+
+        public Object create() {
+            predefined = new File("foo.tmp");
+            assert !predefined.exists();
+            tempDirectory = new TempDirectory(predefined);
+            return null;
+        }
+
+        public void destroy() {
+            assert predefined.listFiles().length == 0;
+            predefined.delete();
+        }
+
+        public void theDirectoryMustNotAlreadyExist() throws IOException {
+            predefined.mkdir();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tempDirectory.create();
+                }
+            }, should.raise(IllegalArgumentException.class));
+        }
+
+        public void whenCreatedTheSpecifiedDirectoryExists() {
+            specify(!predefined.exists());
+            tempDirectory.create();
+            specify(predefined.isDirectory());
+            specify(tempDirectory.getDirectory(), should.equal(predefined));
+        }
+
+        public void whenDisposedTheSpecifiedDirectoryDoesNotExist() {
+            tempDirectory.create();
+            tempDirectory.dispose();
+            specify(!predefined.exists());
+        }
+
+        public void itsParentDirectoryMustAlreadyExist() {
+            File noParent = new File("foo.tmp", "bar.tmp");
+            specify(!noParent.exists());
+            specify(!noParent.getParentFile().exists());
+            tempDirectory = new TempDirectory(noParent);
+            specify(new Block() {
+                public void run() throws Throwable {
+                    tempDirectory.create();
+                }
+            }, should.raise(RuntimeException.class));
+            specify(!noParent.exists());
         }
     }
 }
