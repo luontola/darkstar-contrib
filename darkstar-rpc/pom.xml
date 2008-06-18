@@ -61,36 +61,37 @@
     </pluginRepositories>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.projectdarkstar</groupId>
-            <artifactId>darkstar-server</artifactId>
-            <version>0.9.6</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.projectdarkstar</groupId>
-            <artifactId>darkstar-client</artifactId>
-            <version>0.9.6</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!--
         <dependency>
-            <groupId>net.orfjackal.darkstar-exp</groupId>
+            <groupId>com.projectdarkstar</groupId>
             <artifactId>darkstar-server</artifactId>
-            <version>0.9.6_0</version>
+            <version>0.9.6</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>net.orfjackal.darkstar-exp</groupId>
+            <groupId>com.projectdarkstar</groupId>
             <artifactId>darkstar-client</artifactId>
-            <version>0.9.6_0</version>
+            <version>0.9.6</version>
             <scope>provided</scope>
         </dependency>
         -->
+
+        <!-- NOTE: Should work also with the vanilla Darkstar,
+             but Darkstar EXP is needed for running the tests.-->
+        <dependency>
+            <groupId>net.orfjackal.darkstar-exp</groupId>
+            <artifactId>darkstar-server</artifactId>
+            <version>0.9.6_1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.orfjackal.darkstar-exp</groupId>
+            <artifactId>darkstar-client</artifactId>
+            <version>0.9.6_1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>net.orfjackal.darkstar-contrib</groupId>
