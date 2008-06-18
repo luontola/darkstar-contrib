@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -50,6 +51,7 @@ public class DarkstarServer {
     private String appName;
     private Class<? extends AppListener> appListener;
     private int port = 1139;
+    private final Properties properties = new Properties();
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
@@ -79,6 +81,14 @@ public class DarkstarServer {
         this.port = port;
     }
 
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    public String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
     public void start() {
         if (isRunning()) {
             throw new IllegalStateException("Already started");
@@ -97,6 +107,9 @@ public class DarkstarServer {
         File appRoot = prepareAppRoot(appName);
 
         Properties appProps = new Properties();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            appProps.setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
         appProps.setProperty(StandardProperties.APP_NAME, appName);
         appProps.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
         appProps.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
