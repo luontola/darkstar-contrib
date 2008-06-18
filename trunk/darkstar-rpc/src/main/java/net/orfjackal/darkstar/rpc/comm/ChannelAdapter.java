@@ -24,9 +24,7 @@
 
 package net.orfjackal.darkstar.rpc.comm;
 
-import com.sun.sgs.app.Channel;
-import com.sun.sgs.app.ChannelListener;
-import com.sun.sgs.app.ClientSession;
+import com.sun.sgs.app.*;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.MessageSender;
 
@@ -51,7 +49,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private MessageReciever requestReciever;
 
     private final RpcGateway gateway;
-    private Channel channel; // TODO: will not run without TransparentReferences, because Channels are managed objects
+    private ManagedReference<Channel> channel; // TODO: will not run without TransparentReferences, because Channels are managed objects
 
     public ChannelAdapter() {
         this(10000);
@@ -62,7 +60,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     }
 
     public void setChannel(Channel channel) {
-        this.channel = channel;
+        this.channel = AppContext.getDataManager().createReference(channel);
     }
 
     public RpcGateway getGateway() {
@@ -84,7 +82,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
         if (channel == null) {
             throw new IllegalStateException("No connection");
         }
-        channel.send(null, buf);
+        channel.get().send(null, buf);
     }
 
     private class MyRequestSender implements MessageSender, Serializable {
