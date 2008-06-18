@@ -103,18 +103,21 @@ public class DarkstarServer {
     }
 
     public void start() {
+        start(createAppConfig());
+    }
+
+    public void start(File configFile) {
         if (isRunning()) {
             throw new IllegalStateException("Already started");
         }
-        File config = prepareAppConfig();
-        process = executor.exec(getMainClass(), config.getAbsolutePath());
+        process = executor.exec(getMainClass(), configFile.getAbsolutePath());
     }
 
-    private File prepareAppConfig() {
+    private File createAppConfig() {
         if (getAppName().equals("")) {
             throw new IllegalArgumentException("appName is not set");
         }
-        File appRoot = prepareAppRoot(getAppName());
+        File appRoot = createAppRoot(getAppName());
         appProperties.setProperty(APP_ROOT, appRoot.getAbsolutePath());
 
         File appConfig = new File(workingDir, getAppName() + ".properties");
@@ -122,7 +125,7 @@ public class DarkstarServer {
         return appConfig;
     }
 
-    private File prepareAppRoot(String appName) {
+    private File createAppRoot(String appName) {
         File appRoot = new File(workingDir, "data" + File.separator + appName);
         File dataDir = new File(appRoot, "dsdb");
         dataDir.mkdirs();

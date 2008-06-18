@@ -34,10 +34,7 @@ import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Properties;
@@ -130,7 +127,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             specify(server.getAppListener(), should.equal(null));
             waiter.waitForBytes(APPLESS_CONTEXT_READY_MSG, TIMEOUT);
             String err = server.getSystemErr().toString();
-            specify(err.contains("NoApp"));
+            specify(err, err.contains("NoApp"));
         }
     }
 
@@ -174,8 +171,8 @@ public class DarkstarServerSpec extends Specification<Object> {
 
             String out = server.getSystemOut().toString();
             String err = server.getSystemErr().toString();
-            specify(err.contains("HelloWorld: application is ready"));
-            specify(out.contains("Howdy ho!"));
+            specify(err, err.contains("HelloWorld: application is ready"));
+            specify(out, out.contains("Howdy ho!"));
         }
 
         public void itListensToTheSpecifiedPort() throws IOException {
@@ -207,13 +204,18 @@ public class DarkstarServerSpec extends Specification<Object> {
             for (File file : dataDir.listFiles()) {
                 totalSize += file.length();
             }
-            specify(totalSize > 10 * MB);
+            specify((Object) totalSize, totalSize > 10 * MB);
         }
 
         public void itCanNotBeStartedWithoutFirstShuttingItDown() {
             specify(new Block() {
                 public void run() throws Throwable {
                     server.start();
+                }
+            }, should.raise(IllegalStateException.class));
+            specify(new Block() {
+                public void run() throws Throwable {
+                    server.start(new File(tempDirectory.getDirectory(), "HelloWorld.properties"));
                 }
             }, should.raise(IllegalStateException.class));
         }
@@ -223,45 +225,62 @@ public class DarkstarServerSpec extends Specification<Object> {
             server.shutdown();
             specify(!server.isRunning());
             String log1 = server.getSystemErr().toString();
-            specify(log1.contains("The Kernel is ready"));
-            specify(log1.contains("HelloWorld: application is ready"));
-            specify(!log1.contains("recovering for node"));
+            specify(log1, log1.contains("The Kernel is ready"));
+            specify(log1, log1.contains("HelloWorld: application is ready"));
+            specify(log1, !log1.contains("recovering for node"));
 
             server.start();
             waiter.setStream(server.getSystemErr());
             waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
             specify(server.isRunning());
             String log2 = server.getSystemErr().toString();
-            specify(log2.contains("The Kernel is ready"));
-            specify(log2.contains("HelloWorld: application is ready"));
-            specify(log2.contains("recovering for node"));
+            specify(log2, log2.contains("The Kernel is ready"));
+            specify(log2, log2.contains("HelloWorld: application is ready"));
+            specify(log2, log2.contains("recovering for node"));
         }
     }
 
-    public class WhenACustomAppPropertiesFileIsUsed {
+    public class WhenAnExistingAppPropertiesFileIsUsed {
 
         private DarkstarServer server;
         private StreamWaiter waiter;
 
-        public Object create() throws InterruptedException {
+        private File dsdb;
+
+        public Object create() throws InterruptedException, IOException {
             File appRoot = new File(tempDirectory.getDirectory(), "customAppRoot");
             appRoot.mkdir();
-            assert appRoot.isDirectory();
+            dsdb = new File(appRoot, "dsdb");
+            dsdb.mkdir();
 
+            Properties p = new Properties();
+            p.setProperty(DarkstarServer.APP_NAME, "AppInCustomRoot");
+            p.setProperty(DarkstarServer.APP_LISTENER, HelloWorld.class.getName());
+            p.setProperty(DarkstarServer.APP_PORT, DarkstarServer.APP_PORT_DEFAULT);
+            p.setProperty(DarkstarServer.APP_ROOT, appRoot.getAbsolutePath());
+            File configFile = new File(appRoot, "MyConfig.properties");
+            FileOutputStream out = new FileOutputStream(configFile);
+            p.store(out, null);
+            out.close();
 
             server = new DarkstarServer(tempDirectory.getDirectory());
-//            server.start();
-
-//            waiter = new StreamWaiter(server.getSystemErr());
+            server.start(configFile);
+            waiter = new StreamWaiter(server.getSystemErr());
             return null;
         }
 
         public void destroy() {
+            System.out.println(server.getSystemOut());
+            System.err.println(server.getSystemErr());
+            waiter.dispose();
             server.shutdown();
         }
 
-        public void todo() {
-            // TODO
+        public void theServerIsStartedUnderTheSpecifiedAppRoot() throws TimeoutException {
+            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
+            String err = server.getSystemErr().toString();
+            specify(err, err.contains("AppInCustomRoot"));
+            specify(dsdb.listFiles().length > 5);
         }
     }
 
