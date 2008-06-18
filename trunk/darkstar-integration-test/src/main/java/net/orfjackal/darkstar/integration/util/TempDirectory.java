@@ -35,7 +35,7 @@ public class TempDirectory {
 
     private static final Logger log = Logger.getLogger(TempDirectory.class.getName());
 
-    public static final String PREFIX = TempDirectory.class.getName() + ".";
+    public static final String PREFIX = TempDirectory.class.getSimpleName() + ".";
 
     private File directory;
 

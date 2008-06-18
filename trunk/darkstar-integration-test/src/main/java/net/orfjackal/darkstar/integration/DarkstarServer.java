@@ -42,6 +42,7 @@ import java.util.Properties;
 public class DarkstarServer {
 
     public static final String MAIN_CLASS = "com.sun.sgs.impl.kernel.Kernel";
+    public static final String WATCHDOG_PORT_PROPERTY = "com.sun.sgs.impl.service.watchdog.server.port";
 
     private final JavaProcessExecutor executor = new JavaProcessExecutor();
     private final File workingDir;
@@ -50,6 +51,7 @@ public class DarkstarServer {
     private String appName;
     private Class<? extends AppListener> appListener;
     private int port = 1139;
+    private int watchdogPort = 0;
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
@@ -79,6 +81,14 @@ public class DarkstarServer {
         this.port = port;
     }
 
+    public int getWatchdogPort() {
+        return watchdogPort;
+    }
+
+    public void setWatchdogPort(int watchdogPort) {
+        this.watchdogPort = watchdogPort;
+    }
+
     public void start() {
         if (isRunning()) {
             throw new IllegalStateException("Already started");
@@ -101,6 +111,9 @@ public class DarkstarServer {
         appProps.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
         appProps.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
         appProps.setProperty(StandardProperties.APP_PORT, Integer.toString(port));
+        if (watchdogPort > 0) {
+            appProps.setProperty(WATCHDOG_PORT_PROPERTY, Integer.toString(watchdogPort));
+        }
         //appProps.setProperty(StandardProperties.MANAGERS, "");
 
         File appConfig = new File(workingDir, appName + ".properties");
