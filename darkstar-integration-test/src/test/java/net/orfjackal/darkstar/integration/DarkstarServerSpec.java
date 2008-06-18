@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -130,7 +131,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             specify(!server.isRunning());
         }
 
-        public void itPrintsSomeLogMessages() throws InterruptedException {
+        public void itPrintsSomeLogMessages() throws InterruptedException, TimeoutException {
             waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
 
             String out = server.getSystemOut().toString();
@@ -145,7 +146,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             clientSocket.close();
         }
 
-        public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException {
+        public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException, TimeoutException {
             waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
 
             File dir = tempDirectory.getDirectory();
@@ -170,7 +171,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             }, should.raise(IllegalStateException.class));
         }
 
-        public void itCanBeRestarted() throws InterruptedException {
+        public void itCanBeRestarted() throws InterruptedException, TimeoutException {
             waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
             server.shutdown();
             specify(!server.isRunning());

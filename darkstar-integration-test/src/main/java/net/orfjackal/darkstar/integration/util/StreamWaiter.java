@@ -25,6 +25,7 @@
 package net.orfjackal.darkstar.integration.util;
 
 import java.io.ByteArrayOutputStream;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -66,15 +67,19 @@ public class StreamWaiter {
         return end - start;
     }
 
-    public long waitForBytes(byte[] needle, int timeout) {
+    public long waitForBytes(byte[] needle, int timeout) throws TimeoutException {
         long start = System.currentTimeMillis();
-        while (System.currentTimeMillis() < start + timeout
-                && !contains(needle, stream.toByteArray())) {
+        boolean bytesFound;
+        while (!(bytesFound = contains(needle, stream.toByteArray()))
+                && System.currentTimeMillis() < start + timeout) {
             sleep(5);
         }
-        // TODO: throw a timeout exception if the bytes are not found
         long end = System.currentTimeMillis();
-        return end - start;
+        long waitTime = end - start;
+        if (!bytesFound) {
+            throw new TimeoutException("The bytes were not found after waiting for " + waitTime + " ms");
+        }
+        return waitTime;
     }
 
     private static boolean contains(byte[] needle, byte[] haystack) {

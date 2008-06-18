@@ -24,12 +24,14 @@
 
 package net.orfjackal.darkstar.integration.util;
 
+import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -200,8 +202,14 @@ public class StreamWaiterSpec extends Specification<Object> {
         }
 
         public void nothingIsWrittenToStreamThenWaitingIsTimedOut() {
-            long waitTime = waiter.waitForBytes("hello".getBytes(), 200);
-            specify(waitTime, should.equal(200, DELTA));
+            long start = System.currentTimeMillis();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    waiter.waitForBytes("hello".getBytes(), 200);
+                }
+            }, should.raise(TimeoutException.class));
+            long end = System.currentTimeMillis();
+            specify(end - start, should.equal(200, DELTA));
         }
 
         public void ifOnlyWrongBytesAppearThenTheWaitingIsTimeOut() {
@@ -220,11 +228,17 @@ public class StreamWaiterSpec extends Specification<Object> {
                 }
             });
             t.start();
-            long waitTime = waiter.waitForBytes("hello".getBytes(), 200);
-            specify(waitTime, should.equal(200, DELTA));
+            long start = System.currentTimeMillis();
+            specify(new Block() {
+                public void run() throws Throwable {
+                    waiter.waitForBytes("hello".getBytes(), 200);
+                }
+            }, should.raise(TimeoutException.class));
+            long end = System.currentTimeMillis();
+            specify(end - start, should.equal(200, DELTA));
         }
 
-        public void ifTheRightBytesAppearThenTheWaitingEndsImmediately() {
+        public void ifTheRightBytesAppearThenTheWaitingEndsImmediately() throws TimeoutException {
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     try {
