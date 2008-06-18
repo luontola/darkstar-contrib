@@ -52,6 +52,7 @@ public class DarkstarServerSpec extends Specification<Object> {
 
     //private static final byte[] KERNEL_READY_MSG = "Kernel is ready".getBytes();
     private static final byte[] APPLICATION_READY_MSG = "application is ready".getBytes();
+    private static final byte[] APPLESS_CONTEXT_READY_MSG = "non-application context is ready".getBytes();
     private static final int TIMEOUT = 10000;
 
     private TempDirectory tempDirectory;
@@ -99,25 +100,41 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void appNameMustBeSetBeforeStarting() {
-            server.setAppListener(HelloWorld.class);
             specify(new Block() {
                 public void run() throws Throwable {
                     server.start();
                 }
-            }, should.raise(IllegalArgumentException.class, "appName is null"));
-        }
-
-        public void appListenerMustBeSetBeforeStarting() {
-            server.setAppName("HelloWorld");
-            specify(new Block() {
-                public void run() throws Throwable {
-                    server.start();
-                }
-            }, should.raise(IllegalArgumentException.class, "appListener is null"));
+            }, should.raise(IllegalArgumentException.class, "appName is not set"));
         }
     }
 
-    public class WhenTheServerIsStarted {
+    public class WhenAnEmptyServerIsStarted {
+
+        private DarkstarServer server;
+        private StreamWaiter waiter;
+
+        public Object create() {
+            server = new DarkstarServer(tempDirectory.getDirectory());
+            server.setAppName("NoApp");
+            server.start();
+            waiter = new StreamWaiter(server.getSystemErr());
+            return null;
+        }
+
+        public void destroy() {
+            waiter.dispose();
+            server.shutdown();
+        }
+
+        public void theServerStartsWithoutAppListener() throws InterruptedException, TimeoutException {
+            specify(server.getAppListener(), should.equal(null));
+            waiter.waitForBytes(APPLESS_CONTEXT_READY_MSG, TIMEOUT);
+            String err = server.getSystemErr().toString();
+            specify(err.contains("NoApp"));
+        }
+    }
+
+    public class WhenTheServerIsStartedWithAnApplication {
 
         private DarkstarServer server;
         private StreamWaiter waiter;
@@ -130,6 +147,11 @@ public class DarkstarServerSpec extends Specification<Object> {
             server.setProperty("my.custom.key", "MyValue");
             server.start();
             waiter = new StreamWaiter(server.getSystemErr());
+
+            specify(server.getAppName(), should.equal("HelloWorld"));
+            specify(server.getAppListener(), should.equal(HelloWorld.class));
+            specify(server.getPort(), should.equal(12345));
+            specify(server.getProperty("my.custom.key"), should.equal("MyValue"));
             return null;
         }
 

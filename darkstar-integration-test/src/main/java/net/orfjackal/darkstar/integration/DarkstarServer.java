@@ -33,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -43,50 +42,64 @@ import java.util.Properties;
 public class DarkstarServer {
 
     public static final String MAIN_CLASS = "com.sun.sgs.impl.kernel.Kernel";
+    public static final String APP_ROOT = StandardProperties.APP_ROOT;
+    public static final String APP_NAME = StandardProperties.APP_NAME;
+    public static final String APP_LISTENER = StandardProperties.APP_LISTENER;
+    public static final String APP_LISTENER_NONE = StandardProperties.APP_LISTENER_NONE;
+    public static final String APP_PORT = StandardProperties.APP_PORT;
+    public static final String APP_PORT_DEFAULT = "1139";
 
     private final JavaProcessExecutor executor = new JavaProcessExecutor();
     private final File workingDir;
+    private final Properties appProperties;
     private ProcessHolder process;
-
-    private String appName;
-    private Class<? extends AppListener> appListener;
-    private int port = 1139;
-    private final Properties properties = new Properties();
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
+        appProperties = new Properties();
+        appProperties.setProperty(APP_NAME, "");
+        appProperties.setProperty(APP_LISTENER, APP_LISTENER_NONE);
+        appProperties.setProperty(APP_PORT, APP_PORT_DEFAULT);
     }
 
     public String getAppName() {
-        return appName;
+        return getProperty(APP_NAME);
     }
 
     public void setAppName(String appName) {
-        this.appName = appName;
+        setProperty(APP_NAME, appName);
     }
 
     public Class<? extends AppListener> getAppListener() {
-        return appListener;
+        String className = getProperty(APP_LISTENER);
+        if (className.equals(APP_LISTENER_NONE)) {
+            return null;
+        }
+        try {
+            return Class.forName(className).asSubclass(AppListener.class);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public void setAppListener(Class<? extends AppListener> appListener) {
-        this.appListener = appListener;
+        setProperty(APP_LISTENER, appListener.getName());
     }
 
     public int getPort() {
-        return port;
+        return Integer.valueOf(getProperty(APP_PORT));
     }
 
     public void setPort(int port) {
-        this.port = port;
+        setProperty(APP_PORT, Integer.toString(port));
     }
 
     public void setProperty(String key, String value) {
-        properties.setProperty(key, value);
+        appProperties.setProperty(key, value);
     }
 
     public String getProperty(String key) {
-        return properties.getProperty(key);
+        return appProperties.getProperty(key);
     }
 
     public void start() {
@@ -98,26 +111,14 @@ public class DarkstarServer {
     }
 
     private File prepareAppConfig() {
-        if (appName == null) {
-            throw new IllegalArgumentException("appName is null");
+        if (getAppName().equals("")) {
+            throw new IllegalArgumentException("appName is not set");
         }
-        if (appListener == null) {
-            throw new IllegalArgumentException("appListener is null");
-        }
-        File appRoot = prepareAppRoot(appName);
+        File appRoot = prepareAppRoot(getAppName());
+        appProperties.setProperty(APP_ROOT, appRoot.getAbsolutePath());
 
-        Properties appProps = new Properties();
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            appProps.setProperty(entry.getKey().toString(), entry.getValue().toString());
-        }
-        appProps.setProperty(StandardProperties.APP_NAME, appName);
-        appProps.setProperty(StandardProperties.APP_ROOT, appRoot.getAbsolutePath());
-        appProps.setProperty(StandardProperties.APP_LISTENER, appListener.getName());
-        appProps.setProperty(StandardProperties.APP_PORT, Integer.toString(port));
-        //appProps.setProperty(StandardProperties.MANAGERS, "");
-
-        File appConfig = new File(workingDir, appName + ".properties");
-        writeToFile(appConfig, appProps);
+        File appConfig = new File(workingDir, getAppName() + ".properties");
+        writeToFile(appConfig, appProperties);
         return appConfig;
     }
 
