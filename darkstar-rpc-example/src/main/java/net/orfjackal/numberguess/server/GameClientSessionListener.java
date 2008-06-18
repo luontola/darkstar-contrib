@@ -71,6 +71,5 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
 
     public void removingObject() {
         logger.log(Level.INFO, "Removing " + getClass().getName());
-        AppContext.getDataManager().removeObject(session);
     }
 }
