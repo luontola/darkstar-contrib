@@ -53,20 +53,28 @@ public class DarkstarServerSpec extends Specification<Object> {
     private static final byte[] APPLICATION_READY_MSG = "application is ready".getBytes();
     private static final int TIMEOUT = 10000;
 
+    private TempDirectory tempDirectory;
+
+    public void create() {
+        tempDirectory = new TempDirectory();
+        tempDirectory.create();
+    }
+
+    public void destroy() {
+        tempDirectory.dispose();
+    }
+
+
     public class WhenTheServerHasNotBeenStarted {
 
-        private TempDirectory tempDirectory;
         private DarkstarServer server;
 
         public Object create() {
-            tempDirectory = new TempDirectory();
-            tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
             return null;
         }
 
         public void destroy() {
-            tempDirectory.dispose();
         }
 
         public void itIsNotRunning() {
@@ -110,13 +118,10 @@ public class DarkstarServerSpec extends Specification<Object> {
 
     public class WhenTheServerIsStarted {
 
-        private TempDirectory tempDirectory;
         private DarkstarServer server;
         private StreamWaiter waiter;
 
         public Object create() throws InterruptedException {
-            tempDirectory = new TempDirectory();
-            tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
             server.setAppName("HelloWorld");
             server.setAppListener(HelloWorld.class);
@@ -129,7 +134,6 @@ public class DarkstarServerSpec extends Specification<Object> {
         public void destroy() {
             waiter.dispose();
             server.shutdown();
-            tempDirectory.dispose();
         }
 
         public void itIsRunning() {
@@ -200,6 +204,30 @@ public class DarkstarServerSpec extends Specification<Object> {
             specify(log2.contains("recovering for node"));
         }
     }
+
+    public class WhenACustomAppPropertiesFileIsUsed {
+
+        private DarkstarServer server;
+        private StreamWaiter waiter;
+
+        public Object create() throws InterruptedException {
+            File appRoot = new File(tempDirectory.getDirectory(), "customAppRoot");
+            appRoot.mkdir();
+            assert appRoot.isDirectory();
+
+
+            server = new DarkstarServer(tempDirectory.getDirectory());
+//            server.start();
+
+//            waiter = new StreamWaiter(server.getSystemErr());
+            return null;
+        }
+
+        public void todo() {
+            // TODO
+        }
+    }
+
 
     public static class HelloWorld implements AppListener, Serializable {
 
