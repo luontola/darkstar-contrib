@@ -37,12 +37,14 @@ import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.Properties;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -60,6 +62,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private TempDirectory tempDirectory;
         private DarkstarServer server;
         private StreamWaiter waiter;
+        private RpcTestClientListener client;
 
         public Object create() throws TimeoutException {
             tempDirectory = new TempDirectory();
@@ -69,26 +72,30 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             server.setAppListener(RpcTestAppListener.class);
             server.start();
             waiter = new StreamWaiter(server.getSystemOut());
-            try {
-                waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
-            } finally {
-                System.out.println(server.getSystemOut());
-                System.err.println(server.getSystemErr());
-            }
+            waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
+            client = new RpcTestClientListener("localhost", server.getPort());
             return null;
         }
 
         public void destroy() {
+            System.out.println("client.events = " + client.events);
+            System.out.println("client.messages = " + client.messages);
+            System.out.println("Server Out:");
+            System.out.println(server.getSystemOut());
+            System.err.println("Server Log:");
+            System.err.println(server.getSystemErr());
             server.shutdown();
             tempDirectory.dispose();
         }
 
-        public void todo() {
+        public void theClientCanLogin() throws InterruptedException {
+            client.login();
+            Thread.sleep(1000);
             // TODO
         }
     }
 
-    // Interfaces for connecting to Darkstar
+    // Interface implementaitons for connecting to Darkstar
 
     public static class RpcTestAppListener implements AppListener, Serializable {
         private static final long serialVersionUID = 1L;
@@ -131,15 +138,33 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static class RpcTestClientListener implements SimpleClientListener {
 
-        private final SimpleClient client;
-        private final LinkedList<String> events = new LinkedList<String>();
+        public final BlockingQueue<String> events = new LinkedBlockingQueue<String>();
+        public final BlockingQueue<String> messages = new LinkedBlockingQueue<String>();
 
-        public RpcTestClientListener() {
+        private final String host;
+        private final int port;
+        private final SimpleClient client;
+
+        public RpcTestClientListener(String host, int port) {
+            this.host = host;
+            this.port = port;
             this.client = new SimpleClient(this);
         }
 
+        public void login() {
+            Properties props = new Properties();
+            props.setProperty("host", host);
+            props.setProperty("port", Integer.toString(port));
+            try {
+                client.login(props);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         public void receivedMessage(ByteBuffer message) {
-            events.add("receivedMessage");
+            byte[] bytes = ByteBufferUtils.asByteArray(message);
+            messages.add(new String(bytes));
         }
 
         public ClientChannelListener joinedChannel(ClientChannel channel) {
