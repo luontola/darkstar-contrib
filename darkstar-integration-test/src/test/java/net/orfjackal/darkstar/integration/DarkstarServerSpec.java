@@ -35,6 +35,7 @@ import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ConnectException;
@@ -126,6 +127,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             server.setAppName("HelloWorld");
             server.setAppListener(HelloWorld.class);
             server.setPort(12345);
+            server.setProperty("my.custom.key", "MyValue");
             server.start();
             waiter = new StreamWaiter(server.getSystemErr());
             return null;
@@ -158,6 +160,15 @@ public class DarkstarServerSpec extends Specification<Object> {
             Socket clientSocket = new Socket("localhost", 12345);
             specify(clientSocket.isConnected());
             clientSocket.close();
+        }
+
+        public void customPropertyKeysCanBeSet() throws IOException {
+            File configFile = new File(tempDirectory.getDirectory(), "HelloWorld.properties");
+            Properties appProps = new Properties();
+            FileInputStream in = new FileInputStream(configFile);
+            appProps.load(in);
+            in.close();
+            specify(appProps.getProperty("my.custom.key"), should.equal("MyValue"));
         }
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException, TimeoutException {
@@ -221,6 +232,10 @@ public class DarkstarServerSpec extends Specification<Object> {
 
 //            waiter = new StreamWaiter(server.getSystemErr());
             return null;
+        }
+
+        public void destroy() {
+            server.shutdown();
         }
 
         public void todo() {
