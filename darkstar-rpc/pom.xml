@@ -30,7 +30,8 @@
 
     <scm>
         <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</connection>
-        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</developerConnection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc
+        </developerConnection>
         <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc</url>
     </scm>
 
@@ -62,6 +63,21 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.projectdarkstar</groupId>
+            <artifactId>darkstar-server</artifactId>
+            <version>0.9.6</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.projectdarkstar</groupId>
+            <artifactId>darkstar-client</artifactId>
+            <version>0.9.6</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+        <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-server</artifactId>
             <version>0.9.6_0</version>
@@ -74,6 +90,7 @@
             <version>0.9.6_0</version>
             <scope>provided</scope>
         </dependency>
+        -->
 
         <dependency>
             <groupId>net.orfjackal.darkstar-contrib</groupId>
