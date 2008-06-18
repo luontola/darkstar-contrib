@@ -69,17 +69,14 @@ public class StreamWaiter {
 
     public long waitForBytes(byte[] needle, int timeout) throws TimeoutException {
         long start = System.currentTimeMillis();
-        boolean bytesFound;
-        while (!(bytesFound = contains(needle, stream.toByteArray()))
-                && System.currentTimeMillis() < start + timeout) {
+        while (!contains(needle, stream.toByteArray())) {
+            if (System.currentTimeMillis() > start + timeout) {
+                throw new TimeoutException("Stream did not contain: " + new String(needle));
+            }
             sleep(5);
         }
         long end = System.currentTimeMillis();
-        long waitTime = end - start;
-        if (!bytesFound) {
-            throw new TimeoutException("The bytes were not found after waiting for " + waitTime + " ms");
-        }
-        return waitTime;
+        return end - start;
     }
 
     private static boolean contains(byte[] needle, byte[] haystack) {
