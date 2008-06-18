@@ -24,18 +24,25 @@
 
 package net.orfjackal.darkstar.rpc.comm;
 
-import com.sun.sgs.app.AppListener;
-import com.sun.sgs.app.ClientSession;
-import com.sun.sgs.app.ClientSessionListener;
+import com.sun.sgs.app.*;
+import com.sun.sgs.client.ClientChannel;
+import com.sun.sgs.client.ClientChannelListener;
+import com.sun.sgs.client.simple.SimpleClient;
+import com.sun.sgs.client.simple.SimpleClientListener;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.DarkstarServer;
 import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
+import net.orfjackal.darkstar.rpc.ServiceHelper;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
+import java.net.PasswordAuthentication;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.Properties;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -59,7 +66,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             tempDirectory.create();
             server = new DarkstarServer(tempDirectory.getDirectory());
             server.setAppName("RpcTest");
-            server.setAppListener(RpcAppListener.class);
+            server.setAppListener(RpcTestAppListener.class);
             server.start();
             waiter = new StreamWaiter(server.getSystemOut());
             try {
@@ -81,8 +88,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
     }
 
-    public static class RpcAppListener implements AppListener, Serializable {
+    // Interfaces for connecting to Darkstar
 
+    public static class RpcTestAppListener implements AppListener, Serializable {
         private static final long serialVersionUID = 1L;
 
         public void initialize(Properties props) {
@@ -90,7 +98,91 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public ClientSessionListener loggedIn(ClientSession session) {
+            return new RpcTestClientSessionListener(session);
+        }
+    }
+
+    private static class RpcTestClientSessionListener implements ClientSessionListener, ManagedObject, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final ClientSession session;
+        private final RpcGateway gateway;
+
+        public RpcTestClientSessionListener(ClientSession session) {
+            this.session = session;
+            gateway = initGateway(session);
+            gateway.registerService(Echo.class, new EchoImpl());
+        }
+
+        private RpcGateway initGateway(ClientSession session) {
+            ChannelAdapter adapter = new ChannelAdapter();
+            Channel channel = AppContext.getChannelManager()
+                    .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
+            adapter.setChannel(channel);
+            return adapter.getGateway();
+        }
+
+        public void receivedMessage(ByteBuffer message) {
+        }
+
+        public void disconnected(boolean graceful) {
+        }
+    }
+
+    private static class RpcTestClientListener implements SimpleClientListener {
+
+        private final SimpleClient client;
+        private final LinkedList<String> events = new LinkedList<String>();
+
+        public RpcTestClientListener() {
+            this.client = new SimpleClient(this);
+        }
+
+        public void receivedMessage(ByteBuffer message) {
+            events.add("receivedMessage");
+        }
+
+        public ClientChannelListener joinedChannel(ClientChannel channel) {
+            events.add("joinedChannel: " + channel);
             return null;
+        }
+
+        public PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication("guest", "guest".toCharArray());
+        }
+
+        public void loggedIn() {
+            events.add("loggedIn");
+        }
+
+        public void loginFailed(String reason) {
+            events.add("loginFailed: " + reason);
+        }
+
+        public void reconnecting() {
+            events.add("reconnecting");
+        }
+
+        public void reconnected() {
+            events.add("reconnected");
+        }
+
+        public void disconnected(boolean graceful, String reason) {
+            events.add("disconnected: " + graceful + ", " + reason);
+        }
+    }
+
+    // Application logic
+
+    private interface Echo {
+        Future<String> echo(String s);
+    }
+
+    private static class EchoImpl implements Echo, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public Future<String> echo(String s) {
+            return ServiceHelper.wrap(s + ", " + s);
         }
     }
 }
