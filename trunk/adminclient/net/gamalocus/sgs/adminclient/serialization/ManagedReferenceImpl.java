@@ -10,9 +10,7 @@ import java.util.logging.Logger;
 
 import net.gamalocus.sgs.adminclient.connection.AdminClientConnection;
 import net.gamalocus.sgs.adminclient.connection.AdminClientConnectionFactory;
-import net.gamalocus.sgs.adminclient.connection.ResponseListener;
 import net.gamalocus.sgs.adminclient.messages.GetManagedObjectFromReference;
-import net.gamalocus.sgs.adminclient.messages.ManagedObjectCapsule;
 
 import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
@@ -23,7 +21,7 @@ import com.sun.sgs.app.ManagedReference;
  * @author emanuel
  *
  */
-public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializable
+public class ManagedReferenceImpl<T extends ManagedObject> implements ManagedReference<T>, Serializable
 {
     /** The version of the serialized form. */
     private static final long serialVersionUID = 1;
@@ -121,10 +119,28 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> ManagedReferenceImpl<T> getInstance(AdminClientConnection connection, long oid)
+	public static <T extends ManagedObject> ManagedReferenceImpl<T> 
+		getInstance(AdminClientConnection connection, long oid)
 	{
 		ManagedReferenceImpl<T> ref = new ManagedReferenceImpl<T>(oid);
 		return connection != null ? (ManagedReferenceImpl<T>)connection.readResolveReference(ref.id, ref) : ref;
+	}
+	
+	/**
+	 * Used for prefetching groups of objects.
+	 */
+	public void setObject(ManagedObject object)
+	{
+		status = Status.SUCCEEDED;
+		this.object = object;
+	}
+	
+	/**
+	 * Used for prefetching groups of objects.
+	 */
+	public boolean isCached()
+	{
+		return object != null;
 	}
 	
 	/**
@@ -158,9 +174,6 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 		logger.log(Level.WARNING, "tried to flush while were fetching", new Throwable());
     }
     
-    /**
-     * TODO: fetch the object.
-     */
 	@SuppressWarnings("unchecked")
 	public T get() {
 		
@@ -170,19 +183,24 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 			if(object == null)
 			{
 				// Only send ONE request.
-				if(status == Status.NOT_FETCHED)
+				if(status == Status.NOT_FETCHED || status == Status.FAILED)
 				{
 					status = Status.FETCHING;
+					logger.log(Level.WARNING, 
+							String.format("Fetch triggered by ManagedObject.get(), id: %d.", id),
+							new Throwable());
 					try
 					{
 						object = getConnection().sendSync(
-							new GetManagedObjectFromReference(this)).object;
+							new GetManagedObjectFromReference(this)).objects.values().iterator().next();
 						status = Status.SUCCEEDED;
 					}
 					catch (Throwable e)
 					{
 						status = Status.FAILED;
-						logger.log(Level.WARNING, "Could not fetch object["+id+"]", e);
+						final String msg = "Could not fetch object[" + id + "]";
+						logger.log(Level.WARNING, msg, e);
+						throw new NullPointerException(msg);
 					}
 				}
 			}
@@ -199,7 +217,7 @@ public class ManagedReferenceImpl<T> implements ManagedReference<T>, Serializabl
 		return (T2)get();
 	}
 
-	private AdminClientConnection getConnection()
+	public AdminClientConnection getConnection()
 	{
 		return connectionFactory != null ? connectionFactory.getConnection() : null;
 	}

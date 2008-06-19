@@ -101,7 +101,9 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 
 	public void receivedMessage(ByteBuffer message)
 	{
-		packet_assembler.append(message);
+		byte[] tmp = new byte[message.capacity()];
+		message.get(tmp);
+		packet_assembler.append(tmp);
 		if (packet_assembler.isComplete()) {
 			AbstractAdminMessage<?> clientMessage = null;
 			ReturnValueContainer<?> returnValue = null; 
@@ -130,10 +132,12 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 				}
 			} catch (IOException ioe) {
 				log.log(Level.WARNING, "Received broken packetized object.", ioe);
-				returnValue = new ReturnValueContainer<Serializable>(ioe, clientMessage.getRequestId());
+				returnValue = new ReturnValueContainer<Serializable>(ioe, 
+						clientMessage != null ? clientMessage.getRequestId() : -1);
 			} catch (ClassNotFoundException cnfe) {
 				log.log(Level.WARNING, "Received packetized object of unknown type.", cnfe);
-				returnValue = new ReturnValueContainer<Serializable>(cnfe, clientMessage.getRequestId());
+				returnValue = new ReturnValueContainer<Serializable>(cnfe, 
+						clientMessage != null ? clientMessage.getRequestId() : -1);
 			}
 			
 			send(returnValue);
