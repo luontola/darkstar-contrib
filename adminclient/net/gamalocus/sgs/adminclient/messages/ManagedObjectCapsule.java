@@ -1,6 +1,9 @@
 package net.gamalocus.sgs.adminclient.messages;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.sgs.app.ManagedObject;
 
@@ -13,5 +16,6 @@ import com.sun.sgs.app.ManagedObject;
 public class ManagedObjectCapsule implements Serializable
 {
 	private static final long serialVersionUID = 6411488225621348780L;
-	public ManagedObject object;
+	public final Map<BigInteger, ManagedObject> objects = 
+		new HashMap<BigInteger, ManagedObject>();
 }

@@ -324,6 +324,8 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 	public <T extends AbstractAdminMessage<U>, U extends Serializable> 
 		U sendSync(T message) throws Throwable
 	{
+		final int timeout = 60 * 1000;
+
 		Object mutex = new Object();
 		BlockingResponseAdapter<U> listener = new BlockingResponseAdapter<U>(mutex);
 		synchronized (mutex)
@@ -331,7 +333,7 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 			send(message, listener);
 			try
 			{
-				mutex.wait(30000);
+				mutex.wait(timeout);
 			}
 			catch (InterruptedException e)
 			{
@@ -344,14 +346,16 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 		}
 		if(listener.throwable == null)
 		{
-			throw new RuntimeException("sendSync must have timed out (after 30 seconds)");
+			throw new RuntimeException(String.format("sendSync must have timed out (after %s ms)", timeout));
 		}
 		throw listener.throwable;		
 	}
 
 	public void receivedMessage(ByteBuffer message)
 	{
-		packet_assembler.append(message);
+		byte[] tmp = new byte[message.capacity()];
+		message.get(tmp);
+		packet_assembler.append(tmp);
 		if (packet_assembler.isComplete()) {
 			try {
 				ReturnValueContainer<?> returnValue = packet_assembler.poll();

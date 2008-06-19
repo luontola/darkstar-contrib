@@ -2,6 +2,11 @@ package net.gamalocus.sgs.adminclient.messages;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +14,7 @@ import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import net.gamalocus.sgs.services.datainspector.DataInspectorManager;
 
 import com.sun.sgs.app.AppContext;
+import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.ObjectNotFoundException;
 
@@ -17,21 +23,31 @@ public class GetManagedObjectFromReference extends AbstractAdminMessage<ManagedO
 	private static final long serialVersionUID = -8928477688187069136L;
 	private final static Logger logger = 
 		Logger.getLogger(GetManagedObjectFromReference.class.getName());
-	private BigInteger reference_id;
+	private Collection<BigInteger> referenceIds;
 	
-	public GetManagedObjectFromReference(ManagedReference reference) {
-		this(reference.getId());
+	public <T extends ManagedObject> GetManagedObjectFromReference(ManagedReference<T>... refs)
+	{
+		this(Arrays.asList(refs));
 	}
 	
-	public GetManagedObjectFromReference(BigInteger reference_id) {
+	public <T extends ManagedObject> GetManagedObjectFromReference(Collection<ManagedReference<T>> refs) {
+		ArrayList<BigInteger> ids = new ArrayList<BigInteger>(refs.size());
+		for (ManagedReference<?> ref : refs)
+		{
+			ids.add(ref.getId());
+		}
+		referenceIds = ids;
+	}
+
+	/*
+	public GetManagedObjectFromReference(Collection<BigInteger> reference_id) {
 		this.reference_id = reference_id;
 	}
-	
-	
-	
-	public BigInteger getReferenceId()
+	*/
+
+	public Collection<BigInteger> getReferenceIds()
 	{
-		return reference_id;
+		return referenceIds;
 	}
 
 	@Override
@@ -39,10 +55,16 @@ public class GetManagedObjectFromReference extends AbstractAdminMessage<ManagedO
 		throws IOException, NoSuchFieldException, IllegalAccessException
 	{
 		ManagedObjectCapsule result = new ManagedObjectCapsule();
-		try {
-			result.object = AppContext.getManager(DataInspectorManager.class).getObject(reference_id);
-		} catch(ObjectNotFoundException onfe) {
-			logger.log(Level.WARNING, "Tried to get a non-existing object", onfe);
+		for (BigInteger id : referenceIds)
+		{
+			try 
+			{
+				result.objects.put(id, AppContext.getManager(DataInspectorManager.class).getObject(id));
+			} 
+			catch(ObjectNotFoundException onfe) 
+			{
+				logger.log(Level.WARNING, "Tried to get a non-existing object", onfe);
+			}
 		}
 		return result;
 	}
