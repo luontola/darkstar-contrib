@@ -140,7 +140,7 @@ public class ManagedReferenceImpl<T extends ManagedObject> implements ManagedRef
 	 */
 	public boolean isCached()
 	{
-		return object != null;
+		return status == Status.SUCCEEDED;
 	}
 	
 	/**
