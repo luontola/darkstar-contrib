@@ -11,12 +11,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Note: This class is related to {@link net.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream}.
+ * Note: This class is related to {@link com.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream}.
  * 
- * {@link net.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream} cannot be used
+ * {@link com.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream} cannot be used
  * instead because it is more specialized.
  * 
- * {@link net.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream} cannot be derived
+ * {@link com.gamalocus.sgs.adminclient.serialization.ClassLoaderOverridingObjectInputStream} cannot be derived
  * from this class because of dependency issues.
  * 
  * This is why we have to have these two, very similar classes.

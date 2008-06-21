@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.services.datainspector;
+package com.gamalocus.sgs.services.datainspector;
 
 import java.math.BigInteger;
 import java.util.Properties;

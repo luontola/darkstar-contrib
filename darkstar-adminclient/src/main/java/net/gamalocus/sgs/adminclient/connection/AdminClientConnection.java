@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.Packetizer;
 import net.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
 import net.gamalocus.sgs.adminclient.messages.AuthenticateWithServer;
 import net.gamalocus.sgs.adminclient.messages.CallMethodOnManagedObjectAdminMessage;
@@ -21,6 +20,7 @@ import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 import net.gamalocus.sgs.adminclient.serialization.AdminClientAssembler;
 import net.gamalocus.sgs.adminclient.serialization.ManagedReferenceImpl;
 
+import com.gamalocus.sgs.adminclient.Packetizer;
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
 import com.sun.sgs.client.simple.SimpleClient;

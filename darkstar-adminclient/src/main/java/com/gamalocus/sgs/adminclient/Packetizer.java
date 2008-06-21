@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient;
+package com.gamalocus.sgs.adminclient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

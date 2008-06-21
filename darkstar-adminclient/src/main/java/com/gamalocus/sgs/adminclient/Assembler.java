@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient;
+package com.gamalocus.sgs.adminclient;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import com.gamalocus.sgs.adminclient.Packetizer.Type;
 import com.sun.sgs.app.ManagedObject;
 
-import net.gamalocus.sgs.adminclient.Packetizer.Type;
 import net.gamalocus.sgs.adminclient.messages.ManagedObjectCapsule;
 import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 

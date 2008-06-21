@@ -12,11 +12,11 @@ import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.Assembler;
-import net.gamalocus.sgs.adminclient.Packetizer;
 import net.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
 import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 
+import com.gamalocus.sgs.adminclient.Assembler;
+import com.gamalocus.sgs.adminclient.Packetizer;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ClientSession;
