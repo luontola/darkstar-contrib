@@ -11,8 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
-import net.gamalocus.sgs.services.datainspector.DataInspectorManager;
 
+import com.gamalocus.sgs.services.datainspector.DataInspectorManager;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;

@@ -8,7 +8,8 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.Assembler;
+import com.gamalocus.sgs.adminclient.Assembler;
+
 import net.gamalocus.sgs.adminclient.connection.AdminClientConnection;
 
 public class AdminClientAssembler<T extends Serializable> extends Assembler<T>

@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.services.profile;
+package com.gamalocus.sgs.services.profile;
 
 import java.util.Hashtable;
 import java.util.logging.Logger;

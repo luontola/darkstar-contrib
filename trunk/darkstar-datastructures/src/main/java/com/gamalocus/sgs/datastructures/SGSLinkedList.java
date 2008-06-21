@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.datastructures;
+package com.gamalocus.sgs.datastructures;
 
 import java.io.Serializable;
 
