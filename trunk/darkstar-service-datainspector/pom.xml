@@ -56,10 +56,17 @@
 		<repository>
 			<id>gamalocus.net-ssh</id>
 			<url>
-				scpexe://gamalocus.com/home/apache/websites/www.gamalocus.com/maven2
+				scpexe://gamalocus.com/home/apache/websites/www.gamalocus.com/maven2/repository
 			</url>
 		</repository>
+		<snapshotRepository>
+			<id>gamalocus.net-snapshot-ssh</id>
+			<url>
+				scpexe://gamalocus.com/home/apache/websites/www.gamalocus.com/maven2/snapshotRepository
+			</url>
+		</snapshotRepository>
 	</distributionManagement>
+
 
 	<dependencies>
 		<dependency>
