@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.serialization;
+package com.gamalocus.sgs.adminclient.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;

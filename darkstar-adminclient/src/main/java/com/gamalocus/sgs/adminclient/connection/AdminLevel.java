@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.connection;
+package com.gamalocus.sgs.adminclient.connection;
 
 public enum AdminLevel
 {

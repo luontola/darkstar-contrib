@@ -13,10 +13,10 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import com.gamalocus.sgs.adminclient.Packetizer.Type;
+import com.gamalocus.sgs.adminclient.messages.ManagedObjectCapsule;
+import com.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 import com.sun.sgs.app.ManagedObject;
 
-import net.gamalocus.sgs.adminclient.messages.ManagedObjectCapsule;
-import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 
 public class Assembler<T extends Serializable> implements Serializable
 {

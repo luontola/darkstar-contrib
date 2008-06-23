@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.connection;
+package com.gamalocus.sgs.adminclient.connection;
 
 import java.util.EnumSet;
 

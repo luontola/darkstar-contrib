@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.serialization;
+package com.gamalocus.sgs.adminclient.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,8 @@ import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import com.gamalocus.sgs.adminclient.Assembler;
+import com.gamalocus.sgs.adminclient.connection.AdminClientConnection;
 
-import net.gamalocus.sgs.adminclient.connection.AdminClientConnection;
 
 public class AdminClientAssembler<T extends Serializable> extends Assembler<T>
 {

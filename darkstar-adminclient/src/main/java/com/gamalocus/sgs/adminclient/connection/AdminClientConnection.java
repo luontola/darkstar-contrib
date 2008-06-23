@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.connection;
+package com.gamalocus.sgs.adminclient.connection;
 
 import java.io.IOException;
 import java.io.ObjectStreamClass;
@@ -13,14 +13,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
-import net.gamalocus.sgs.adminclient.messages.AuthenticateWithServer;
-import net.gamalocus.sgs.adminclient.messages.CallMethodOnManagedObjectAdminMessage;
-import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
-import net.gamalocus.sgs.adminclient.serialization.AdminClientAssembler;
-import net.gamalocus.sgs.adminclient.serialization.ManagedReferenceImpl;
 
 import com.gamalocus.sgs.adminclient.Packetizer;
+import com.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
+import com.gamalocus.sgs.adminclient.messages.AuthenticateWithServer;
+import com.gamalocus.sgs.adminclient.messages.CallMethodOnManagedObjectAdminMessage;
+import com.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
+import com.gamalocus.sgs.adminclient.serialization.AdminClientAssembler;
+import com.gamalocus.sgs.adminclient.serialization.ManagedReferenceImpl;
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
 import com.sun.sgs.client.simple.SimpleClient;
