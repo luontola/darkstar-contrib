@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.messages;
+package com.gamalocus.sgs.adminclient.messages;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -10,8 +10,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 
+import com.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import com.gamalocus.sgs.services.datainspector.DataInspectorManager;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedObject;

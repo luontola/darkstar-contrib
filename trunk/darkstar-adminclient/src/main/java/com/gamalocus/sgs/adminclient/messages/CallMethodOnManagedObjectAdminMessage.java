@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.messages;
+package com.gamalocus.sgs.adminclient.messages;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 
+import com.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import com.gamalocus.sgs.services.datainspector.DataInspectorManager;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedObject;

@@ -3,7 +3,7 @@
  *
  * @author emanuel
  */
-package net.gamalocus.sgs.adminclient.connection;
+package com.gamalocus.sgs.adminclient.connection;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,11 +12,11 @@ import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
-import net.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 
 import com.gamalocus.sgs.adminclient.Assembler;
 import com.gamalocus.sgs.adminclient.Packetizer;
+import com.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
+import com.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ClientSession;

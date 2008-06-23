@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.serialization;
+package com.gamalocus.sgs.adminclient.serialization;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,10 +8,10 @@ import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.gamalocus.sgs.adminclient.connection.AdminClientConnection;
-import net.gamalocus.sgs.adminclient.connection.AdminClientConnectionFactory;
-import net.gamalocus.sgs.adminclient.messages.GetManagedObjectFromReference;
 
+import com.gamalocus.sgs.adminclient.connection.AdminClientConnection;
+import com.gamalocus.sgs.adminclient.connection.AdminClientConnectionFactory;
+import com.gamalocus.sgs.adminclient.messages.GetManagedObjectFromReference;
 import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
 

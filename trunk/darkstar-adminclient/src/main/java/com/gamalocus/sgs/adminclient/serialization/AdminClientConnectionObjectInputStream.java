@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.gamalocus.sgs.adminclient.serialization;
+package com.gamalocus.sgs.adminclient.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,10 @@ import java.io.ObjectStreamClass;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.gamalocus.sgs.adminclient.connection.AdminClientConnection;
+
 import sun.reflect.generics.repository.ClassRepository;
 
-import net.gamalocus.sgs.adminclient.connection.AdminClientConnection;
 
 public class AdminClientConnectionObjectInputStream extends CustomClassLoaderObjectInputStream
 {

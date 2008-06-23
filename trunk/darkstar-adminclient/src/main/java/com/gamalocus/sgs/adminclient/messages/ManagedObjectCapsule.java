@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.adminclient.messages;
+package com.gamalocus.sgs.adminclient.messages;
 
 import java.io.Serializable;
 import java.math.BigInteger;
