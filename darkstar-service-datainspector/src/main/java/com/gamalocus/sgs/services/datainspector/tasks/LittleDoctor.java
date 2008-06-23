@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.services.datainspector.tasks;
+package com.gamalocus.sgs.services.datainspector.tasks;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
