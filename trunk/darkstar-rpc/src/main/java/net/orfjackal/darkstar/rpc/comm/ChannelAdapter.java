@@ -60,6 +60,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     }
 
     public void setChannel(Channel channel) {
+        // TODO: mock the data manager (move mocks from darkstar-tref into darkstar-exp-mocks)
         this.channel = AppContext.getDataManager().createReference(channel);
     }
 
@@ -90,7 +91,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
         private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {
-            ByteBuffer buf = ByteBuffer.allocateDirect(message.length + 1);
+            ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
             buf.put(RpcGateway.REQUEST_TO_SLAVE);
             buf.put(message);
             buf.flip();
@@ -107,7 +108,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
         private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {
-            ByteBuffer buf = ByteBuffer.allocateDirect(message.length + 1);
+            ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
             buf.put(RpcGateway.RESPONSE_FROM_MASTER);
             buf.put(message);
             buf.flip();
