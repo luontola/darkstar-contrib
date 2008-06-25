@@ -1,4 +1,4 @@
-package net.gamalocus.sgs.services.hotbackup;
+package com.gamalocus.sgs.services.hotbackup;
 
 import java.io.File;
 import java.io.IOException;
