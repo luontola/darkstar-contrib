@@ -123,6 +123,8 @@ public class EndToEndSpec extends Specification<Object> {
     }
 }
 
+// TODO: method callbacks (from the server side, call the method of an anonymous inner class given as a parameter on the client side)
+
 /*
 TODO: synchronous and asynchronous versions of the same interface (or rely on Future.get() only?)
 
