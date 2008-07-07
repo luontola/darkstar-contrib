@@ -47,15 +47,15 @@
 
 	<distributionManagement>
 		<repository>
-			<id>gamalocus.net-ssh</id>
+			<id>gamalocus.com-dev</id>
 			<url>
-				scpexe://gamalocus.com/home/apache/websites/www.gamalocus.com/maven2/repository
+				scpexe://dev.cotwl.net/home/cotk/maven2/repository
 			</url>
 		</repository>
 		<snapshotRepository>
-			<id>gamalocus.net-snapshot-ssh</id>
+			<id>gamalocus.com-snapshot-dev</id>
 			<url>
-				scpexe://gamalocus.com/home/apache/websites/www.gamalocus.com/maven2/snapshotRepository
+				scpexe://dev.cotwl.net/home/cotk/maven2/snapshotRepository
 			</url>
 		</snapshotRepository>
 	</distributionManagement>
