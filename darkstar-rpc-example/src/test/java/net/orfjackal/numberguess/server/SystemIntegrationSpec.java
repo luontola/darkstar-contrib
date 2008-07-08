@@ -24,56 +24,16 @@
 
 package net.orfjackal.numberguess.server;
 
-import com.sun.sgs.app.ManagedObject;
-import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.numberguess.game.GuessResult;
-import net.orfjackal.numberguess.game.NumberGuessGame;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
-
-import java.io.Serializable;
-import java.util.concurrent.Future;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
 
 /**
  * @author Esko Luontola
- * @since 16.6.2008
+ * @since 19.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject, Serializable {
+@RunWith(JDaveRunner.class)
+public class SystemIntegrationSpec extends Specification<Object> {
 
-    // TODO: Make this class non-ManagedObject, and make instead NumberGuessGameImpl a ManagedObject. Wrap 'game' field in a ManagedReference. 
-
-    private static final long serialVersionUID = 1L;
-
-    private final NumberGuessGame game;
-
-    public NumberGuessGameServiceImpl(NumberGuessGame game) {
-        this.game = game;
-    }
-
-    public Future<Integer> getMinimum() {
-        return ServiceHelper.wrap(game.getMinimum());
-    }
-
-    public void setMinimum(int minimum) {
-        game.setMinimum(minimum);
-    }
-
-    public Future<Integer> getMaximum() {
-        return ServiceHelper.wrap(game.getMaximum());
-    }
-
-    public void setMaximum(int maximum) {
-        game.setMaximum(maximum);
-    }
-
-    public void newGame() {
-        game.newGame();
-    }
-
-    public Future<GuessResult> guess(int guess) {
-        return ServiceHelper.wrap(game.guess(guess));
-    }
-
-    public Future<Integer> tries() {
-        return ServiceHelper.wrap(game.tries());
-    }
+    // TODO: use darkstar-integration-test for some final tests, to make sure ManagedReferences are created correctly
 }
