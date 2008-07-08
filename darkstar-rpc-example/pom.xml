@@ -61,13 +61,13 @@
 
     <dependencies>
 
+        <!-- TODO: should run with Vanilla Darkstar, once ManagedReference management is added -->
         <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-server</artifactId>
             <version>0.9.6_0</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-client</artifactId>
