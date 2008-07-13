@@ -30,6 +30,7 @@ import com.sun.sgs.client.ServerSessionListener;
 import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.darkstar.rpc.MockChannel;
 import net.orfjackal.darkstar.rpc.ServiceProvider;
 import net.orfjackal.darkstar.rpc.ServiceReference;
@@ -47,6 +48,15 @@ import java.util.concurrent.TimeoutException;
  */
 @RunWith(JDaveRunner.class)
 public class ChannelAdapterSpec extends Specification<Object> {
+
+    public void create() {
+        MockAppContext.install();
+    }
+
+    public void destroy() {
+        MockAppContext.uninstall();
+    }
+
 
     public class WhenThereIsAChannelForRpcBetweenOneClient {
 
