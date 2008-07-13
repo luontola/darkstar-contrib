@@ -34,6 +34,7 @@ import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.util.DebugClient;
+import net.orfjackal.darkstar.rpc.util.TimeoutInterrupter;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
