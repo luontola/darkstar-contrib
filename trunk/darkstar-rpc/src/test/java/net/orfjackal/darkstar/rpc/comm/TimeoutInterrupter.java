@@ -30,7 +30,7 @@ package net.orfjackal.darkstar.rpc.comm;
  */
 public class TimeoutInterrupter implements Runnable {
 
-    // TODO: move this utility to a utility project and write tests for it
+    // TODO: move this utility to a utility project and write tests for it (maybe darkstar-integration-test together with DarkstarIntegrationSpec.RpcTestClient?)
     // test: wait on java.util.concurrent.BlockingQueue.take, nothing to take -> interrupted
     // test: wait on java.util.concurrent.BlockingQueue.take, somethign to take -> no interrupt
 

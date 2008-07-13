@@ -152,6 +152,8 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static class RpcTestClient implements SimpleClientListener {
 
+        // TODO: move this to a utility project, maybe darkstar-integration-test?
+
         public static final String LOGGED_IN = "loggedIn";
         public static final String LOGIN_FAILED = "loginFailed";
         public static final String RECONNECTING = "reconnecting";
