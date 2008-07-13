@@ -52,7 +52,7 @@ public class RpcServerSpec extends Specification<Object> {
     private Logger log;
     private Filter filter;
 
-    public RpcServerSpec() {
+    public void create() {
         client = new DummySender();
         server = new RpcServerImpl(client);
 
@@ -61,7 +61,7 @@ public class RpcServerSpec extends Specification<Object> {
         log.setFilter(filter);
     }
 
-    private void destroyParent() {
+    public void destroy() {
         log.setFilter(null);
     }
 
@@ -76,10 +76,6 @@ public class RpcServerSpec extends Specification<Object> {
 
         public Object create() {
             return null;
-        }
-
-        public void destroy() {
-            destroyParent();
         }
 
         public void noServicesMayBeInvoked() {
@@ -101,10 +97,6 @@ public class RpcServerSpec extends Specification<Object> {
             service = new FooServiceImpl();
             serviceRef = server.registerService(FooService.class, service);
             return null;
-        }
-
-        public void destroy() {
-            destroyParent();
         }
 
         public void serviceMethodsMayBeInvoked() {
@@ -192,10 +184,6 @@ public class RpcServerSpec extends Specification<Object> {
             serviceRef1 = server.registerService(FooService.class, service1);
             serviceRef2 = server.registerService(FooService.class, service2);
             return null;
-        }
-
-        public void destroy() {
-            destroyParent();
         }
 
         public void allTheServicesAreRegistered() {

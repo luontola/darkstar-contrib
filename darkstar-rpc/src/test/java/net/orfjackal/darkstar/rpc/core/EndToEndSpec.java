@@ -51,7 +51,7 @@ public class EndToEndSpec extends Specification<Object> {
     private ServiceReference<Foo> fooServiceRef;
     private Foo fooProxy;
 
-    public EndToEndSpec() {
+    public void create() {
         server = new RpcServerImpl(network.getServerToClient());
         client = new RpcClientImpl(network.getClientToServer());
 
@@ -64,7 +64,7 @@ public class EndToEndSpec extends Specification<Object> {
         fooProxy = factory.create(fooServiceRef);
     }
 
-    private void destroyParent() {
+    public void destroy() {
         network.shutdown();
     }
 
@@ -73,10 +73,6 @@ public class EndToEndSpec extends Specification<Object> {
 
         public Object create() {
             return null;
-        }
-
-        public void destroy() {
-            destroyParent();
         }
 
         public void theServiceMethodOnTheServerSideIsAlsoCalled() throws InterruptedException {

@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
  * @since 15.6.2008
  */
 public class MockChannel {
+    
+    // TODO: move to darkstar-exp-mocks?
 
     private final ExecutorService messageQueue = Executors.newCachedThreadPool();
 

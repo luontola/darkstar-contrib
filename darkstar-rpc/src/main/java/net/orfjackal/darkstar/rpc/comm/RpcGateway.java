@@ -99,7 +99,7 @@ public class RpcGateway implements RpcServer, Serializable {
     private Set asProxies(Set refs) {
         Set proxies = new HashSet();
         for (Object ref : refs) {
-            proxies.add(proxyFactory.create((ServiceReference) ref));
+            proxies.add(proxyFactory.create((ServiceReference<?>) ref));
         }
         return proxies;
     }

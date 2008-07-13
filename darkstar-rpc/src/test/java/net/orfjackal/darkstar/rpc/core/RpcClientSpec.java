@@ -51,7 +51,7 @@ public class RpcClientSpec extends Specification<Object> {
     private DummySender server;
     private RpcClient client;
 
-    public RpcClientSpec() {
+    public void create() {
         server = new DummySender();
         client = new RpcClientImpl(server);
     }
