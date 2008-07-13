@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.util;
+package net.orfjackal.darkstar.integration.util;
 
 /**
  * Interrupts the specified thread after the timeout has passed, unless the thread
@@ -33,7 +33,7 @@ package net.orfjackal.darkstar.rpc.util;
  */
 public class TimedInterrupt implements Runnable {
 
-    // TODO: move this utility to a utility project and write tests for it (maybe darkstar-integration-test together with DarkstarIntegrationSpec.RpcTestClient?)
+    // TODO: write tests for this class
     // test: wait on java.util.concurrent.BlockingQueue.take, nothing to take -> interrupted
     // test: wait on java.util.concurrent.BlockingQueue.take, somethign to take -> no interrupt
 
