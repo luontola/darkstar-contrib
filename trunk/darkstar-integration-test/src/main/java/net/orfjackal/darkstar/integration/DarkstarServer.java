@@ -59,7 +59,8 @@ public class DarkstarServer {
     private final File workingDir;
     private final Properties appProperties;
     private ProcessHolder process;
-    private StreamWaiter waiter;
+    private StreamWaiter outWaiter;
+    private StreamWaiter errWaiter;
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
@@ -118,7 +119,8 @@ public class DarkstarServer {
             throw new IllegalStateException("Already started");
         }
         process = executor.exec(getMainClass(), configFile.getAbsolutePath());
-        waiter = new StreamWaiter(getSystemErr());
+        outWaiter = new StreamWaiter(getSystemOut());
+        errWaiter = new StreamWaiter(getSystemErr());
     }
 
     private File createAppConfig() {
@@ -172,7 +174,8 @@ public class DarkstarServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        waiter.dispose();
+        outWaiter.dispose();
+        errWaiter.dispose();
     }
 
     public boolean isRunning() {
@@ -196,14 +199,22 @@ public class DarkstarServer {
     }
 
     public void waitForKernelReady(int timeout) throws TimeoutException {
-        waiter.waitForBytes(KERNEL_READY_MSG.getBytes(), timeout);
+        waitUntilSystemErrContains(KERNEL_READY_MSG, timeout);
     }
 
     public void waitForApplicationReady(int timeout) throws TimeoutException {
-        waiter.waitForBytes(APPLICATION_READY_MSG.getBytes(), timeout);
+        waitUntilSystemErrContains(APPLICATION_READY_MSG, timeout);
     }
 
     public void waitForApplessContextReady(int timeout) throws TimeoutException {
-        waiter.waitForBytes(APPLESS_CONTEXT_READY_MSG.getBytes(), timeout);
+        waitUntilSystemErrContains(APPLESS_CONTEXT_READY_MSG, timeout);
+    }
+
+    public void waitUntilSystemOutContains(String needle, int timeout) throws TimeoutException {
+        outWaiter.waitForBytes(needle.getBytes(), timeout);
+    }
+
+    public void waitUntilSystemErrContains(String needle, int timeout) throws TimeoutException {
+        errWaiter.waitForBytes(needle.getBytes(), timeout);
     }
 }
