@@ -53,26 +53,14 @@ public class GameMain implements Runnable {
         String username = in.nextLine();
 
         GameClient client = new GameClient(username);
-//        if (client.login(host, port)) {
-//            waitUntilLoggedIn(client);
-//            game = client.getNumberGuessGame();
-//            try {
-//                gameLoop();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            client.logout(false);
-//        }
-    }
-
-    private void waitUntilLoggedIn(GameClient client) {
+        client.login(host, port);
+        game = client.getGame();
         try {
-            while (!client.isConnected()) {
-                Thread.sleep(100);
-            }
-        } catch (InterruptedException e) {
+            gameLoop();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        client.logout(false);
     }
 
     private void gameLoop() throws ExecutionException, InterruptedException {
