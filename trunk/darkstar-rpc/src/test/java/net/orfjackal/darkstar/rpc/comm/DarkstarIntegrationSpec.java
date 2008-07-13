@@ -34,7 +34,7 @@ import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.util.DebugClient;
-import net.orfjackal.darkstar.rpc.util.TimeoutInterrupter;
+import net.orfjackal.darkstar.rpc.util.TimedInterrupt;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
@@ -63,7 +63,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private TempDirectory tempDirectory;
         private StreamWaiter waiter;
-        private Thread testTimeouter;
+        private Thread testTimeout;
 
         public Object create() throws TimeoutException {
             tempDirectory = new TempDirectory();
@@ -83,18 +83,11 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             };
 
             // wait for the server to start up before running the tests
-            // TODO: move to darkstar-integration-test as a 'waitForApplicationStartup' method?
             waiter = new StreamWaiter(server.getSystemOut());
-            try {
-                waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
-            } catch (TimeoutException e) {
-                System.out.println(server.getSystemOut());
-                System.err.println(server.getSystemErr());
-                throw e;
-            }
+            waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
 
-            // needed to avoid blocking in client.events.take()
-            testTimeouter = TimeoutInterrupter.start(Thread.currentThread(), TIMEOUT);
+            // needed to avoid blocking on client.events.take()
+            testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
             return null;
         }
 
@@ -105,8 +98,8 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 //            System.out.println(server.getSystemOut());
 //            System.err.println("Server Log:");
 //            System.err.println(server.getSystemErr());
+            testTimeout.interrupt();
             client.logout(true);
-            testTimeouter.interrupt();
             server.shutdown();
             tempDirectory.dispose();
         }

@@ -31,7 +31,7 @@ package net.orfjackal.darkstar.rpc.util;
  * @author Esko Luontola
  * @since 18.6.2008
  */
-public class TimeoutInterrupter implements Runnable {
+public class TimedInterrupt implements Runnable {
 
     // TODO: move this utility to a utility project and write tests for it (maybe darkstar-integration-test together with DarkstarIntegrationSpec.RpcTestClient?)
     // test: wait on java.util.concurrent.BlockingQueue.take, nothing to take -> interrupted
@@ -40,20 +40,25 @@ public class TimeoutInterrupter implements Runnable {
     private final Thread threadToInterrupt;
     private final int timeout;
 
+    public static Thread startOnCurrentThread(int timeout) {
+        return start(Thread.currentThread(), timeout);
+    }
+
     public static Thread start(Thread threadToInterrupt, int timeout) {
-        Thread t = new Thread(new TimeoutInterrupter(threadToInterrupt, timeout));
+        Thread t = new Thread(new TimedInterrupt(threadToInterrupt, timeout));
         t.setDaemon(true);
         t.start();
         return t;
     }
 
-    public TimeoutInterrupter(Thread threadToInterrupt, int timeout) {
+    public TimedInterrupt(Thread threadToInterrupt, int timeout) {
         this.threadToInterrupt = threadToInterrupt;
         this.timeout = timeout;
     }
 
     public void run() {
         try {
+            assert Thread.currentThread().isDaemon();
             Thread.sleep(timeout);
             if (!Thread.currentThread().isInterrupted()) {
                 threadToInterrupt.interrupt();
