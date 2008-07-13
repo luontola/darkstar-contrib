@@ -4,7 +4,7 @@
 
 Darkstar Integration Test contains utility classes for easily starting up the Darkstar Server in a separate process. Utilities for deleting the generated data files after running the tests are also provided.
 
-Here is a short example of using the !DarkstarServer and !DebugClient classes to run a tests where the client logs in and disconnects. Later this library might contain better JUnit integration, but for now this is how you can use it:
+Here is a short example of using the [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DarkstarServer.java DarkstarServer] and [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DebugClient.java DebugClient] classes to run a tests where the client logs in and disconnects. Later this library might contain better JUnit integration, but for now this is how you can use it:
 
 {{{
 final int TIMEOUT = 5000;
@@ -41,7 +41,7 @@ assert event.startsWith(DebugClient.DISCONNECTED);
 
 /* TEAR DOWN */
 
-System.out.println(server.getSystemOut()); // for debug purposes
+System.out.println(server.getSystemOut()); // you may also find [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/util/StreamWaiter.java StreamWaiter] useful
 System.err.println(server.getSystemErr());
 
 testTimeout.interrupt();
