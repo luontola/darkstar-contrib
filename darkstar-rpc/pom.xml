@@ -30,8 +30,7 @@
 
     <scm>
         <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</connection>
-        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc
-        </developerConnection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc</developerConnection>
         <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc</url>
     </scm>
 
@@ -91,6 +90,13 @@
             <artifactId>darkstar-client</artifactId>
             <version>0.9.6_1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.orfjackal.darkstar-exp</groupId>
+            <artifactId>darkstar-exp-mocks</artifactId>
+            <version>0.9.6_1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
