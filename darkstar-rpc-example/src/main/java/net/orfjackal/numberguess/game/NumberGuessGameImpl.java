@@ -24,6 +24,8 @@
 
 package net.orfjackal.numberguess.game;
 
+import com.sun.sgs.app.ManagedObject;
+
 import java.io.Serializable;
 import java.util.Random;
 
@@ -31,8 +33,7 @@ import java.util.Random;
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameImpl implements NumberGuessGame, Serializable {
-
+public class NumberGuessGameImpl implements NumberGuessGame, ManagedObject, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final int DEFAULT_MIN = 1;

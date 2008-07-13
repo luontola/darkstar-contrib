@@ -24,11 +24,12 @@
 
 package net.orfjackal.numberguess.server;
 
-import com.sun.sgs.app.ManagedObject;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.numberguess.game.GuessResult;
 import net.orfjackal.numberguess.game.NumberGuessGame;
+import net.orfjackal.numberguess.game.NumberGuessGameImpl;
 import net.orfjackal.numberguess.services.NumberGuessGameService;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -42,19 +43,24 @@ import java.util.concurrent.ExecutionException;
 @RunWith(JDaveRunner.class)
 public class NumberGuessGameServiceSpec extends Specification<Object> {
 
+    public void create() throws Exception {
+        MockAppContext.install();
+    }
+
+    public void destroy() throws Exception {
+        MockAppContext.uninstall();
+    }
+
+    
     public class ANumberGuessGameService {
 
         private NumberGuessGame game;
         private NumberGuessGameService service;
 
         public Object create() {
-            game = mock(NumberGuessGame.class);
+            game = mock(NumberGuessGameImpl.class);
             service = new NumberGuessGameServiceImpl(game);
             return null;
-        }
-
-        public void isAManagedObject() {
-            specify(service instanceof ManagedObject);
         }
 
         public void forwardsGetMinimum() throws ExecutionException, InterruptedException {

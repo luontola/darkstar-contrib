@@ -52,20 +52,20 @@ public class GameMain implements Runnable {
         System.out.print("Enter your name: ");
         String username = in.nextLine();
 
-        GameClientListener client = new GameClientListener(username);
-        if (client.login(host, port)) {
-            waitUntilLoggedIn(client);
-            game = client.getNumberGuessGame();
-            try {
-                gameLoop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            client.logout();
-        }
+        GameClient client = new GameClient(username);
+//        if (client.login(host, port)) {
+//            waitUntilLoggedIn(client);
+//            game = client.getNumberGuessGame();
+//            try {
+//                gameLoop();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            client.logout(false);
+//        }
     }
 
-    private void waitUntilLoggedIn(GameClientListener client) {
+    private void waitUntilLoggedIn(GameClient client) {
         try {
             while (!client.isConnected()) {
                 Thread.sleep(100);

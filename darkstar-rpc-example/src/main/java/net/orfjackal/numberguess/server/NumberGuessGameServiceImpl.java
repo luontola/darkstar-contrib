@@ -24,7 +24,8 @@
 
 package net.orfjackal.numberguess.server;
 
-import com.sun.sgs.app.ManagedObject;
+import com.sun.sgs.app.AppContext;
+import com.sun.sgs.app.ManagedReference;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.numberguess.game.GuessResult;
 import net.orfjackal.numberguess.game.NumberGuessGame;
@@ -37,43 +38,40 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class NumberGuessGameServiceImpl implements NumberGuessGameService, ManagedObject, Serializable {
-
-    // TODO: Make this class non-ManagedObject, and make instead NumberGuessGameImpl a ManagedObject. Wrap 'game' field in a ManagedReference. 
-
+public class NumberGuessGameServiceImpl implements NumberGuessGameService, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final NumberGuessGame game;
+    private final ManagedReference<NumberGuessGame> game;
 
     public NumberGuessGameServiceImpl(NumberGuessGame game) {
-        this.game = game;
+        this.game = AppContext.getDataManager().createReference(game);
     }
 
     public Future<Integer> getMinimum() {
-        return ServiceHelper.wrap(game.getMinimum());
+        return ServiceHelper.wrap(game.get().getMinimum());
     }
 
     public void setMinimum(int minimum) {
-        game.setMinimum(minimum);
+        game.get().setMinimum(minimum);
     }
 
     public Future<Integer> getMaximum() {
-        return ServiceHelper.wrap(game.getMaximum());
+        return ServiceHelper.wrap(game.get().getMaximum());
     }
 
     public void setMaximum(int maximum) {
-        game.setMaximum(maximum);
+        game.get().setMaximum(maximum);
     }
 
     public void newGame() {
-        game.newGame();
+        game.get().newGame();
     }
 
     public Future<GuessResult> guess(int guess) {
-        return ServiceHelper.wrap(game.guess(guess));
+        return ServiceHelper.wrap(game.get().guess(guess));
     }
 
     public Future<Integer> tries() {
-        return ServiceHelper.wrap(game.tries());
+        return ServiceHelper.wrap(game.get().tries());
     }
 }

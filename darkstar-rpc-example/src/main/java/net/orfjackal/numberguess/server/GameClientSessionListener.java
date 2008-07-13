@@ -40,18 +40,23 @@ import java.util.logging.Logger;
  * @since 16.6.2008
  */
 public class GameClientSessionListener implements ClientSessionListener, ManagedObjectRemoval, ManagedObject, Serializable {
-
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(GameClientSessionListener.class.getName());
 
-    private final ClientSession session;
+    private final ManagedReference<ClientSession> session;
     private final RpcGateway gateway;
+    private final ManagedReference<NumberGuessGameImpl> game;
 
     public GameClientSessionListener(ClientSession session) {
-        this.session = session;
+        this.session = AppContext.getDataManager().createReference(session);
+        this.game = AppContext.getDataManager().createReference(new NumberGuessGameImpl());
         this.gateway = initGateway(session);
+        registerServices();
+    }
+
+    private void registerServices() {
         gateway.registerService(NumberGuessGameService.class,
-                new NumberGuessGameServiceImpl(new NumberGuessGameImpl()));
+                new NumberGuessGameServiceImpl(game.get()));
     }
 
     private RpcGateway initGateway(ClientSession session) {
@@ -71,10 +76,11 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
     }
 
     public void disconnected(boolean graceful) {
-        logger.log(Level.INFO, "User {0} disconnected", session.getName());
+        logger.log(Level.INFO, "User {0} disconnected", session.get().getName());
     }
 
     public void removingObject() {
         logger.log(Level.INFO, "Removing " + getClass().getName());
+        AppContext.getDataManager().removeObject(game.getForUpdate());
     }
 }

@@ -32,7 +32,6 @@ import net.orfjackal.darkstar.rpc.comm.ClientChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
 import net.orfjackal.numberguess.services.NumberGuessGameService;
 
-import java.io.IOException;
 import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
 import java.util.Properties;
@@ -42,27 +41,31 @@ import java.util.Set;
  * @author Esko Luontola
  * @since 16.6.2008
  */
-public class GameClientListener implements SimpleClientListener {
+public class GameClient {
 
+    private static final int TIMEOUT = 5000;
+
+    private final String username;
     private final SimpleClient client;
-    private String username;
+    private final Object waitForResponse = new Object();
     private NumberGuessGameService numberGuessGame;
 
-    public GameClientListener(String username) {
+    public GameClient(String username) {
         this.username = username;
-        client = new SimpleClient(this);
+        client = new SimpleClient(new MySimpleClientListener());
     }
 
-    public boolean login(String host, String port) {
+    public void login(String host, String port) {
         Properties props = new Properties();
         props.put("host", host);
         props.put("port", port);
         try {
-            client.login(props);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            synchronized (waitForResponse) {
+                client.login(props);
+                waitForResponse.wait(TIMEOUT);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -70,8 +73,8 @@ public class GameClientListener implements SimpleClientListener {
         return client.isConnected();
     }
 
-    public void logout() {
-        client.logout(false);
+    public void logout(boolean force) {
+        client.logout(force);
     }
 
     private void initServices(RpcGateway gateway) {
@@ -91,42 +94,50 @@ public class GameClientListener implements SimpleClientListener {
         return numberGuessGame;
     }
 
-    public void receivedMessage(ByteBuffer message) {
+    private void fireResponseRecieved() {
+        synchronized (waitForResponse) {
+            waitForResponse.notifyAll();
+        }
     }
 
-    public ClientChannelListener joinedChannel(ClientChannel channel) {
-        ClientChannelAdapter adapter = new ClientChannelAdapter();
-        ClientChannelListener listener = adapter.joinedChannel(channel);
-        initServices(adapter.getGateway());
-        return listener;
-    }
 
-    public PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(username, "password".toCharArray());
-    }
+    private class MySimpleClientListener implements SimpleClientListener {
 
-    public void loggedIn() {
-        System.out.println("Logged in.");
-    }
+        public void receivedMessage(ByteBuffer message) {
+        }
 
-    public void loginFailed(String reason) {
-        System.out.println("Login failed: " + reason);
-    }
+        public ClientChannelListener joinedChannel(ClientChannel channel) {
+            ClientChannelAdapter adapter = new ClientChannelAdapter();
+            ClientChannelListener listener = adapter.joinedChannel(channel);
+            initServices(adapter.getGateway());
+            return listener;
+        }
 
-    public void reconnecting() {
-        System.out.println("Reconnecting...");
-    }
+        public PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, "password".toCharArray());
+        }
 
-    public void reconnected() {
-        System.out.println("Reconnected.");
-    }
+        public void loggedIn() {
+            System.out.println("Logged in.");
+            fireResponseRecieved();
+        }
 
-    public void disconnected(boolean graceful, String reason) {
-        System.out.println("Disconnected: " + reason);
-        resetServices();
-    }
+        public void loginFailed(String reason) {
+            System.out.println("Login failed: " + reason);
+            fireResponseRecieved();
+        }
 
-    public void waitUntilConnected() {
+        public void reconnecting() {
+            System.out.println("Reconnecting...");
+        }
 
+        public void reconnected() {
+            System.out.println("Reconnected.");
+        }
+
+        public void disconnected(boolean graceful, String reason) {
+            System.out.println("Disconnected: " + reason);
+            resetServices();
+        }
     }
 }
