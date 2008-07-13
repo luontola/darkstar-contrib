@@ -27,23 +27,22 @@ package net.orfjackal.darkstar.rpc.comm;
 import com.sun.sgs.app.*;
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
-import com.sun.sgs.client.simple.SimpleClient;
-import com.sun.sgs.client.simple.SimpleClientListener;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.DarkstarServer;
 import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
+import net.orfjackal.darkstar.rpc.util.DebugClient;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -78,7 +77,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             gatewayOnClient = adapter.getGateway();
             client = new DebugClient("localhost", server.getPort()) {
                 public ClientChannelListener joinedChannel(ClientChannel channel) {
-                    super.joinedChannel(channel);
                     return adapter.joinedChannel(channel);
                 }
             };
@@ -178,87 +176,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void disconnected(boolean graceful) {
-        }
-    }
-
-    private static class DebugClient implements SimpleClientListener {
-
-        // TODO: move this to a utility project, maybe darkstar-integration-test?
-
-        public static final String LOGGED_IN = "loggedIn";
-        public static final String LOGIN_FAILED = "loginFailed";
-        public static final String RECONNECTING = "reconnecting";
-        public static final String RECONNECTED = "reconnected";
-        public static final String DISCONNECTED = "disconnected";
-        public static final String JOINED_CHANNEL = "joinedChannel";
-
-        public final BlockingQueue<String> events = new LinkedBlockingQueue<String>();
-        public final BlockingQueue<ByteBuffer> messages = new LinkedBlockingQueue<ByteBuffer>();
-
-        private final String host;
-        private final int port;
-        private final SimpleClient client;
-
-        public DebugClient(String host, int port) {
-            this.host = host;
-            this.port = port;
-            this.client = new SimpleClient(this);
-        }
-
-        public void login() {
-            Properties props = new Properties();
-            props.setProperty("host", host);
-            props.setProperty("port", Integer.toString(port));
-            try {
-                client.login(props);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public boolean isConnected() {
-            return client.isConnected();
-        }
-
-        public void logout(boolean force) {
-            client.logout(force);
-        }
-
-        public void send(ByteBuffer message) throws IOException {
-            client.send(message);
-        }
-
-        public void receivedMessage(ByteBuffer message) {
-            messages.add(message);
-        }
-
-        public ClientChannelListener joinedChannel(ClientChannel channel) {
-            events.add(JOINED_CHANNEL + ": " + channel);
-            return null;
-        }
-
-        public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication("guest", "guest".toCharArray());
-        }
-
-        public void loggedIn() {
-            events.add(LOGGED_IN);
-        }
-
-        public void loginFailed(String reason) {
-            events.add(LOGIN_FAILED + ": " + reason);
-        }
-
-        public void reconnecting() {
-            events.add(RECONNECTING);
-        }
-
-        public void reconnected() {
-            events.add(RECONNECTED);
-        }
-
-        public void disconnected(boolean graceful, String reason) {
-            events.add(DISCONNECTED + ": " + graceful + ", " + reason);
         }
     }
 
