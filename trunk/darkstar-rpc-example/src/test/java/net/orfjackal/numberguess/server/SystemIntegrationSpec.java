@@ -27,7 +27,6 @@ package net.orfjackal.numberguess.server;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.DarkstarServer;
-import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.numberguess.client.GameClient;
@@ -49,7 +48,6 @@ public class SystemIntegrationSpec extends Specification<Object> {
 
     private DarkstarServer server;
     private TempDirectory tempDirectory;
-    private StreamWaiter waiter;
     private Thread testTimeout;
 
     public void create() throws Exception {
@@ -60,10 +58,7 @@ public class SystemIntegrationSpec extends Specification<Object> {
         server.setAppName("NumberGuessGame");
         server.setAppListener(GameAppListener.class);
         server.start();
-
-        // wait for the server to start
-        waiter = new StreamWaiter(server.getSystemErr());
-        waiter.waitForBytes("NumberGuessGame".getBytes(), TIMEOUT);
+        server.waitForApplicationReady(TIMEOUT);
 
         // abort the tests if they take too long
         testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
