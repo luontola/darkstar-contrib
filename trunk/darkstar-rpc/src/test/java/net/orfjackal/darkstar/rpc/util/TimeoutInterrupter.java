@@ -22,11 +22,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.comm;
+package net.orfjackal.darkstar.rpc.util;
 
 /**
  * Interrupts the specified thread after the timeout has passed, unless the thread
  * where this interrupter is running is interrupted first.
+ *
+ * @author Esko Luontola
+ * @since 18.6.2008
  */
 public class TimeoutInterrupter implements Runnable {
 
