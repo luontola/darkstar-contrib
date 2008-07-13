@@ -49,7 +49,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private MessageReciever requestReciever;
 
     private final RpcGateway gateway;
-    private ManagedReference<Channel> channel; // TODO: will not run without TransparentReferences, because Channels are managed objects
+    private ManagedReference<Channel> channel;
 
     public ChannelAdapter() {
         this(10000);
@@ -60,7 +60,6 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     }
 
     public void setChannel(Channel channel) {
-        // TODO: mock the data manager (move mocks from darkstar-tref into darkstar-exp-mocks)
         this.channel = AppContext.getDataManager().createReference(channel);
     }
 

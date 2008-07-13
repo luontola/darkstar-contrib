@@ -46,13 +46,13 @@ public class ServiceProviderSpec extends Specification<Object> {
     private RpcClient client;
     private RpcProxyFactory factory;
 
-    public ServiceProviderSpec() {
+    public void create() {
         server = new RpcServerImpl(network.getServerToClient());
         client = new RpcClientImpl(network.getClientToServer());
         factory = new RpcProxyFactory(client);
     }
 
-    private void destroyParent() {
+    public void destroy() {
         network.shutdown();
     }
 
@@ -72,10 +72,6 @@ public class ServiceProviderSpec extends Specification<Object> {
             foo2Ref = server.registerService(Foo.class, dummy(Foo.class, "foo2"));
             bar3Ref = server.registerService(Bar.class, dummy(Bar.class, "bar3"));
             return null;
-        }
-
-        public void destroy() {
-            destroyParent();
         }
 
         public void canBeRetrievedFromTheClient() {

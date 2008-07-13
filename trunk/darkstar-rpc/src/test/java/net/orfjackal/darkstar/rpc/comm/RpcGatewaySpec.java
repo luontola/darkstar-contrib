@@ -48,6 +48,10 @@ public class RpcGatewaySpec extends Specification<Object> {
     private MockNetwork toMaster = new MockNetwork();
     private MockNetwork toSlave = new MockNetwork();
 
+    public void destroy() {
+        shutdownNetwork();
+    }
+
     private void shutdownNetwork() {
         toMaster.shutdownAndWait();
         toSlave.shutdownAndWait();
@@ -73,10 +77,6 @@ public class RpcGatewaySpec extends Specification<Object> {
             masterGateway.registerService(Foo.class, fooOnMaster);
             masterGateway.registerService(Bar.class, barOnMaster);
             return null;
-        }
-
-        public void destroy() {
-            shutdownNetwork();
         }
 
         public void servicesCanBeAddedLocally() {
