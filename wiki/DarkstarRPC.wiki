@@ -3,7 +3,7 @@
 
 = Introduction =
 
-With this library it is possible to call methods on remote objects almost as if they were local objects. You need to define an interface for your RPC service and register an instance implementing that interface. Then you can query from the remote side for that service. Two-way communication is supported - the client can call RPC services on the server, and the server can call RPC services on the client.
+With this library it is possible to call methods on remote objects almost as if they were local objects. You need to define an interface for your RPC service and register an instance implementing that interface. Then you can query from the remote side for that service. Two-way communication is supported - the client can call RPC services on the server and the server can call RPC services on the client.
 
 All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (returned value or thrown exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed, so you can use void methods to create a message passing style API.
 
