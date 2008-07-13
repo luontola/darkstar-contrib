@@ -141,8 +141,10 @@ public class TempDirectorySpec extends Specification<Object> {
         }
 
         public void destroy() {
-            assert predefined.listFiles().length == 0;
-            predefined.delete();
+            if (predefined.isDirectory()) {
+                assert predefined.listFiles().length == 0;
+                predefined.delete();
+            }
         }
 
         public void theDirectoryMustNotAlreadyExist() throws IOException {
