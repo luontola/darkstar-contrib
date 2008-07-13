@@ -175,15 +175,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="net.orfjackal.darkstar-contrib:darkstar-integration-test:1.0-SNAPSHOT">
+      <library name="net.orfjackal.darkstar-contrib:darkstar-integration-test:1.0">
         <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0/darkstar-integration-test-1.0.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0/darkstar-integration-test-1.0-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0/darkstar-integration-test-1.0-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
