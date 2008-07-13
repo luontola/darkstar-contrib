@@ -6,7 +6,7 @@ Darkstar Integration Test contains utility classes for easily starting up the Da
 
 The sources can be downloaded from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page]. You may also [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/ browse] the source repository.
 
-Here is a short example of using the [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DarkstarServer.java DarkstarServer] and [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DebugClient.java DebugClient] classes to run a tests where the client logs in and disconnects. Later this library might contain better JUnit integration, but for now this is how you can use it:
+Here is a short example of using the [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DarkstarServer.java DarkstarServer] and [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/DebugClient.java DebugClient] classes to run a test where the client logs in and disconnects. Later this library might contain better JUnit integration, but for now this is how you can use it:
 
 {{{
 final int TIMEOUT = 5000;
