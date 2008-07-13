@@ -56,10 +56,15 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
 
     private RpcGateway initGateway(ClientSession session) {
         ChannelAdapter adapter = new ChannelAdapter();
+        createRpcChannelForClient(session, adapter);
+        return adapter.getGateway();
+    }
+
+    private static void createRpcChannelForClient(ClientSession session, ChannelAdapter adapter) {
         Channel channel = AppContext.getChannelManager()
                 .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
+        channel.join(session);
         adapter.setChannel(channel);
-        return adapter.getGateway();
     }
 
     public void receivedMessage(ByteBuffer message) {
