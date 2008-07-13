@@ -33,10 +33,6 @@ package net.orfjackal.darkstar.integration.util;
  */
 public class TimedInterrupt implements Runnable {
 
-    // TODO: write tests for this class
-    // test: wait on java.util.concurrent.BlockingQueue.take, nothing to take -> interrupted
-    // test: wait on java.util.concurrent.BlockingQueue.take, somethign to take -> no interrupt
-
     private final Thread threadToInterrupt;
     private final int timeout;
 
