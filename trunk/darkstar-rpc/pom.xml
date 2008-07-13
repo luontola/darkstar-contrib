@@ -60,21 +60,6 @@
     </pluginRepositories>
 
     <dependencies>
-        <!--
-        <dependency>
-            <groupId>com.projectdarkstar</groupId>
-            <artifactId>darkstar-server</artifactId>
-            <version>0.9.6</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.projectdarkstar</groupId>
-            <artifactId>darkstar-client</artifactId>
-            <version>0.9.6</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
 
         <!-- NOTE: Should work also with the vanilla Darkstar,
              but Darkstar EXP is needed for running the tests.-->
@@ -102,7 +87,7 @@
         <dependency>
             <groupId>net.orfjackal.darkstar-contrib</groupId>
             <artifactId>darkstar-integration-test</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
 
