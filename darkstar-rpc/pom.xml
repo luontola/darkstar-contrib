@@ -66,21 +66,21 @@
         <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-server</artifactId>
-            <version>0.9.6_1-SNAPSHOT</version>
+            <version>0.9.6_1</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-client</artifactId>
-            <version>0.9.6_1-SNAPSHOT</version>
+            <version>0.9.6_1</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>net.orfjackal.darkstar-exp</groupId>
             <artifactId>darkstar-exp-mocks</artifactId>
-            <version>0.9.6_1-SNAPSHOT</version>
+            <version>0.9.6_1</version>
             <scope>test</scope>
         </dependency>
 
