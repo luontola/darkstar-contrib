@@ -3,7 +3,7 @@
 
     <groupId>net.orfjackal.darkstar-contrib</groupId>
     <artifactId>darkstar-rpc-example</artifactId>
-    <version>1.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Darkstar RPC Example</name>
@@ -27,9 +27,9 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-rpc-example-1.0</connection>
-        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-rpc-example-1.0</developerConnection>
-        <url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-rpc-example-1.0</url>
+        <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc-example</connection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc-example</developerConnection>
+        <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc-example</url>
     </scm>
 
     <distributionManagement>
