@@ -18,16 +18,42 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="com.projectdarkstar:darkstar-server:0.9.6">
+    <orderEntry type="module-library" exported="">
+      <library name="net.orfjackal.darkstar-contrib:darkstar-rpc:1.0-SNAPSHOT">
         <CLASSES>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-server/0.9.6/darkstar-server-0.9.6-sources.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="net.orfjackal.darkstar-contrib:darkstar-integration-test:1.0-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="com.projectdarkstar:darkstar-client:0.9.6">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -84,6 +110,32 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
+      <library name="net.orfjackal.darkstar-exp:darkstar-server:0.9.6_1-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_1-SNAPSHOT/darkstar-server-0.9.6_1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_1-SNAPSHOT/darkstar-server-0.9.6_1-SNAPSHOT-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-server/0.9.6_1-SNAPSHOT/darkstar-server-0.9.6_1-SNAPSHOT-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="net.orfjackal.darkstar-exp:darkstar-shared:0.9.6_1-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_1-SNAPSHOT/darkstar-shared-0.9.6_1-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_1-SNAPSHOT/darkstar-shared-0.9.6_1-SNAPSHOT-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-shared/0.9.6_1-SNAPSHOT/darkstar-shared-0.9.6_1-SNAPSHOT-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="berkeleydb:bdb:4.5.20">
         <CLASSES>
           <root url="jar://$M2_REPO$/berkeleydb/bdb/4.5.20/bdb-4.5.20.jar!/" />
@@ -122,42 +174,16 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library name="com.projectdarkstar:darkstar-client:0.9.6">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/com/projectdarkstar/darkstar-client/0.9.6/darkstar-client-0.9.6-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library name="net.orfjackal.darkstar-contrib:darkstar-rpc:1.0-SNAPSHOT">
-        <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-rpc/1.0-SNAPSHOT/darkstar-rpc-1.0-SNAPSHOT-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="module-library">
-      <library name="net.orfjackal.darkstar-contrib:darkstar-integration-test:1.0-SNAPSHOT">
+      <library name="net.orfjackal.darkstar-exp:darkstar-exp-mocks:0.9.6_1-SNAPSHOT">
         <CLASSES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-exp-mocks/0.9.6_1-SNAPSHOT/darkstar-exp-mocks-0.9.6_1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-javadoc.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-exp-mocks/0.9.6_1-SNAPSHOT/darkstar-exp-mocks-0.9.6_1-SNAPSHOT-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-contrib/darkstar-integration-test/1.0-SNAPSHOT/darkstar-integration-test-1.0-SNAPSHOT-sources.jar!/" />
+          <root url="jar://$M2_REPO$/net/orfjackal/darkstar-exp/darkstar-exp-mocks/0.9.6_1-SNAPSHOT/darkstar-exp-mocks-0.9.6_1-SNAPSHOT-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

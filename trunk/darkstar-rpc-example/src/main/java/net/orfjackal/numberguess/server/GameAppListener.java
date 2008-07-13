@@ -38,15 +38,14 @@ import java.util.logging.Logger;
  * @since 16.6.2008
  */
 public class GameAppListener implements AppListener, Serializable {
-
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger(GameAppListener.class.getName());
+    private static final Logger log = Logger.getLogger(GameAppListener.class.getName());
 
     public void initialize(Properties props) {
     }
 
     public ClientSessionListener loggedIn(ClientSession session) {
-        logger.log(Level.INFO, "User {0} logged in", session.getName());
+        log.log(Level.INFO, "User {0} logged in", session.getName());
         return new GameClientSessionListener(session);
     }
 }

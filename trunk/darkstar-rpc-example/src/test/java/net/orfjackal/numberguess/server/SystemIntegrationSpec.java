@@ -30,7 +30,7 @@ import net.orfjackal.darkstar.integration.DarkstarServer;
 import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
-import net.orfjackal.numberguess.client.GameClientListener;
+import net.orfjackal.numberguess.client.GameClient;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeoutException;
@@ -74,23 +74,23 @@ public class SystemIntegrationSpec extends Specification<Object> {
         tempDirectory.dispose();
     }
 
+
     public class WhenClientConnectsToTheServer {
 
-        private GameClientListener client;
+        private GameClient client;
 
         public Object create() throws TimeoutException {
-            client = new GameClientListener("John Doe");
+            client = new GameClient("John Doe");
+            specify(!client.isConnected());
             client.login("localhost", String.valueOf(server.getPort()));
             return null;
         }
 
         public void destroy() {
-//            client.logout(true);
+            client.logout(true);
         }
 
-        public void clientConnectsToTheServer() {
-            specify(!client.isConnected());
-            client.waitUntilConnected();
+        public void clientIsConnected() {
             specify(client.isConnected());
         }
     }
