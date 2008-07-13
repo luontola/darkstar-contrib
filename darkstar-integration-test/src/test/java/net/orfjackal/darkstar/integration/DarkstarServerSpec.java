@@ -158,6 +158,7 @@ public class DarkstarServerSpec extends Specification<Object> {
 
         public void itPrintsSomeLogMessages() throws InterruptedException, TimeoutException {
             server.waitForApplicationReady(TIMEOUT);
+            server.waitUntilSystemOutContains("Howdy ho!", TIMEOUT);
             String out = server.getSystemOut().toString();
             String err = server.getSystemErr().toString();
             specify(err, err.contains("HelloWorld: application is ready"));
