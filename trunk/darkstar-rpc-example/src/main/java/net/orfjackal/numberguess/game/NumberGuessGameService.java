@@ -22,9 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.numberguess.services;
-
-import net.orfjackal.numberguess.game.GuessResult;
+package net.orfjackal.numberguess.game;
 
 import java.util.concurrent.Future;
 

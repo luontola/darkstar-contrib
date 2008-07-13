@@ -25,7 +25,7 @@
 package net.orfjackal.numberguess.client;
 
 import net.orfjackal.numberguess.game.GuessResult;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
