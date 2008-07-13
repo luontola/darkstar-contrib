@@ -49,6 +49,8 @@ server.shutdown();
 tempDirectory.dispose();
 }}}
 
+The sources can be downloaded from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page]. You may also [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/ browse] the source repository.
+
 
 == Using Maven ==
 
