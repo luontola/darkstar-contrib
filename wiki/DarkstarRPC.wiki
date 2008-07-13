@@ -5,15 +5,15 @@
 
 With this library it is possible to call methods on remote objects almost as if they were local objects. You need to define an interface for your RPC service and register an instance implementing that interface. Then you can query from the remote side for that service.
 
-All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (returned value or thrown exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed.
+All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (returned value or thrown exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed, so you can use void methods to create a message passing style API.
 
 See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/src/test/java/net/orfjackal/darkstar/rpc/comm/DarkstarIntegrationSpec.java DarkstarIntegrationSpec] for an example of how to integrate Darkstar RPC with Darkstar. More usage examples are in [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/src/test/java/net/orfjackal/darkstar/rpc/comm/RpcGatewaySpec.java RpcGatewaySpec].
 
-For now you will need to download the sources from SVN and build them with Maven using the command: mvn verify
+For now you will need to download the sources from SVN and build them with Maven using the command "mvn verify". The library and its examples are not yet finished, so they might not run.
 
 
 == Links ==
 
-  * SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/
+  * SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/ http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc-example/
   * Original discussion thread: [http://www.projectdarkstar.com/component/option,com_smf/Itemid,99999999/topic,470.0 Remote Procedure Calls (RPC) and Darkstar]
   * Developer: [http://www.orfjackal.net/ Esko Luontola] (Jackal von ÖRF)
