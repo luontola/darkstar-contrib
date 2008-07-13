@@ -84,7 +84,7 @@ public class GameClient {
         try {
             synchronized (gatewayLock) {
                 if (gateway == null) {
-                    gatewayLock.wait();
+                    gatewayLock.wait(TIMEOUT);
                 }
                 return gateway;
             }
@@ -112,9 +112,13 @@ public class GameClient {
         }
 
         public ClientChannelListener joinedChannel(ClientChannel channel) {
-            ClientChannelAdapter adapter = new ClientChannelAdapter();
-            setGateway(adapter.getGateway());
-            return adapter.joinedChannel(channel);
+            if (channel.getName().startsWith("RpcChannel")) {
+                ClientChannelAdapter adapter = new ClientChannelAdapter();
+                setGateway(adapter.getGateway());
+                return adapter.joinedChannel(channel);
+            } else {
+                throw new RuntimeException("Unexpected channel: " + channel);
+            }
         }
 
         public PasswordAuthentication getPasswordAuthentication() {
