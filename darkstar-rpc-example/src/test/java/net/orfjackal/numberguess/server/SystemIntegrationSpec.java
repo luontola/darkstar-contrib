@@ -31,8 +31,11 @@ import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.numberguess.client.GameClient;
+import net.orfjackal.numberguess.game.GuessResult;
+import net.orfjackal.numberguess.services.NumberGuessGameService;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -92,6 +95,16 @@ public class SystemIntegrationSpec extends Specification<Object> {
 
         public void clientIsConnected() {
             specify(client.isConnected());
+        }
+
+        public void gameCanBeUsed() throws ExecutionException, InterruptedException {
+            NumberGuessGameService game = client.getGame();
+            game.setMinimum(4);
+            game.setMaximum(4);
+            specify(game.guess(5).get(), should.equal(GuessResult.TOO_HIGH));
+            specify(game.guess(3).get(), should.equal(GuessResult.TOO_LOW));
+            specify(game.guess(4).get(), should.equal(GuessResult.SUCCESS));
+            specify(game.tries().get(), should.equal(3));
         }
     }
 }

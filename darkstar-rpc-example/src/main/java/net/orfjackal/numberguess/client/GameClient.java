@@ -45,10 +45,13 @@ public class GameClient {
 
     private static final int TIMEOUT = 5000;
 
+    private final Object loginResponseLock = new Object();
+    private final Object gatewayLock = new Object();
+
     private final String username;
     private final SimpleClient client;
-    private final Object waitForResponse = new Object();
-    private NumberGuessGameService numberGuessGame;
+
+    private RpcGateway gateway;
 
     public GameClient(String username) {
         this.username = username;
@@ -60,9 +63,9 @@ public class GameClient {
         props.put("host", host);
         props.put("port", port);
         try {
-            synchronized (waitForResponse) {
+            synchronized (loginResponseLock) {
                 client.login(props);
-                waitForResponse.wait(TIMEOUT);
+                loginResponseLock.wait(TIMEOUT);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -77,29 +80,31 @@ public class GameClient {
         client.logout(force);
     }
 
-    private void initServices(RpcGateway gateway) {
-        Set<NumberGuessGameService> numberGuessGame = gateway.remoteFindByType(NumberGuessGameService.class);
-        assert numberGuessGame.size() == 1;
-        this.numberGuessGame = numberGuessGame.iterator().next();
-    }
-
-    private void resetServices() {
-        this.numberGuessGame = null;
-    }
-
-    public NumberGuessGameService getNumberGuessGame() {
-        if (numberGuessGame == null) {
-            throw new IllegalStateException("Not connected to server");
-        }
-        return numberGuessGame;
-    }
-
-    private void fireResponseRecieved() {
-        synchronized (waitForResponse) {
-            waitForResponse.notifyAll();
+    private RpcGateway getGateway() {
+        try {
+            synchronized (gatewayLock) {
+                if (gateway == null) {
+                    gatewayLock.wait();
+                }
+                return gateway;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    private void setGateway(RpcGateway gateway) {
+        synchronized (gatewayLock) {
+            this.gateway = gateway;
+            gatewayLock.notifyAll();
+        }
+    }
+
+    public NumberGuessGameService getGame() {
+        Set<NumberGuessGameService> games = getGateway().remoteFindByType(NumberGuessGameService.class);
+        assert games.size() == 1;
+        return games.iterator().next();
+    }
 
     private class MySimpleClientListener implements SimpleClientListener {
 
@@ -108,9 +113,8 @@ public class GameClient {
 
         public ClientChannelListener joinedChannel(ClientChannel channel) {
             ClientChannelAdapter adapter = new ClientChannelAdapter();
-            ClientChannelListener listener = adapter.joinedChannel(channel);
-            initServices(adapter.getGateway());
-            return listener;
+            setGateway(adapter.getGateway());
+            return adapter.joinedChannel(channel);
         }
 
         public PasswordAuthentication getPasswordAuthentication() {
@@ -119,12 +123,16 @@ public class GameClient {
 
         public void loggedIn() {
             System.out.println("Logged in.");
-            fireResponseRecieved();
+            synchronized (loginResponseLock) {
+                loginResponseLock.notifyAll();
+            }
         }
 
         public void loginFailed(String reason) {
             System.out.println("Login failed: " + reason);
-            fireResponseRecieved();
+            synchronized (loginResponseLock) {
+                loginResponseLock.notifyAll();
+            }
         }
 
         public void reconnecting() {
@@ -137,7 +145,7 @@ public class GameClient {
 
         public void disconnected(boolean graceful, String reason) {
             System.out.println("Disconnected: " + reason);
-            resetServices();
+            setGateway(null);
         }
     }
 }
