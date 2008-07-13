@@ -8,6 +8,15 @@ With this library it is possible to call methods on remote objects almost as if 
 All method calls are handled asynchronously. If the method needs to return a value, you may obtain the response (returned value or thrown exception) through a [http://java.sun.com/javase/6/docs/api/java/util/concurrent/Future.html Future]. Void methods will not send a response when they are executed, so you can use void methods to create a message passing style API.
 
 
+== Example Application ==
+
+See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc-example/ darkstar-rpc-example] for an example of how to use the RPC library with Darkstar. You can download its sources and pre-built binaries from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page].
+
+To build it from sources with Maven, use the command "mvn verify". The /target directory will contain the server application (darkstar-rpc-example-1.0-server.zip) and an executable client jar (darkstar-rpc-example-1.0-jar-with-dependencies.jar).
+
+The test sources of [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/ darkstar-rpc] may also be useful as examples.
+
+
 == Using Maven ==
 
 To use the RPC library in a Maven project, add the following dependency to your pom.xml:
@@ -27,15 +36,6 @@ To use the RPC library in a Maven project, add the following dependency to your 
         </dependency>
     </dependencies>
 }}}
-
-
-== Example Application ==
-
-See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc-example/ darkstar-rpc-example] for an example of how to use the RPC library with Darkstar. You can download its sources and pre-built binaries from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page].
-
-To build it from sources with Maven, use the command "mvn verify". The /target directory will contain the server application (darkstar-rpc-example-1.0-server.zip) and an executable client jar (darkstar-rpc-example-1.0-jar-with-dependencies.jar).
-
-The test sources of [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/ darkstar-rpc] may also be useful as examples.
 
 
 == Links ==
