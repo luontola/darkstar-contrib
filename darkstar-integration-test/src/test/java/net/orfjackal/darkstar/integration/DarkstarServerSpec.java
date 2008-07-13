@@ -30,7 +30,6 @@ import com.sun.sgs.app.ClientSessionListener;
 import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import org.junit.runner.RunWith;
 
@@ -47,9 +46,6 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class DarkstarServerSpec extends Specification<Object> {
 
-    //private static final byte[] KERNEL_READY_MSG = "Kernel is ready".getBytes();
-    private static final byte[] APPLICATION_READY_MSG = "application is ready".getBytes();
-    private static final byte[] APPLESS_CONTEXT_READY_MSG = "non-application context is ready".getBytes();
     private static final int TIMEOUT = 10000;
 
     private TempDirectory tempDirectory;
@@ -108,24 +104,21 @@ public class DarkstarServerSpec extends Specification<Object> {
     public class WhenAnEmptyServerIsStarted {
 
         private DarkstarServer server;
-        private StreamWaiter waiter;
 
         public Object create() {
             server = new DarkstarServer(tempDirectory.getDirectory());
             server.setAppName("NoApp");
             server.start();
-            waiter = new StreamWaiter(server.getSystemErr());
             return null;
         }
 
         public void destroy() {
-            waiter.dispose();
             server.shutdown();
         }
 
         public void theServerStartsWithoutAppListener() throws InterruptedException, TimeoutException {
             specify(server.getAppListener(), should.equal(null));
-            waiter.waitForBytes(APPLESS_CONTEXT_READY_MSG, TIMEOUT);
+            server.waitForApplessContextReady(TIMEOUT);
             String err = server.getSystemErr().toString();
             specify(err, err.contains("NoApp"));
         }
@@ -134,7 +127,6 @@ public class DarkstarServerSpec extends Specification<Object> {
     public class WhenTheServerIsStartedWithAnApplication {
 
         private DarkstarServer server;
-        private StreamWaiter waiter;
 
         public Object create() throws InterruptedException {
             server = new DarkstarServer(tempDirectory.getDirectory());
@@ -143,7 +135,6 @@ public class DarkstarServerSpec extends Specification<Object> {
             server.setPort(12345);
             server.setProperty("my.custom.key", "MyValue");
             server.start();
-            waiter = new StreamWaiter(server.getSystemErr());
 
             specify(server.getAppName(), should.equal("HelloWorld"));
             specify(server.getAppListener(), should.equal(HelloWorld.class));
@@ -153,7 +144,6 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            waiter.dispose();
             server.shutdown();
         }
 
@@ -167,15 +157,15 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void itPrintsSomeLogMessages() throws InterruptedException, TimeoutException {
-            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
-
+            server.waitForApplicationReady(TIMEOUT);
             String out = server.getSystemOut().toString();
             String err = server.getSystemErr().toString();
             specify(err, err.contains("HelloWorld: application is ready"));
             specify(out, out.contains("Howdy ho!"));
         }
 
-        public void itListensToTheSpecifiedPort() throws IOException {
+        public void itListensToTheSpecifiedPort() throws IOException, TimeoutException {
+            server.waitForKernelReady(TIMEOUT);
             Socket clientSocket = new Socket("localhost", 12345);
             specify(clientSocket.isConnected());
             clientSocket.close();
@@ -191,7 +181,7 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void allFilesAreWrittenInTheWorkingDirectory() throws InterruptedException, TimeoutException {
-            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
+            server.waitForApplicationReady(TIMEOUT);
 
             File dir = tempDirectory.getDirectory();
             File appProps = new File(dir, "HelloWorld.properties");
@@ -221,7 +211,7 @@ public class DarkstarServerSpec extends Specification<Object> {
         }
 
         public void itCanBeRestarted() throws InterruptedException, TimeoutException {
-            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
+            server.waitForApplicationReady(TIMEOUT);
             server.shutdown();
             specify(!server.isRunning());
             String log1 = server.getSystemErr().toString();
@@ -230,8 +220,7 @@ public class DarkstarServerSpec extends Specification<Object> {
             specify(log1, !log1.contains("recovering for node"));
 
             server.start();
-            waiter.setStream(server.getSystemErr());
-            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
+            server.waitForApplicationReady(TIMEOUT);
             specify(server.isRunning());
             String log2 = server.getSystemErr().toString();
             specify(log2, log2.contains("The Kernel is ready"));
@@ -243,48 +232,43 @@ public class DarkstarServerSpec extends Specification<Object> {
     public class WhenAnExistingAppPropertiesFileIsUsed {
 
         private DarkstarServer server;
-        private StreamWaiter waiter;
+        private File dataDir;
+        private File configFile;
 
-        private File dsdb;
-
-        public Object create() throws InterruptedException, IOException {
+        public Object create() throws InterruptedException, IOException, TimeoutException {
             File appRoot = new File(tempDirectory.getDirectory(), "customAppRoot");
             appRoot.mkdir();
-            dsdb = new File(appRoot, "dsdb");
-            dsdb.mkdir();
+            dataDir = new File(appRoot, "dsdb");
+            dataDir.mkdir();
 
+            configFile = new File(appRoot, "MyConfig.properties");
             Properties p = new Properties();
             p.setProperty(DarkstarServer.APP_NAME, "AppInCustomRoot");
             p.setProperty(DarkstarServer.APP_LISTENER, HelloWorld.class.getName());
             p.setProperty(DarkstarServer.APP_PORT, DarkstarServer.APP_PORT_DEFAULT);
             p.setProperty(DarkstarServer.APP_ROOT, appRoot.getAbsolutePath());
-            File configFile = new File(appRoot, "MyConfig.properties");
             FileOutputStream out = new FileOutputStream(configFile);
             p.store(out, null);
             out.close();
 
             server = new DarkstarServer(tempDirectory.getDirectory());
-            server.start(configFile);
-            waiter = new StreamWaiter(server.getSystemErr());
             return null;
         }
 
         public void destroy() {
-            waiter.dispose();
             server.shutdown();
         }
 
         public void theServerIsStartedUnderTheSpecifiedAppRoot() throws TimeoutException {
-            waiter.waitForBytes(APPLICATION_READY_MSG, TIMEOUT);
-            String err = server.getSystemErr().toString();
-            specify(err, err.contains("AppInCustomRoot"));
-            specify(dsdb.listFiles().length > 5);
+            specify(dataDir.listFiles().length == 0);
+            server.start(configFile);
+            server.waitForApplicationReady(TIMEOUT);
+            specify(dataDir.listFiles().length > 5);
         }
     }
 
 
     public static class HelloWorld implements AppListener, Serializable {
-
         private static final long serialVersionUID = 1L;
 
         public void initialize(Properties props) {
