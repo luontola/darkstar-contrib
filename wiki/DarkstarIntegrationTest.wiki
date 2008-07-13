@@ -41,7 +41,7 @@ assert event.startsWith(DebugClient.DISCONNECTED);
 
 /* TEAR DOWN */
 
-System.out.println(server.getSystemOut()); // you may also find [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/util/StreamWaiter.java StreamWaiter] useful
+System.out.println(server.getSystemOut()); // you may also find the StreamWaiter class useful
 System.err.println(server.getSystemErr());
 
 testTimeout.interrupt();
