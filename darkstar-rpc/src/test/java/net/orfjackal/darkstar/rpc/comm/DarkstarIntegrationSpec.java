@@ -31,7 +31,6 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.DarkstarServer;
 import net.orfjackal.darkstar.integration.DebugClient;
-import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
@@ -62,7 +61,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private RpcGateway gatewayOnClient;
 
         private TempDirectory tempDirectory;
-        private StreamWaiter waiter;
         private Thread testTimeout;
 
         public Object create() throws TimeoutException {
@@ -83,8 +81,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             };
 
             // wait for the server to start up before running the tests
-            waiter = new StreamWaiter(server.getSystemOut());
-            waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
+            server.waitUntilSystemOutContains(STARTUP_MSG, TIMEOUT);
 
             // needed to avoid blocking on client.events.take()
             testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
