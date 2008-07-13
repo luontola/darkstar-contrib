@@ -10,11 +10,11 @@ All method calls are handled asynchronously. If the method needs to return a val
 
 == Example Application ==
 
-See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc-example/ darkstar-rpc-example] for an example of how to use the RPC library with Darkstar. You can download its sources and pre-built binaries from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page].
+See [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc-example/ darkstar-rpc-example] for an example on how to use the RPC library with Darkstar. You can download its sources and pre-built binaries from the [http://code.google.com/p/darkstar-contrib/downloads/list downloads page].
 
 To build it from sources with Maven, use the command "mvn verify". The /target directory will contain the server application (darkstar-rpc-example-1.0-server.zip) and an executable client jar (darkstar-rpc-example-1.0-jar-with-dependencies.jar).
 
-The test sources of [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/ darkstar-rpc] may also be useful as examples.
+The test sources of [http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-rpc/ darkstar-rpc] may also serve as examples.
 
 
 == Using Maven ==
@@ -40,6 +40,7 @@ To use the RPC library in a Maven project, add the following dependency to your 
 
 == Links ==
 
-  * SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/ http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc-example/
+  * Darkstar RPC SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/
+  * Darkstar RPC Example SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc-example/
   * Original discussion thread: [http://www.projectdarkstar.com/component/option,com_smf/Itemid,99999999/topic,470.0 Remote Procedure Calls (RPC) and Darkstar]
   * Developer: [http://www.orfjackal.net/ Esko Luontola] (Jackal von ÖRF)
