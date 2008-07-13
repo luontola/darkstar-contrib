@@ -32,7 +32,7 @@ import net.orfjackal.darkstar.integration.util.TempDirectory;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.numberguess.client.GameClient;
 import net.orfjackal.numberguess.game.GuessResult;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.ExecutionException;

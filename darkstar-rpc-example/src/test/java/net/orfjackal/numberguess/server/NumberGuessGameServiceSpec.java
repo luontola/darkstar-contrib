@@ -30,7 +30,7 @@ import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.numberguess.game.GuessResult;
 import net.orfjackal.numberguess.game.NumberGuessGame;
 import net.orfjackal.numberguess.game.NumberGuessGameImpl;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

@@ -28,7 +28,7 @@ import com.sun.sgs.app.*;
 import net.orfjackal.darkstar.rpc.comm.ChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
 import net.orfjackal.numberguess.game.NumberGuessGameImpl;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;

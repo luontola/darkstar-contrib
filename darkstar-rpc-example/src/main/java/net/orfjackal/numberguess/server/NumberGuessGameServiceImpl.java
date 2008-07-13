@@ -29,7 +29,7 @@ import com.sun.sgs.app.ManagedReference;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.numberguess.game.GuessResult;
 import net.orfjackal.numberguess.game.NumberGuessGame;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 
 import java.io.Serializable;
 import java.util.concurrent.Future;

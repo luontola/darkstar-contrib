@@ -30,7 +30,7 @@ import com.sun.sgs.client.simple.SimpleClient;
 import com.sun.sgs.client.simple.SimpleClientListener;
 import net.orfjackal.darkstar.rpc.comm.ClientChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
-import net.orfjackal.numberguess.services.NumberGuessGameService;
+import net.orfjackal.numberguess.game.NumberGuessGameService;
 
 import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
