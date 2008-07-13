@@ -64,8 +64,11 @@ public class GameMain implements Runnable {
     }
 
     private void gameLoop() throws ExecutionException, InterruptedException {
-        Integer min = game.getMinimum().get();
-        Integer max = game.getMaximum().get();
+        System.out.print("Enter minimum number: ");
+        game.setMinimum(in.nextInt());
+        System.out.print("Enter maximum number: ");
+        game.setMaximum(in.nextInt());
+
         boolean tryAgain;
         do {
             System.out.println();
@@ -73,6 +76,8 @@ public class GameMain implements Runnable {
             System.out.println();
 
             game.newGame();
+            Integer min = game.getMinimum().get();
+            Integer max = game.getMaximum().get();
 
             System.out.print("Guess a number between " + min + " and " + max + ": ");
 
@@ -80,10 +85,11 @@ public class GameMain implements Runnable {
 
             System.out.println();
             System.out.print("Do you want to play again (Y/N)? ");
-            tryAgain = in.nextLine().toUpperCase().startsWith("Y");
+            tryAgain = in.next().toUpperCase().startsWith("Y");
         } while (tryAgain);
 
         System.out.println("Thank you for playing.");
+        System.out.println();
     }
 
     private void guessLoop() throws InterruptedException, ExecutionException {
