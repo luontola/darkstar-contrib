@@ -41,7 +41,8 @@ assert event.startsWith(DebugClient.DISCONNECTED);
 
 /* TEAR DOWN */
 
-System.out.println(server.getSystemOut()); // you may also find the StreamWaiter class useful
+// Some debug output. You may also find StreamWaiter useful for examining SystemOut/Err
+System.out.println(server.getSystemOut());
 System.err.println(server.getSystemErr());
 
 testTimeout.interrupt();
