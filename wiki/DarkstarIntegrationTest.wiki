@@ -1,0 +1,48 @@
+#summary An integration testing framework for running tests against a full-featured Darkstar Server
+
+= Introduction =
+
+
+
+
+== Using Maven ==
+
+To use darkstar-integration-test in a Maven project, add the following dependency to your pom.xml. You also need to have Darkstar Server's libraries in at least the "test" scope.
+
+{{{
+    <repositories>
+        <repository>
+            <id>orfjackal</id>
+            <url>http://repo.orfjackal.net/maven2</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>net.orfjackal.darkstar-contrib</groupId>
+            <artifactId>darkstar-integration-test</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+}}}
+
+You also must use a relatively new version of maven-surefire-plugin, or the classpaths will not be right. At least version 2.4.3 works with darkstar-integration-test (and 2.3 will _not_ work).
+
+{{{
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.3</version>
+            </plugin>
+        </plugins>
+    </build>
+}}}
+
+You also need to have the BDB native libraries somewhere along the path, or alternative you may set the java.library.path system property with maven-surefire-plugin: http://maven.apache.org/plugins/maven-surefire-plugin/howto.html
+
+
+= Links =
+
+  * SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test/
+  * Developer: [http://www.orfjackal.net/ Esko Luontola] (Jackal von ÖRF)
