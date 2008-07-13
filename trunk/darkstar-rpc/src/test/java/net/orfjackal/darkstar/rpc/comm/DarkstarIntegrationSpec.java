@@ -30,11 +30,11 @@ import com.sun.sgs.client.ClientChannelListener;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.integration.DarkstarServer;
+import net.orfjackal.darkstar.integration.DebugClient;
 import net.orfjackal.darkstar.integration.util.StreamWaiter;
 import net.orfjackal.darkstar.integration.util.TempDirectory;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.darkstar.rpc.util.DebugClient;
-import net.orfjackal.darkstar.rpc.util.TimedInterrupt;
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
