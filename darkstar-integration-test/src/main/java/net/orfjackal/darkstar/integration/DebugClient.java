@@ -22,7 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.util;
+package net.orfjackal.darkstar.integration;
 
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
@@ -42,8 +42,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @since 13.7.2008
  */
 public class DebugClient {
-
-    // TODO: move this to a utility project, maybe darkstar-integration-test?
 
     public static final String LOGGED_IN = "loggedIn";
     public static final String LOGIN_FAILED = "loginFailed";
