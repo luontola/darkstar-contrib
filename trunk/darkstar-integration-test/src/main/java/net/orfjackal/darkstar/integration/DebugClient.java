@@ -104,6 +104,10 @@ public class DebugClient {
         throw new UnsupportedOperationException("Override this method to join channels");
     }
 
+    public String toString() {
+        return getClass().getSimpleName() + "[events=" + events + ",messages=" + messages + "]";
+    }
+
 
     private class MySimpleClientListener implements SimpleClientListener {
 
