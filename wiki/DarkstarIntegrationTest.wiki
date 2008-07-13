@@ -2,7 +2,46 @@
 
 = Introduction =
 
+Darkstar Integration Test contains utility classes for easily starting up the Darkstar Server in a separate process. Utilities for deleting the generated data files after running the tests are also provided.
 
+Here is a short example of using the DarkstarServer and DebugClient classes to run a tests where the client logs in and disconnects. Later this library might contain better JUnit integration, but for now this is how you can use it:
+
+{{{
+private static final int TIMEOUT = 5000;
+private DarkstarServer server;
+private TempDirectory tempDirectory;
+private Thread testTimeout;
+
+/* SET UP */
+
+tempDirectory = new TempDirectory();
+tempDirectory.create();
+
+server = new DarkstarServer(tempDirectory.getDirectory());
+server.setAppName("MyApp");
+server.setAppListener(MyAppListener.class);
+server.start();
+server.waitForApplicationReady(TIMEOUT);
+
+// abort the tests if they take too long
+testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+
+/* TEST */
+
+DebugClient client = new DebugClient("localhost", server.getPort(), "username", "password");
+client.login();
+String event = client.events.take();
+assert event.startsWith(DebugClient.LOGGED_IN);
+client.logout(false);
+event = client.events.take();
+assert event.startsWith(DebugClient.DISCONNECTED);
+
+/* TEAR DOWN */
+
+testTimeout.interrupt();
+server.shutdown();
+tempDirectory.dispose();
+}}}
 
 
 == Using Maven ==
