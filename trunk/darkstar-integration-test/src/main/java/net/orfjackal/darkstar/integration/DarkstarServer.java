@@ -28,12 +28,14 @@ import com.sun.sgs.app.AppListener;
 import com.sun.sgs.impl.kernel.StandardProperties;
 import net.orfjackal.darkstar.integration.util.JavaProcessExecutor;
 import net.orfjackal.darkstar.integration.util.ProcessHolder;
+import net.orfjackal.darkstar.integration.util.StreamWaiter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -49,10 +51,15 @@ public class DarkstarServer {
     public static final String APP_PORT = StandardProperties.APP_PORT;
     public static final String APP_PORT_DEFAULT = "1139";
 
+    public static final String KERNEL_READY_MSG = "Kernel is ready";
+    public static final String APPLICATION_READY_MSG = "application is ready";
+    public static final String APPLESS_CONTEXT_READY_MSG = "non-application context is ready";
+
     private final JavaProcessExecutor executor = new JavaProcessExecutor();
     private final File workingDir;
     private final Properties appProperties;
     private ProcessHolder process;
+    private StreamWaiter waiter;
 
     public DarkstarServer(File workingDir) {
         this.workingDir = workingDir;
@@ -111,6 +118,7 @@ public class DarkstarServer {
             throw new IllegalStateException("Already started");
         }
         process = executor.exec(getMainClass(), configFile.getAbsolutePath());
+        waiter = new StreamWaiter(getSystemErr());
     }
 
     private File createAppConfig() {
@@ -164,6 +172,7 @@ public class DarkstarServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        waiter.dispose();
     }
 
     public boolean isRunning() {
@@ -184,5 +193,17 @@ public class DarkstarServer {
 
     public ByteArrayOutputStream getSystemErr() {
         return process.getSystemErr();
+    }
+
+    public void waitForKernelReady(int timeout) throws TimeoutException {
+        waiter.waitForBytes(KERNEL_READY_MSG.getBytes(), timeout);
+    }
+
+    public void waitForApplicationReady(int timeout) throws TimeoutException {
+        waiter.waitForBytes(APPLICATION_READY_MSG.getBytes(), timeout);
+    }
+
+    public void waitForApplessContextReady(int timeout) throws TimeoutException {
+        waiter.waitForBytes(APPLESS_CONTEXT_READY_MSG.getBytes(), timeout);
     }
 }
