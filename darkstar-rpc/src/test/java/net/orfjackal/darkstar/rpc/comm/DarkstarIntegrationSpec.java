@@ -42,10 +42,8 @@ import java.io.Serializable;
 import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeoutException;
+import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * @author Esko Luontola
@@ -59,10 +57,12 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     public class WhenUsingARealDarkstarServer {
 
-        private TempDirectory tempDirectory;
         private DarkstarServer server;
+        private DebugClient client;
+        private RpcGateway gatewayOnClient;
+
+        private TempDirectory tempDirectory;
         private StreamWaiter waiter;
-        private RpcTestClient client;
         private Thread testTimeouter;
 
         public Object create() throws TimeoutException {
@@ -73,9 +73,18 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             server.setAppName("RpcTest");
             server.setAppListener(RpcTestAppListener.class);
             server.start();
-            client = new RpcTestClient("localhost", server.getPort());
+
+            final ClientChannelAdapter adapter = new ClientChannelAdapter();
+            gatewayOnClient = adapter.getGateway();
+            client = new DebugClient("localhost", server.getPort()) {
+                public ClientChannelListener joinedChannel(ClientChannel channel) {
+                    super.joinedChannel(channel);
+                    return adapter.joinedChannel(channel);
+                }
+            };
 
             // wait for the server to start up before running the tests
+            // TODO: move to darkstar-integration-test as a 'waitForApplicationStartup' method?
             waiter = new StreamWaiter(server.getSystemOut());
             try {
                 waiter.waitForBytes(STARTUP_MSG.getBytes(), TIMEOUT);
@@ -91,25 +100,42 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            System.out.println("client.events = " + client.events);
-            System.out.println("client.messages = " + client.messages);
-            System.out.println("Server Out:");
-            System.out.println(server.getSystemOut());
-            System.err.println("Server Log:");
-            System.err.println(server.getSystemErr());
+//            System.out.println("client.events = " + client.events);
+//            System.out.println("client.messages = " + client.messages);
+//            System.out.println("Server Out:");
+//            System.out.println(server.getSystemOut());
+//            System.err.println("Server Log:");
+//            System.err.println(server.getSystemErr());
+            client.logout(true);
             testTimeouter.interrupt();
             server.shutdown();
             tempDirectory.dispose();
         }
 
-        public void theClientCanLogin() throws InterruptedException {
+        public void rpcMethodsOnServerMayBeCalledFromClient() throws InterruptedException, ExecutionException {
+
+            // wait for the client to log in
             client.login();
             String event = client.events.take();
-            specify(event, event.startsWith(RpcTestClient.LOGGED_IN));
+            specify(event, event.startsWith(DebugClient.LOGGED_IN));
+
+            // wait for the RPC channel to be established
+            event = client.events.take();
+            specify(event, event.startsWith(DebugClient.JOINED_CHANNEL));
+
+            // locate the RPC service
+            Set<Echo> services = gatewayOnClient.remoteFindByType(Echo.class);
+            specify(services.size(), should.equal(1));
+            Echo echo = services.iterator().next();
+
+            // call methods on the RPC service
+            Future<String> f = echo.echo("hello");
+            String result = f.get();
+            specify(result, should.equal("hello, hello"));
         }
     }
 
-    // Interface implementaitons for connecting to Darkstar
+    // Interface implementations for connecting to Darkstar
 
     public static class RpcTestAppListener implements AppListener, Serializable {
         private static final long serialVersionUID = 1L;
@@ -137,10 +163,15 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private RpcGateway initGateway(ClientSession session) {
             ChannelAdapter adapter = new ChannelAdapter();
+            rpcChannelForClient(session, adapter);
+            return adapter.getGateway();
+        }
+
+        private static void rpcChannelForClient(ClientSession session, ChannelAdapter adapter) {
             Channel channel = AppContext.getChannelManager()
                     .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
+            channel.join(session);
             adapter.setChannel(channel);
-            return adapter.getGateway();
         }
 
         public void receivedMessage(ByteBuffer message) {
@@ -150,7 +181,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
     }
 
-    private static class RpcTestClient implements SimpleClientListener {
+    private static class DebugClient implements SimpleClientListener {
 
         // TODO: move this to a utility project, maybe darkstar-integration-test?
 
@@ -162,13 +193,13 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         public static final String JOINED_CHANNEL = "joinedChannel";
 
         public final BlockingQueue<String> events = new LinkedBlockingQueue<String>();
-        public final BlockingQueue<String> messages = new LinkedBlockingQueue<String>();
+        public final BlockingQueue<ByteBuffer> messages = new LinkedBlockingQueue<ByteBuffer>();
 
         private final String host;
         private final int port;
         private final SimpleClient client;
 
-        public RpcTestClient(String host, int port) {
+        public DebugClient(String host, int port) {
             this.host = host;
             this.port = port;
             this.client = new SimpleClient(this);
@@ -185,9 +216,20 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             }
         }
 
+        public boolean isConnected() {
+            return client.isConnected();
+        }
+
+        public void logout(boolean force) {
+            client.logout(force);
+        }
+
+        public void send(ByteBuffer message) throws IOException {
+            client.send(message);
+        }
+
         public void receivedMessage(ByteBuffer message) {
-            byte[] bytes = ByteBufferUtils.asByteArray(message);
-            messages.add(new String(bytes));
+            messages.add(message);
         }
 
         public ClientChannelListener joinedChannel(ClientChannel channel) {
@@ -222,11 +264,11 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     // Application logic
 
-    private interface Echo {
+    public interface Echo {
         Future<String> echo(String s);
     }
 
-    private static class EchoImpl implements Echo, Serializable {
+    public static class EchoImpl implements Echo, Serializable {
         private static final long serialVersionUID = 1L;
 
         public Future<String> echo(String s) {
