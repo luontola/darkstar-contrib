@@ -70,8 +70,8 @@ public class SystemIntegrationSpec extends Specification<Object> {
     }
 
     public void destroy() throws Exception {
-        System.out.println(server.getSystemOut());
-        System.err.println(server.getSystemErr());
+//        System.out.println(server.getSystemOut());
+//        System.err.println(server.getSystemErr());
         testTimeout.interrupt();
         server.shutdown();
         tempDirectory.dispose();
