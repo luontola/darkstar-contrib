@@ -26,7 +26,14 @@ package net.orfjackal.numberguess.server;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.DarkstarServer;
+import net.orfjackal.darkstar.integration.util.StreamWaiter;
+import net.orfjackal.darkstar.integration.util.TempDirectory;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
+import net.orfjackal.numberguess.client.GameClientListener;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -35,5 +42,56 @@ import org.junit.runner.RunWith;
 @RunWith(JDaveRunner.class)
 public class SystemIntegrationSpec extends Specification<Object> {
 
-    // TODO: use darkstar-integration-test for some final tests, to make sure ManagedReferences are created correctly
+    private static final int TIMEOUT = 5000;
+
+    private DarkstarServer server;
+    private TempDirectory tempDirectory;
+    private StreamWaiter waiter;
+    private Thread testTimeout;
+
+    public void create() throws Exception {
+        tempDirectory = new TempDirectory();
+        tempDirectory.create();
+
+        server = new DarkstarServer(tempDirectory.getDirectory());
+        server.setAppName("NumberGuessGame");
+        server.setAppListener(GameAppListener.class);
+        server.start();
+
+        // wait for the server to start
+        waiter = new StreamWaiter(server.getSystemErr());
+        waiter.waitForBytes("NumberGuessGame".getBytes(), TIMEOUT);
+
+        // abort the tests if they take too long
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+    }
+
+    public void destroy() throws Exception {
+        System.out.println(server.getSystemOut());
+        System.err.println(server.getSystemErr());
+        testTimeout.interrupt();
+        server.shutdown();
+        tempDirectory.dispose();
+    }
+
+    public class WhenClientConnectsToTheServer {
+
+        private GameClientListener client;
+
+        public Object create() throws TimeoutException {
+            client = new GameClientListener("John Doe");
+            client.login("localhost", String.valueOf(server.getPort()));
+            return null;
+        }
+
+        public void destroy() {
+//            client.logout(true);
+        }
+
+        public void clientConnectsToTheServer() {
+            specify(!client.isConnected());
+            client.waitUntilConnected();
+            specify(client.isConnected());
+        }
+    }
 }

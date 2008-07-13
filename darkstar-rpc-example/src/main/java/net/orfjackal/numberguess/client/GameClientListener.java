@@ -125,4 +125,8 @@ public class GameClientListener implements SimpleClientListener {
         System.out.println("Disconnected: " + reason);
         resetServices();
     }
+
+    public void waitUntilConnected() {
+
+    }
 }
