@@ -74,7 +74,7 @@ To use darkstar-integration-test in a Maven project, add the following dependenc
     </dependencies>
 }}}
 
-You also must use a relatively new version of maven-surefire-plugin, or the classpaths will not be right. At least version 2.4.3 works with darkstar-integration-test (and 2.3 will _not_ work).
+You must use a relatively new version of maven-surefire-plugin, or the classpaths will not be right. At least version 2.4.3 works with darkstar-integration-test (and 2.3 will _not_ work).
 
 {{{
     <build>
