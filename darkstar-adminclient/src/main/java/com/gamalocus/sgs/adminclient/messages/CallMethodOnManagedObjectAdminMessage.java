@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
-
 
 import com.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import com.gamalocus.sgs.services.datainspector.DataInspectorManager;
@@ -45,9 +43,10 @@ public class CallMethodOnManagedObjectAdminMessage extends AbstractAdminMessage<
 		
 		this.reference_id = reference_id;
 		this.methodName = methodName;
-		this.parameterValues = 
-			Arrays.copyOf(parameterValues, parameterValues.length, 
-					Serializable[].class);
+		
+		// Cannot use Arrays.copyOf; only present in the Java 6 API.
+		this.parameterValues = new Serializable[parameterValues.length];
+		System.arraycopy(parameterValues, 0, this.parameterValues, 0, parameterValues.length);
 	}
 	
 	@Override
