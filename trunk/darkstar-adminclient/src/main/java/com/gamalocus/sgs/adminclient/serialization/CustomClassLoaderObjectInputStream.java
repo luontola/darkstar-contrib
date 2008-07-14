@@ -25,6 +25,22 @@ import java.util.logging.Logger;
  */
 public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 {
+	/**
+	 * Workaround for lack of cause parameter in pre-Java 6 versions of IOException.
+	 * 
+	 * @author j0rg3n
+	 */
+	public static class IOExceptionWithCause extends IOException
+	{
+		private static final long serialVersionUID = 6712468549430960247L;
+
+		public IOExceptionWithCause(String message, Throwable cause)
+		{
+			super(message);
+			initCause(cause);
+		}
+	}
+
 	private final static Logger logger = 
 		Logger.getLogger(CustomClassLoaderObjectInputStream.class.getName());
 
@@ -107,7 +123,7 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 		}
 		catch (IllegalAccessException e)
 		{
-			throw new IOException(String.format("Field %s.serialVersionUID not accessible.", class_.getName()), e);
+			throw new IOExceptionWithCause(String.format("Field %s.serialVersionUID not accessible.", class_.getName()), e);
 		}
 		catch (NoSuchFieldException e)
 		{
