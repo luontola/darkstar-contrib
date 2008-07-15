@@ -46,29 +46,40 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 
 	private static final Map<String, ObjectStreamClass> NO_REPLACEMENTS = Collections.emptyMap();
 	
-	private final ClassLoader classLoader;
+	private final ClassLoader[] classLoaders;
 	private Map<String, ObjectStreamClass> classReplacements;
 
-	public CustomClassLoaderObjectInputStream(InputStream in, ClassLoader classLoader,
-			Map<String, ObjectStreamClass> classReplacements) throws IOException
+	/**
+	 * You can supply <code>null</code> as class loader to resolve class 
+	 * by the default resolve method.
+	 * 
+	 * It is important to list this first if the next class loader does not have 
+	 * the default loader as its parent, as this is where the commonly accessible 
+	 * classes will come from, such as java.lang.*. 
+	 * 
+	 * If we get these from the custom class loader, we can end up with very odd 
+	 * class cast exceptions.
+	 */
+	public CustomClassLoaderObjectInputStream(InputStream in, 
+			Map<String, ObjectStreamClass> classReplacements,
+			ClassLoader... classLoaders) throws IOException
 	{
 		super(in);
-		this.classLoader = classLoader;
+		this.classLoaders = classLoaders;
 		this.classReplacements = classReplacements;
+		
+		if (classLoaders.length == 0)
+		{
+			throw new IllegalArgumentException("You must supply at least one class loader.");
+		}
 	}
 
 	public CustomClassLoaderObjectInputStream(InputStream in,  
-			Map<String, ObjectStreamClass> classReplacements) throws IOException
+			ClassLoader... classLoaders) throws IOException
 	{
-		this(in, null, classReplacements);
+		this(in, NO_REPLACEMENTS, classLoaders);
 	}
-
-	public CustomClassLoaderObjectInputStream(InputStream in,  
-			ClassLoader classLoader) throws IOException
-	{
-		this(in, classLoader, NO_REPLACEMENTS);
-	}
-
+	
 	@Override
 	protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException
 	{
@@ -81,28 +92,45 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 			desc = replacementDesc;
 		}
 		
-		// Try to get it first by the default resolve method.
-		// This is important, as this is where the commonly accessible classes will come from,
-		// such as java.lang.*. If we get these from the custom class loader, we can end up
-		// with very odd class cast exceptions.
-		try
+		for (int i = 0; i < classLoaders.length; ++i)
 		{
-			return super.resolveClass(desc);
-		}
-		catch (ClassNotFoundException cnfe)
-		{
-			if (classLoader != null)
+			try
 			{
-				logger.finest(String.format("Default implementation unable to find class %s.",
-						desc.getName()));
+				if (classLoaders[i] == null)
+				{
+					return super.resolveClass(desc);
+				}
+				else
+				{
+					return customResolveClass(desc, classLoaders[i]);
+				}
 			}
-			else
+			catch (ClassNotFoundException e)
 			{
-				throw cnfe;
+				if (i + 1 < classLoaders.length)
+				{
+					if (logger.isLoggable(Level.FINEST))
+					{
+						// Just log; there are more opportunities.
+						logger.log(Level.FINEST, 
+								String.format("%s resolution failed for class %s.", 
+								classLoaders[i] != null ? classLoaders[i].getClass().getName() : "Default", 
+								desc.getName()), e);
+					}
+				}
+				else
+				{
+					throw e;
+				}
 			}
 		}
 		
-		// Finally, use the supplied custom class loader
+		// We should never arrive here.
+		throw new AssertionError();
+	}
+
+	private Class<?> customResolveClass(ObjectStreamClass desc, ClassLoader classLoader) throws ClassNotFoundException, IOExceptionWithCause
+	{
 		// Note: We do not use loadClass directly, as it does not handle array classes
 		// well on JDK6.
 		Class<?> class_ = Class.forName(desc.getName(), false, classLoader);
@@ -129,10 +157,12 @@ public class CustomClassLoaderObjectInputStream extends ObjectInputStream
 		{
 			// Do nothing; we cannot verify serialVersionUID if not specified.
 			// FIXME Do this the way that the java serialization does it.
-			logger.log(Level.FINE, 
-					String.format("Unable to verify serialVersionUID of class %s.", desc.getName()), e);
+			if (logger.isLoggable(Level.WARNING))
+			{
+				logger.log(Level.WARNING, String.format("Unable to verify serialVersionUID " +
+						"of class %s.", desc.getName()), e);
+			}
 		}
-			
 		return class_;
 	}
 }
