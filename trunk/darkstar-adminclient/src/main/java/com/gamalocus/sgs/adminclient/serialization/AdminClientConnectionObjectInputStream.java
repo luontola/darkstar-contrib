@@ -5,14 +5,11 @@ package com.gamalocus.sgs.adminclient.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import com.gamalocus.sgs.adminclient.connection.AdminClientConnection;
-
-import sun.reflect.generics.repository.ClassRepository;
 
 
 public class AdminClientConnectionObjectInputStream extends CustomClassLoaderObjectInputStream
@@ -26,8 +23,9 @@ public class AdminClientConnectionObjectInputStream extends CustomClassLoaderObj
 			Map<String, ObjectStreamClass> classReplacements,
 			AdminClientConnection connection) throws IOException
 	{
-		super(in, replacementClassLoader != null ? replacementClassLoader : 
-					AdminClientConnectionObjectInputStream.class.getClassLoader(), classReplacements);
+		super(in, classReplacements, null, 
+				replacementClassLoader != null ? replacementClassLoader : 
+					AdminClientConnectionObjectInputStream.class.getClassLoader());
 		this.connection = connection;
 	}
 
