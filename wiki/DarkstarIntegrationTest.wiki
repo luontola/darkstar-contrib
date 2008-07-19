@@ -35,10 +35,10 @@ testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
 DebugClient client = new DebugClient("localhost", server.getPort(), "username", "password");
 client.login();
 String event = client.events.take();
-assert event.startsWith(DebugClient.LOGGED_IN);
+assert event.startsWith(DebugClient.LOGGED_IN) : "event: " + event;
 client.logout(false);
 event = client.events.take();
-assert event.startsWith(DebugClient.DISCONNECTED);
+assert event.startsWith(DebugClient.DISCONNECTED) : "event: " + event;
 
 
 /* TEAR DOWN */
