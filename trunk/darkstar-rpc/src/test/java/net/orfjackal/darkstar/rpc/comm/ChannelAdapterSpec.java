@@ -49,6 +49,8 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class ChannelAdapterSpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 1000;
+
     public void create() {
         MockAppContext.install();
     }
@@ -67,13 +69,13 @@ public class ChannelAdapterSpec extends Specification<Object> {
         public Object create() {
 
             // initialization on server
-            ChannelAdapter adapterOnServer = new ChannelAdapter(100);
+            ChannelAdapter adapterOnServer = new ChannelAdapter(TIMEOUT);
             gatewayOnServer = adapterOnServer.getGateway();
             mockChannel = new MockChannel(adapterOnServer);
             adapterOnServer.setChannel(mockChannel.getChannel());
 
             // initialization on client
-            final ClientChannelAdapter adapterOnClient = new ClientChannelAdapter(100);
+            final ClientChannelAdapter adapterOnClient = new ClientChannelAdapter(TIMEOUT);
             gatewayOnClient = adapterOnClient.getGateway();
             ServerSessionListener client = new NullServerSessionListener() {
                 public ClientChannelListener joinedChannel(ClientChannel channel) {
