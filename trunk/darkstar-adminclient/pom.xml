@@ -86,7 +86,7 @@
 		<dependency>
 			<groupId>com.gamalocus.darkstar-contrib</groupId>
 			<artifactId>darkstar-service-datainspector</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 	
