@@ -3,7 +3,7 @@
 
 	<groupId>com.gamalocus.darkstar-contrib</groupId>
 	<artifactId>darkstar-service-datainspector</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DataInspector</name>
@@ -31,9 +31,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-service-datainspector-1.0.1</connection>
-		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-service-datainspector-1.0.1</developerConnection>
-		<url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-service-datainspector-1.0.1</url>
+		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-service-datainspector</connection>
+		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-service-datainspector</developerConnection>
+		<url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-service-datainspector</url>
 	</scm>
 
 	<repositories>
