@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.gamalocus.darkstar-contrib</groupId>
+	<artifactId>darkstar-datastructures</artifactId>
+	<version>1.0.1</version>
+	<packaging>jar</packaging>
+
+	<name>Darkstar Data Structures</name>
+	<description>Some data structures</description>
+	<url>http://code.google.com/p/darkstar-contrib/</url>
+	<inceptionYear>2008</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>BSD License</name>
+			<url>
+				http://www.opensource.org/licenses/bsd-license.php
+			</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>greisen</id>
+			<name>Emanuel Greisen</name>
+			<url>http://www.emanuelgreisen.dk/</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-datastructures-1.0.1</connection>
+		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-datastructures-1.0.1</developerConnection>
+		<url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-datastructures-1.0.1</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>gamalocus.com-dev</id>
+			<url>
+				scpexe://dev.cotwl.net/home/cotk/maven2/repository
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>gamalocus.com-snapshot-dev</id>
+			<url>
+				scpexe://dev.cotwl.net/home/cotk/maven2/snapshotRepository
+			</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+
+
+	<repositories>
+		<repository>
+			<id>orfjackal</id>
+			<url>http://repo.orfjackal.net/maven2</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.projectdarkstar</groupId>
+			<artifactId>darkstar-server</artifactId>
+			<version>0.9.6</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
