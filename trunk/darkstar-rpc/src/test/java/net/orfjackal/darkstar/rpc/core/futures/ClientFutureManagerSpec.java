@@ -201,6 +201,9 @@ public class ClientFutureManagerSpec extends Specification<Object> {
             specify(manager.waitingForResponse(), should.equal(1));
         }
 
+        /**
+         * May happen because of network problems, such as re-sent UDP packages.
+         */
         public void unexpectedResponsesAreSilentlyIgnoredAndLogged() {
             checking(new Expectations() {{
                 one(logFilter).isLoggable(with(any(LogRecord.class))); will(returnValue(false));
