@@ -22,59 +22,59 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.comm;
+package net.orfjackal.darkstar.rpc.core.futures;
 
-import net.orfjackal.darkstar.rpc.*;
-import net.orfjackal.darkstar.rpc.core.RpcClientImpl;
+import net.orfjackal.darkstar.rpc.ServiceReference;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
-import net.orfjackal.darkstar.rpc.core.RpcServerImpl;
-import net.orfjackal.darkstar.rpc.core.futures.ProxyGeneratingFuture;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
- * @since 15.6.2008
+ * @since 10.8.2008
  */
-public class RpcGateway implements RpcServer, Serializable {
+public class ProxyGeneratingFuture<T> implements Future<Set<T>>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    public static final byte REQUEST_TO_MASTER = 0;
-    public static final byte RESPONSE_FROM_MASTER = 1;
-    public static final byte REQUEST_TO_SLAVE = 2;
-    public static final byte RESPONSE_FROM_SLAVE = 3;
-
-    private final RpcServer server;
+    private final Future<Set<ServiceReference<T>>> refs;
     private final RpcProxyFactory proxyFactory;
-    private final ServiceProvider serviceProvider;
 
-    public RpcGateway(MessageSender requestSender, MessageSender responseSender) {
-        server = new RpcServerImpl(responseSender);
-        RpcClient client = new RpcClientImpl(requestSender);
-        proxyFactory = new RpcProxyFactory(client);
-        serviceProvider = proxyFactory.create(client.getServiceProvider());
+    public ProxyGeneratingFuture(Future<Set<ServiceReference<T>>> refs, RpcProxyFactory proxyFactory) {
+        this.refs = refs;
+        this.proxyFactory = proxyFactory;
     }
 
-    public <T> ServiceReference<T> registerService(Class<T> serviceInterface, T service) {
-        return server.registerService(serviceInterface, service);
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return refs.cancel(mayInterruptIfRunning);
     }
 
-    public void unregisterService(ServiceReference<?> serviceRef) {
-        server.unregisterService(serviceRef);
+    public boolean isCancelled() {
+        return refs.isCancelled();
     }
 
-    public Map<ServiceReference<?>, Object> registeredServices() {
-        return server.registeredServices();
+    public boolean isDone() {
+        return refs.isDone();
     }
 
-    public <T> Future<Set<T>> remoteFindByType(Class<T> serviceInterface) {
-        return new ProxyGeneratingFuture<T>(serviceProvider.findByType(serviceInterface), proxyFactory);
+    public Set<T> get() throws InterruptedException, ExecutionException {
+        return asProxies(refs.get());
     }
 
-    public Future<Set<?>> remoteFindAll() {
-        return new ProxyGeneratingFuture(serviceProvider.findAll(), proxyFactory);
+    public Set<T> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return asProxies(refs.get(timeout, unit));
+    }
+
+    private Set<T> asProxies(Set<ServiceReference<T>> refs) {
+        Set<T> proxies = new HashSet<T>();
+        for (ServiceReference<T> ref : refs) {
+            proxies.add(proxyFactory.create(ref));
+        }
+        return proxies;
     }
 }

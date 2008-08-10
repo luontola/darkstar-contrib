@@ -22,7 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.core;
+package net.orfjackal.darkstar.rpc.core.futures;
+
+import net.orfjackal.darkstar.rpc.core.Request;
+import net.orfjackal.darkstar.rpc.core.Response;
 
 import java.util.concurrent.FutureTask;
 
@@ -30,11 +33,11 @@ import java.util.concurrent.FutureTask;
  * @author Esko Luontola
  * @since 10.6.2008
  */
-public final class RpcClientFuture<V> extends FutureTask<V> {
+public final class ClientFuture<V> extends FutureTask<V> {
 
     private final Request request;
 
-    public RpcClientFuture(Request request) {
+    public ClientFuture(Request request) {
         super(new NullRunnable(), null);
         this.request = request;
     }

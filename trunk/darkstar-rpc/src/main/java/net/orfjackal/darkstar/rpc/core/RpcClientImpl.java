@@ -25,6 +25,7 @@
 package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.*;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFuture;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,9 +40,9 @@ import java.util.logging.Logger;
  */
 public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(RpcClientImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(RpcClientImpl.class.getName());
 
-    private final Map<Long, RpcClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, RpcClientFuture<?>>();
+    private final Map<Long, ClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ClientFuture<?>>();
     private final MessageSender requestSender;
     private long nextRequestId = 1L;
 
@@ -73,8 +74,8 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
         return rq;
     }
 
-    private <V> RpcClientFuture<V> waitForResponseTo(Request rq) {
-        RpcClientFuture<V> f = new RpcClientFuture<V>(rq);
+    private <V> ClientFuture<V> waitForResponseTo(Request rq) {
+        ClientFuture<V> f = new ClientFuture<V>(rq);
         assert !waitingForResponse.containsKey(rq.requestId);
         waitingForResponse.put(rq.requestId, f);
         return f;
@@ -82,11 +83,11 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
 
     public void receivedMessage(byte[] message) {
         Response rsp = Response.fromBytes(message);
-        RpcClientFuture<?> f = waitingForResponse.remove(rsp.requestId);
+        ClientFuture<?> f = waitingForResponse.remove(rsp.requestId);
         if (f != null) {
             f.markDone(rsp);
         } else {
-            log.warning("Unexpected response: " + rsp);
+            logger.warning("Unexpected response: " + rsp);
         }
     }
 

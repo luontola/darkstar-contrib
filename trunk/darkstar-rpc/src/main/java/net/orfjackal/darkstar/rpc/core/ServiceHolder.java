@@ -36,7 +36,6 @@ import java.util.concurrent.Future;
  * @since 10.6.2008
  */
 public final class ServiceHolder<T> implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private final T service;
