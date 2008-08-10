@@ -82,7 +82,8 @@ public class RpcGateway implements RpcServer, Serializable {
         return new RpcProxyGeneratingFuture(serviceProvider.findAll(), proxyFactory);
     }
 
-    private static class RpcProxyGeneratingFuture<T> implements Future<Set<T>> {
+    private static class RpcProxyGeneratingFuture<T> implements Future<Set<T>>, Serializable {
+        private static final long serialVersionUID = 1L;
 
         private final Future<Set<ServiceReference<T>>> refs;
         private final RpcProxyFactory proxyFactory;

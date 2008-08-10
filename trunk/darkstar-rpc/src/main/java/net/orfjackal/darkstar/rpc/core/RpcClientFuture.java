@@ -30,11 +30,11 @@ import java.util.concurrent.FutureTask;
  * @author Esko Luontola
  * @since 10.6.2008
  */
-public final class RpcFuture<V> extends FutureTask<V> {
+public final class RpcClientFuture<V> extends FutureTask<V> {
 
     private final Request request;
 
-    public RpcFuture(Request request) {
+    public RpcClientFuture(Request request) {
         super(new NullRunnable(), null);
         this.request = request;
     }

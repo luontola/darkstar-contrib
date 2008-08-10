@@ -89,7 +89,7 @@ public class RpcClientSpec extends Specification<Object> {
 
         public void theFutureMayNotBeMarkedDoneByAnotherResponse() {
             final Response rsp = Response.valueReturned(2L, "returnvalue");
-            final RpcFuture<?> rcpFuture = (RpcFuture<?>) future;
+            final RpcClientFuture<?> rcpFuture = (RpcClientFuture<?>) future;
             specify(new Block() {
                 public void run() throws Throwable {
                     rcpFuture.markDone(rsp);
