@@ -57,23 +57,46 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
     private static final byte RECIEVE_RETURN_VALUE = 0x04;
     private static final int TIMEOUT = 5000;
 
+    private DarkstarServer server;
+    private TempDirectory tempDirectory;
+    private Thread testTimeout;
+
+    public void create() throws Exception {
+        tempDirectory = new TempDirectory();
+        tempDirectory.create();
+
+        server = new DarkstarServer(tempDirectory.getDirectory());
+        server.setAppName("RpcTest");
+        server.setAppListener(RpcTestAppListener.class);
+        server.start();
+
+        // wait for the server to start up before running the tests
+        server.waitUntilSystemOutContains(STARTUP_MSG, TIMEOUT);
+
+        // needed to avoid blocking on client.events.take()
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+    }
+
+    public void destroy() throws Exception {
+        try {
+            System.out.println("Server Out:");
+            System.out.println(server.getSystemOut());
+            System.err.println("Server Log:");
+            System.err.println(server.getSystemErr());
+            testTimeout.interrupt();
+        } finally {
+            server.shutdown();
+            tempDirectory.dispose();
+        }
+    }
+
+
     public class WhenUsingARealDarkstarServer {
 
-        private DarkstarServer server;
         private DebugClient client;
         private RpcGateway gatewayOnClient;
 
-        private TempDirectory tempDirectory;
-        private Thread testTimeout;
-
         public Object create() throws Exception {
-            tempDirectory = new TempDirectory();
-            tempDirectory.create();
-
-            server = new DarkstarServer(tempDirectory.getDirectory());
-            server.setAppName("RpcTest");
-            server.setAppListener(RpcTestAppListener.class);
-            server.start();
 
             final ClientChannelAdapter adapter = new ClientChannelAdapter();
             gatewayOnClient = adapter.getGateway();
@@ -82,12 +105,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
                     return adapter.joinedChannel(channel);
                 }
             };
-
-            // wait for the server to start up before running the tests
-            server.waitUntilSystemOutContains(STARTUP_MSG, TIMEOUT);
-
-            // needed to avoid blocking on client.events.take()
-            testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
 
             // wait for the client to log in
             client.login();
@@ -102,19 +119,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            try {
-                System.out.println("client.events = " + client.events);
-                System.out.println("client.messages = " + client.messages);
-                System.out.println("Server Out:");
-                System.out.println(server.getSystemOut());
-                System.err.println("Server Log:");
-                System.err.println(server.getSystemErr());
-                testTimeout.interrupt();
-                client.logout(true);
-            } finally {
-                server.shutdown();
-                tempDirectory.dispose();
-            }
+            System.out.println("client.events = " + client.events);
+            System.out.println("client.messages = " + client.messages);
+            client.logout(true);
         }
 
         public void rpcMethodsOnServerMayBeCalledFromClient() throws Exception {

@@ -31,6 +31,7 @@ import net.orfjackal.darkstar.rpc.DummySender;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.RpcClient;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFuture;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -54,7 +55,7 @@ public class RpcClientSpec extends Specification<Object> {
 
     public void create() {
         server = new DummySender();
-        client = new RpcClientImpl(server);
+        client = new RpcClientImpl(server, new ClientFutureManager());
     }
 
 
@@ -180,7 +181,7 @@ public class RpcClientSpec extends Specification<Object> {
                 one(server).send(with(any(byte[].class))); will(throwException(new IOException()));
                 allowing(server).setCallback(with(any(MessageReciever.class)));
             }});
-            client = new RpcClientImpl(server);
+            client = new RpcClientImpl(server, new ClientFutureManager());
             specify(new Block() {
                 public void run() throws Throwable {
                     client.remoteInvoke(42L, "foo", new Class<?>[0], null);
@@ -202,7 +203,7 @@ public class RpcClientSpec extends Specification<Object> {
         private Logger log;
 
         public Object create() {
-            log = Logger.getLogger(RpcClientImpl.class.getName());
+            log = Logger.getLogger(ClientFutureManager.class.getName());
             return null;
         }
 

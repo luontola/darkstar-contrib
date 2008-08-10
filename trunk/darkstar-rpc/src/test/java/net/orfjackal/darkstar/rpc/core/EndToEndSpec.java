@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.rpc.core;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.*;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -53,7 +54,7 @@ public class EndToEndSpec extends Specification<Object> {
 
     public void create() {
         server = new RpcServerImpl(network.getServerToClient());
-        client = new RpcClientImpl(network.getClientToServer());
+        client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
 
         // initialize Foo on server
         fooService = mock(Foo.class);

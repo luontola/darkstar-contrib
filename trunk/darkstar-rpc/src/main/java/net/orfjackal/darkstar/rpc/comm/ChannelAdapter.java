@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.rpc.comm;
 import com.sun.sgs.app.*;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.MessageSender;
+import net.orfjackal.darkstar.rpc.core.futures.ServerFutureManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private ManagedReference<Channel> channel;
 
     public ChannelAdapter() {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender());
+        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ServerFutureManager());
     }
 
     public void setChannel(Channel channel) {

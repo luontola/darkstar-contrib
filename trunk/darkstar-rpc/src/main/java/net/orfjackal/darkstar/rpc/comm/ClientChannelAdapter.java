@@ -28,6 +28,7 @@ import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.MessageSender;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,7 @@ import java.nio.ByteBuffer;
  * @author Esko Luontola
  * @since 15.6.2008
  */
-public class ClientChannelAdapter implements ClientChannelListener, Serializable {
-    private static final long serialVersionUID = 1L;
+public class ClientChannelAdapter implements ClientChannelListener {
     private static final Logger logger = LoggerFactory.getLogger(ClientChannelAdapter.class);
 
     // client-to-server requests
@@ -53,7 +53,7 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
     private ClientChannel channel;
 
     public ClientChannelAdapter() {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender());
+        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ClientFutureManager());
     }
 
     public RpcGateway getGateway() {

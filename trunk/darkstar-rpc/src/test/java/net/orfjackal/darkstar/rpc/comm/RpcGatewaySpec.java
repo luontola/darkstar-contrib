@@ -30,6 +30,8 @@ import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.MockNetwork;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.ServiceReference;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
+import net.orfjackal.darkstar.rpc.core.futures.ServerFutureManager;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
@@ -75,8 +77,8 @@ public class RpcGatewaySpec extends Specification<Object> {
         private ServiceReference<Foo> fooOnSlaveRef;
 
         public Object create() {
-            slaveGateway = new RpcGateway(toMaster.getClientToServer(), toSlave.getServerToClient());
-            masterGateway = new RpcGateway(toSlave.getClientToServer(), toMaster.getServerToClient());
+            slaveGateway = new RpcGateway(toMaster.getClientToServer(), toSlave.getServerToClient(), new ClientFutureManager());
+            masterGateway = new RpcGateway(toSlave.getClientToServer(), toMaster.getServerToClient(), new ServerFutureManager());
             fooOnSlave = mock(Foo.class, "fooOnSlave");
             fooOnMaster = mock(Foo.class, "fooOnMaster");
             barOnMaster = mock(Bar.class, "barOnMaster");
