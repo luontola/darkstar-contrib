@@ -137,19 +137,19 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             specify(result, should.equal("hello, hello"));
         }
 
-//        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
-//
-//            // command the server to locate the RPC service on the client
-//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
-//            server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
-//
-//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
-//            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = true", TIMEOUT);
-//            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
-//
-//            // command the server to call methods on the RPC service
-//            // TODO
-//        }
+        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
+
+            // command the server to locate the RPC service on the client
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
+            server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
+
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
+            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = true", TIMEOUT);
+            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
+
+            // command the server to call methods on the RPC service
+            // TODO
+        }
     }
 
     // Interface implementations for connecting to Darkstar

@@ -104,13 +104,13 @@ public class ChannelAdapterSpec extends Specification<Object> {
         }
 
         public void serverCanUseServicesOnClient() throws Exception {
-            Set<?> services = gatewayOnServer.remoteFindAll().get();
+            Set<?> services = gatewayOnServer.remoteFindAll().get(10, TimeUnit.MILLISECONDS);
             specify(services.size(), should.equal(1));
         }
 
         public void ifTheClientLeavesTheChannelAllCommunicationsWillBeCut() throws Exception {
             final ServiceLocator locatorOnClient = gatewayOnClient.remoteFindByType(ServiceLocator.class).get().iterator().next();
-            final ServiceLocator locatorOnServer = gatewayOnServer.remoteFindByType(ServiceLocator.class).get().iterator().next();
+            final ServiceLocator locatorOnServer = gatewayOnServer.remoteFindByType(ServiceLocator.class).get(10, TimeUnit.MILLISECONDS).iterator().next();
             mockChannel.leaveAll();
             specify(new Block() {
                 public void run() throws Throwable {

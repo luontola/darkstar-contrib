@@ -43,17 +43,18 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
 
     private final ServerFutureManager manager;
     private final Request request;
-    private Response response;
-    private boolean cancelled = false;
+    private volatile Response response;
+    private volatile boolean cancelled = false;
 
     public ServerFuture(Request request, ServerFutureManager manager) {
         this.request = request;
         this.manager = manager;
     }
 
-    void markDone(Response response) {
+    synchronized void markDone(Response response) {
         assert response.requestId == request.requestId;
         this.response = response;
+        notifyAll();
     }
 
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -85,6 +86,14 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
     }
 
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        if (!isDone()) {
+            synchronized (this) {
+                unit.timedWait(this, timeout);
+            }
+        }
+        if (!isDone()) {
+            throw new TimeoutException();
+        }
         return get();
     }
 }
