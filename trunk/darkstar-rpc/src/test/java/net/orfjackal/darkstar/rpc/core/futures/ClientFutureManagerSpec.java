@@ -30,12 +30,16 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.core.Request;
 import net.orfjackal.darkstar.rpc.core.Response;
+import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -45,21 +49,34 @@ import java.util.concurrent.TimeoutException;
 @Group({"fast"})
 public class ClientFutureManagerSpec extends Specification<Object> {
 
+    private static final int SERVICE_ID = 42;
+
     private FutureManager manager;
     private Request request;
+    private Request request2;
     private Response responseVal;
     private Response responseExp;
     private Response unexpectedResponse;
 
+    private Logger log;
+    private Filter logFilter;
+
     public void create() throws Exception {
+        log = Logger.getLogger(ClientFutureManager.class.getName());
+        logFilter = mock(Filter.class);
+        log.setFilter(logFilter);
+
         manager = new ClientFutureManager();
-        int requestId = 1;
-        request = new Request(requestId, 2, "foo", new Class<?>[0], new Object[0]);
-        responseVal = Response.valueReturned(requestId, "foo!");
-        responseExp = Response.exceptionThrown(requestId, new IllegalArgumentException());
-        unexpectedResponse = Response.valueReturned(requestId + 1, "bar!");
+        request = new Request(1, SERVICE_ID, "foo", new Class<?>[0], new Object[0]);
+        request2 = new Request(2, SERVICE_ID, "foo", new Class<?>[0], new Object[0]);
+        responseVal = Response.valueReturned(1, "foo!");
+        responseExp = Response.exceptionThrown(1, new IllegalArgumentException());
+        unexpectedResponse = Response.valueReturned(3, "bar!");
     }
 
+    public void destroy() throws Exception {
+        log.setFilter(null);
+    }
 
     public class WhenNoRequestsHaveBeenMade {
 
@@ -159,6 +176,39 @@ public class ClientFutureManagerSpec extends Specification<Object> {
             specify(!future.isCancelled());
             specify(!future.cancel(true));
             specify(!future.isCancelled());
+        }
+    }
+
+    public class WhenThereAreManyConcurrentRequests {
+
+        private Future<String> future1;
+        private Future<String> future2;
+
+        public Object create() {
+            future1 = manager.waitForResponseTo(request);
+            future2 = manager.waitForResponseTo(request2);
+            return null;
+        }
+
+        public void managerWaitsForResponsesToAllOfThem() {
+            specify(manager.waitingForResponse(), should.equal(2));
+        }
+
+        public void responsesDoNotAffectUnrelatedFutures() {
+            manager.recievedResponse(responseVal);
+            specify(future1.isDone());
+            specify(!future2.isDone());
+            specify(manager.waitingForResponse(), should.equal(1));
+        }
+
+        public void unexpectedResponsesAreSilentlyIgnoredAndLogged() {
+            checking(new Expectations() {{
+                one(logFilter).isLoggable(with(any(LogRecord.class))); will(returnValue(false));
+            }});
+            manager.recievedResponse(unexpectedResponse);
+            specify(!future1.isDone());
+            specify(!future2.isDone());
+            specify(manager.waitingForResponse(), should.equal(2));
         }
     }
 }
