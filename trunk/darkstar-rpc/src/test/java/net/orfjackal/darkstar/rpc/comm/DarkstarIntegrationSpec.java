@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -50,7 +51,10 @@ import java.util.concurrent.Future;
 public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static final String STARTUP_MSG = "RpcTest has started";
-    private static final byte LOCATE_SERVICE_CMD = 0x01;
+    private static final byte SEND_FIND_SERVICE = 0x01;
+    private static final byte RECIEVE_FIND_SERVICE = 0x02;
+    private static final byte SEND_METHOD_CALL = 0x03;
+    private static final byte RECIEVE_RETURN_VALUE = 0x04;
     private static final int TIMEOUT = 5000;
 
     public class WhenUsingARealDarkstarServer {
@@ -129,13 +133,16 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 //        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
 //
 //            // command the server to locate the RPC service on the client
-//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(LOCATE_SERVICE_CMD).flip());
+//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
+//            server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
+//
+//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
+//            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = true", TIMEOUT);
 //            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
 //
 //            // command the server to call methods on the RPC service
 //            // TODO
 //        }
-
     }
 
     // Interface implementations for connecting to Darkstar
@@ -157,7 +164,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
-        private Future<Set<Echo>> echoOnClient;
+
+        private Future<Set<Echo>> echoOnClientPending;
+        private Echo echoOnClient;
 
         public RpcTestClientSessionListener(ClientSession session) {
             this.session = AppContext.getDataManager().createReference(session);
@@ -180,13 +189,38 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public void receivedMessage(ByteBuffer message) {
             byte command = message.get();
-            if (command == LOCATE_SERVICE_CMD) {
-                System.out.println("command = LOCATE_SERVICE_CMD");
-                echoOnClient = gateway.remoteFindByType(Echo.class);
-                System.out.println("echoOnClient = " + (echoOnClient == null ? "null" : "not null"));
+            System.out.println("command = " + command);
+
+            try {
+                processCommand(command);
+
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void processCommand(byte command) throws ExecutionException, InterruptedException {
+            if (command == SEND_FIND_SERVICE) {
+                echoOnClientPending = gateway.remoteFindByType(Echo.class);
+                System.out.println("echoOnClientPending = " + (echoOnClientPending == null ? "null" : "not null"));
+
+            } else if (command == RECIEVE_FIND_SERVICE) {
+                System.out.println("echoOnClientPending.isDone() = " + echoOnClientPending.isDone());
+                if (echoOnClientPending.isDone()) {
+                    echoOnClient = echoOnClientPending.get().iterator().next();
+                    System.out.println("echoOnClient = " + (echoOnClient == null ? "null" : "not null"));
+                }
+
+            } else if (command == SEND_METHOD_CALL) {
+                // TODO
+
+            } else if (command == RECIEVE_RETURN_VALUE) {
+                // TODO
 
             } else {
-                System.out.println("Unknown command: " + command);
+                throw new IllegalArgumentException("Unknown command: " + command);
             }
         }
 
