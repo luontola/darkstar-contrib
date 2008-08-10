@@ -114,7 +114,7 @@ public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
             if (future == null) {
                 return null;
             }
-            Object value = future.get(100, TimeUnit.MILLISECONDS);
+            Object value = future.get(0, TimeUnit.MILLISECONDS);
             return Response.valueReturned(rq.requestId, value);
 
         } catch (InvocationTargetException e) {

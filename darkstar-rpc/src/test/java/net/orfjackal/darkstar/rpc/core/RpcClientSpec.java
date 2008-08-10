@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.rpc.core;
 import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.DummySender;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.RpcClient;
@@ -37,7 +38,6 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -49,12 +49,20 @@ import java.util.logging.Logger;
 @RunWith(JDaveRunner.class)
 public class RpcClientSpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 1000;
+
     private DummySender server;
     private RpcClient client;
+    private Thread testTimeout;
 
     public void create() {
         server = new DummySender();
         client = new RpcClientImpl(server, new ClientFutureManager());
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+    }
+
+    public void destroy() throws Exception {
+        testTimeout.interrupt();
     }
 
 
@@ -85,7 +93,7 @@ public class RpcClientSpec extends Specification<Object> {
 
             specify(client.waitingForResponse(), should.equal(0));
             specify(future.isDone());
-            specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("returnvalue"));
+            specify(future.get(), should.equal("returnvalue"));
         }
     }
 
@@ -113,8 +121,8 @@ public class RpcClientSpec extends Specification<Object> {
             specify(client.waitingForResponse(), should.equal(1));
             server.callback.receivedMessage(Response.valueReturned(2L, "r2").toBytes());
             specify(client.waitingForResponse(), should.equal(0));
-            specify(future1.get(100, TimeUnit.MILLISECONDS), should.equal("r1"));
-            specify(future2.get(100, TimeUnit.MILLISECONDS), should.equal("r2"));
+            specify(future1.get(), should.equal("r1"));
+            specify(future2.get(), should.equal("r2"));
         }
     }
 
@@ -131,7 +139,7 @@ public class RpcClientSpec extends Specification<Object> {
 
         public void theFutureWillProvideTheExceptionThrown() throws Exception {
             try {
-                future.get(100, TimeUnit.MILLISECONDS);
+                future.get();
                 specify(false);
             } catch (ExecutionException e) {
                 Throwable cause = e.getCause();

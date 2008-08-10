@@ -120,7 +120,7 @@ public class ChannelAdapterSpec extends Specification<Object> {
             specify(new Block() {
                 public void run() throws Throwable {
                     Future<Set<ServiceReference<?>>> f = providerOnServer.findAll();
-                    f.get(100, TimeUnit.MILLISECONDS);
+                    f.get(50, TimeUnit.MILLISECONDS);
                 }
             }, should.raise(TimeoutException.class));
         }
