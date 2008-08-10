@@ -116,7 +116,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         public void rpcMethodsOnServerMayBeCalledFromClient() throws Exception {
 
             // locate the RPC service on server
-            Set<Echo> services = gatewayOnClient.remoteFindByType(Echo.class);
+            Set<Echo> services = gatewayOnClient.remoteFindByType(Echo.class).get();
             specify(services.size(), should.equal(1));
             Echo echoOnServer = services.iterator().next();
 
@@ -157,7 +157,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
-        private Set<Echo> echoOnClient;
+        private Future<Set<Echo>> echoOnClient;
 
         public RpcTestClientSessionListener(ClientSession session) {
             this.session = AppContext.getDataManager().createReference(session);
@@ -166,7 +166,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         private RpcGateway initGateway(ClientSession session) {
-            ChannelAdapter adapter = new ChannelAdapter(TIMEOUT / 2);
+            ChannelAdapter adapter = new ChannelAdapter();
             rpcChannelForClient(session, adapter);
             return adapter.getGateway();
         }

@@ -31,6 +31,7 @@ import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.exp.mocks.MockAppContext;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.MockChannel;
 import net.orfjackal.darkstar.rpc.ServiceProvider;
 import net.orfjackal.darkstar.rpc.ServiceReference;
@@ -51,11 +52,15 @@ public class ChannelAdapterSpec extends Specification<Object> {
 
     private static final int TIMEOUT = 1000;
 
+    private Thread testTimeout;
+
     public void create() {
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
         MockAppContext.install();
     }
 
     public void destroy() {
+        testTimeout.interrupt();
         MockAppContext.uninstall();
     }
 
@@ -69,13 +74,13 @@ public class ChannelAdapterSpec extends Specification<Object> {
         public Object create() {
 
             // initialization on server
-            ChannelAdapter adapterOnServer = new ChannelAdapter(TIMEOUT);
+            ChannelAdapter adapterOnServer = new ChannelAdapter();
             gatewayOnServer = adapterOnServer.getGateway();
             mockChannel = new MockChannel(adapterOnServer);
             adapterOnServer.setChannel(mockChannel.getChannel());
 
             // initialization on client
-            final ClientChannelAdapter adapterOnClient = new ClientChannelAdapter(TIMEOUT);
+            final ClientChannelAdapter adapterOnClient = new ClientChannelAdapter();
             gatewayOnClient = adapterOnClient.getGateway();
             ServerSessionListener client = new NullServerSessionListener() {
                 public ClientChannelListener joinedChannel(ClientChannel channel) {
@@ -93,19 +98,19 @@ public class ChannelAdapterSpec extends Specification<Object> {
             mockChannel.shutdown();
         }
 
-        public void clientCanUseServicesOnServer() {
-            Set<?> services = gatewayOnClient.remoteFindAll();
+        public void clientCanUseServicesOnServer() throws Exception {
+            Set<?> services = gatewayOnClient.remoteFindAll().get();
             specify(services.size(), should.equal(1));
         }
 
-        public void serverCanUseServicesOnClient() {
-            Set<?> services = gatewayOnServer.remoteFindAll();
+        public void serverCanUseServicesOnClient() throws Exception {
+            Set<?> services = gatewayOnServer.remoteFindAll().get();
             specify(services.size(), should.equal(1));
         }
 
-        public void ifTheClientLeavesTheChannelAllCommunicationsWillBeCut() {
-            final ServiceProvider providerOnClient = gatewayOnClient.remoteFindByType(ServiceProvider.class).iterator().next();
-            final ServiceProvider providerOnServer = gatewayOnServer.remoteFindByType(ServiceProvider.class).iterator().next();
+        public void ifTheClientLeavesTheChannelAllCommunicationsWillBeCut() throws Exception {
+            final ServiceProvider providerOnClient = gatewayOnClient.remoteFindByType(ServiceProvider.class).get().iterator().next();
+            final ServiceProvider providerOnServer = gatewayOnServer.remoteFindByType(ServiceProvider.class).get().iterator().next();
             mockChannel.leaveAll();
             specify(new Block() {
                 public void run() throws Throwable {

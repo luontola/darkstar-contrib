@@ -33,8 +33,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -49,13 +51,11 @@ public class RpcGateway implements RpcServer, Serializable {
     public static final byte REQUEST_TO_SLAVE = 2;
     public static final byte RESPONSE_FROM_SLAVE = 3;
 
-    private final long timeoutMs;
     private final RpcServer server;
     private final RpcProxyFactory proxyFactory;
     private final ServiceProvider serviceProvider;
 
-    public RpcGateway(MessageSender requestSender, MessageSender responseSender, long timeoutMs) {
-        this.timeoutMs = timeoutMs;
+    public RpcGateway(MessageSender requestSender, MessageSender responseSender) {
         server = new RpcServerImpl(responseSender);
         RpcClient client = new RpcClientImpl(requestSender);
         proxyFactory = new RpcProxyFactory(client);
@@ -74,33 +74,50 @@ public class RpcGateway implements RpcServer, Serializable {
         return server.registeredServices();
     }
 
-    public <T> Set<T> remoteFindByType(Class<T> serviceInterface) {
-        Set<ServiceReference<T>> refs;
-        Future<Set<ServiceReference<T>>> f = serviceProvider.findByType(serviceInterface);
-        try {
-            refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Querying for services failed", e);
-        }
-        return asProxies(refs);
+    public <T> Future<Set<T>> remoteFindByType(Class<T> serviceInterface) {
+        return new RpcProxyGeneratingFuture<T>(serviceProvider.findByType(serviceInterface), proxyFactory);
     }
 
-    public Set<?> remoteFindAll() {
-        Set<ServiceReference<?>> refs;
-        Future<Set<ServiceReference<?>>> f = serviceProvider.findAll();
-        try {
-            refs = f.get(timeoutMs, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Querying for services failed", e);
-        }
-        return asProxies(refs);
+    public Future<Set<?>> remoteFindAll() {
+        return new RpcProxyGeneratingFuture(serviceProvider.findAll(), proxyFactory);
     }
 
-    private Set asProxies(Set refs) {
-        Set proxies = new HashSet();
-        for (Object ref : refs) {
-            proxies.add(proxyFactory.create((ServiceReference<?>) ref));
+    private static class RpcProxyGeneratingFuture<T> implements Future<Set<T>> {
+
+        private final Future<Set<ServiceReference<T>>> refs;
+        private final RpcProxyFactory proxyFactory;
+
+        public RpcProxyGeneratingFuture(Future<Set<ServiceReference<T>>> refs, RpcProxyFactory proxyFactory) {
+            this.refs = refs;
+            this.proxyFactory = proxyFactory;
         }
-        return proxies;
+
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return refs.cancel(mayInterruptIfRunning);
+        }
+
+        public boolean isCancelled() {
+            return refs.isCancelled();
+        }
+
+        public boolean isDone() {
+            return refs.isDone();
+        }
+
+        public Set<T> get() throws InterruptedException, ExecutionException {
+            return asProxies(refs.get());
+        }
+
+        public Set<T> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return asProxies(refs.get(timeout, unit));
+        }
+
+        private Set<T> asProxies(Set<ServiceReference<T>> refs) {
+            Set<T> proxies = new HashSet<T>();
+            for (ServiceReference<T> ref : refs) {
+                proxies.add(proxyFactory.create(ref));
+            }
+            return proxies;
+        }
     }
 }

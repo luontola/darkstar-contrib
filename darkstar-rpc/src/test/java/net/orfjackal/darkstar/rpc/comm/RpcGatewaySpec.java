@@ -26,6 +26,7 @@ package net.orfjackal.darkstar.rpc.comm;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.MockNetwork;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.ServiceReference;
@@ -33,10 +34,8 @@ import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -45,10 +44,18 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class RpcGatewaySpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 1000;
+
     private MockNetwork toMaster = new MockNetwork();
     private MockNetwork toSlave = new MockNetwork();
+    private Thread testTimeout;
+
+    public void create() throws Exception {
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+    }
 
     public void destroy() {
+        testTimeout.interrupt();
         shutdownNetwork();
     }
 
@@ -68,8 +75,8 @@ public class RpcGatewaySpec extends Specification<Object> {
         private ServiceReference<Foo> fooOnSlaveRef;
 
         public Object create() {
-            slaveGateway = new RpcGateway(toMaster.getClientToServer(), toSlave.getServerToClient(), 100);
-            masterGateway = new RpcGateway(toSlave.getClientToServer(), toMaster.getServerToClient(), 100);
+            slaveGateway = new RpcGateway(toMaster.getClientToServer(), toSlave.getServerToClient());
+            masterGateway = new RpcGateway(toSlave.getClientToServer(), toMaster.getServerToClient());
             fooOnSlave = mock(Foo.class, "fooOnSlave");
             fooOnMaster = mock(Foo.class, "fooOnMaster");
             barOnMaster = mock(Bar.class, "barOnMaster");
@@ -91,65 +98,65 @@ public class RpcGatewaySpec extends Specification<Object> {
             specify(slaveGateway.registeredServices().size(), should.equal(before - 1));
         }
 
-        public void slaveCanFindAllServicesOnMaster() {
-            Set<?> onMaster = slaveGateway.remoteFindAll();
+        public void slaveCanFindAllServicesOnMaster() throws Exception {
+            Set<?> onMaster = slaveGateway.remoteFindAll().get();
             specify(onMaster.size(), should.equal(3));
         }
 
-        public void masterCanFindAllServicesOnSlave() {
-            Set<?> onSlave = masterGateway.remoteFindAll();
+        public void masterCanFindAllServicesOnSlave() throws Exception {
+            Set<?> onSlave = masterGateway.remoteFindAll().get();
             specify(onSlave.size(), should.equal(2));
         }
 
-        public void slaveCanFindServicesOnMasterByType() {
-            Set<Foo> foosOnMaster = slaveGateway.remoteFindByType(Foo.class);
+        public void slaveCanFindServicesOnMasterByType() throws Exception {
+            Set<Foo> foosOnMaster = slaveGateway.remoteFindByType(Foo.class).get();
             specify(foosOnMaster.size(), should.equal(1));
-            Set<Bar> barsOnMaster = slaveGateway.remoteFindByType(Bar.class);
+            Set<Bar> barsOnMaster = slaveGateway.remoteFindByType(Bar.class).get();
             specify(barsOnMaster.size(), should.equal(1));
         }
 
-        public void masterCanFindServicesOnSlaveByType() {
-            Set<Foo> foosOnSlave = masterGateway.remoteFindByType(Foo.class);
+        public void masterCanFindServicesOnSlaveByType() throws Exception {
+            Set<Foo> foosOnSlave = masterGateway.remoteFindByType(Foo.class).get();
             specify(foosOnSlave.size(), should.equal(1));
-            Set<Bar> barsOnSlave = masterGateway.remoteFindByType(Bar.class);
+            Set<Bar> barsOnSlave = masterGateway.remoteFindByType(Bar.class).get();
             specify(barsOnSlave.size(), should.equal(0));
         }
 
-        public void slaveCanCallServiceMethodsOnMaster() {
+        public void slaveCanCallServiceMethodsOnMaster() throws Exception {
             checking(new Expectations() {{
                 one(fooOnMaster).serviceMethod();
             }});
-            Set<Foo> foos = slaveGateway.remoteFindByType(Foo.class);
+            Set<Foo> foos = slaveGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             foo.serviceMethod();
             shutdownNetwork();
         }
 
-        public void masterCanCallServiceMethodsOnSlave() {
+        public void masterCanCallServiceMethodsOnSlave() throws Exception {
             checking(new Expectations() {{
                 one(fooOnSlave).serviceMethod();
             }});
-            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class);
+            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             foo.serviceMethod();
             shutdownNetwork();
         }
 
-        public void slaveGetsResponsesFromMaster() throws ExecutionException, TimeoutException, InterruptedException {
+        public void slaveGetsResponsesFromMaster() throws Exception {
             checking(new Expectations() {{
                 one(fooOnMaster).hello("ping?"); will(returnValue(ServiceHelper.wrap("pong!")));
             }});
-            Set<Foo> foos = slaveGateway.remoteFindByType(Foo.class);
+            Set<Foo> foos = slaveGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             Future<String> future = foo.hello("ping?");
             specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("pong!"));
         }
 
-        public void masterGetsResponsesFromSlave() throws ExecutionException, TimeoutException, InterruptedException {
+        public void masterGetsResponsesFromSlave() throws Exception {
             checking(new Expectations() {{
                 one(fooOnSlave).hello("ping?"); will(returnValue(ServiceHelper.wrap("pong!")));
             }});
-            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class);
+            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             Future<String> future = foo.hello("ping?");
             specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("pong!"));
