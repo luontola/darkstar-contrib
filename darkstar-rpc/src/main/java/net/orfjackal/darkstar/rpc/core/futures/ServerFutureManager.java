@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -40,17 +42,30 @@ public class ServerFutureManager implements FutureManager, Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
 
+    private final Map<Long, ServerFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ServerFuture<?>>();
+
     public <V> Future<V> waitForResponseTo(Request request) {
-        // TODO
-        return null;
+        ServerFuture<V> f = new ServerFuture<V>(request, this);
+        assert !waitingForResponse.containsKey(request.requestId);
+        waitingForResponse.put(request.requestId, f);
+        assert waitingForResponse.containsKey(request.requestId);
+        return f;
     }
 
     public void recievedResponse(Response response) {
-        // TODO
+        ServerFuture<?> f = waitingForResponse.remove(response.requestId);
+        if (f != null) {
+            f.markDone(response);
+        } else {
+            logger.warn("Unexpected response: {}", response);
+        }
     }
 
     public int waitingForResponse() {
-        // TODO
-        return 0;
+        return waitingForResponse.size();
+    }
+
+    void doNotWaitForResponse(Request request) {
+        waitingForResponse.remove(request.requestId);
     }
 }

@@ -24,6 +24,11 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
+import com.sun.sgs.app.ManagedObject;
+import net.orfjackal.darkstar.rpc.core.Request;
+import net.orfjackal.darkstar.rpc.core.Response;
+
+import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -33,25 +38,53 @@ import java.util.concurrent.TimeoutException;
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ServerFuture<V> implements Future<V> {
+public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
+    private static final long serialVersionUID = 1L;
+
+    private final ServerFutureManager manager;
+    private final Request request;
+    private Response response;
+    private boolean cancelled = false;
+
+    public ServerFuture(Request request, ServerFutureManager manager) {
+        this.request = request;
+        this.manager = manager;
+    }
+
+    void markDone(Response response) {
+        assert response.requestId == request.requestId;
+        this.response = response;
+    }
 
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return false; // TODO
+        if (isDone()) {
+            return false;
+        }
+        manager.doNotWaitForResponse(request);
+        cancelled = true;
+        return true;
     }
 
     public boolean isCancelled() {
-        return false; // TODO
+        return cancelled;
     }
 
     public boolean isDone() {
-        return false; // TODO
+        return response != null;
     }
 
     public V get() throws InterruptedException, ExecutionException {
-        return null; // TODO
+        if (!isDone()) {
+            throw new InterruptedException("Not done; Blocking operations are not allowed on Darkstar Server");
+        }
+        if (response.exception != null) {
+            throw new ExecutionException(response.exception);
+        } else {
+            return (V) response.value;
+        }
     }
 
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return null; // TODO
+        return get();
     }
 }
