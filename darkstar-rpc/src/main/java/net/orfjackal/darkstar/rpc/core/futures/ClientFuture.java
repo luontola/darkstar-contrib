@@ -36,21 +36,26 @@ import java.util.concurrent.FutureTask;
 public final class ClientFuture<V> extends FutureTask<V> {
 
     private final Request request;
+    private final ClientFutureManager manager;
 
-    public ClientFuture(Request request) {
+    public ClientFuture(Request request, ClientFutureManager manager) {
         super(new NullRunnable(), null);
         this.request = request;
+        this.manager = manager;
     }
 
-    public void markDone(Response response) {
-        if (response.requestId != request.requestId) {
-            throw new IllegalArgumentException("Wrong requestId");
-        }
+    void markDone(Response response) {
+        assert response.requestId == request.requestId;
         if (response.exception != null) {
             setException(response.exception);
         } else {
             set((V) response.value);
         }
+    }
+
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        manager.doNotWaitForResponse(request);
+        return super.cancel(mayInterruptIfRunning);
     }
 
     private static class NullRunnable implements Runnable {

@@ -30,7 +30,6 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.DummySender;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.RpcClient;
-import net.orfjackal.darkstar.rpc.core.futures.ClientFuture;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -87,16 +86,6 @@ public class RpcClientSpec extends Specification<Object> {
             specify(client.waitingForResponse(), should.equal(0));
             specify(future.isDone());
             specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("returnvalue"));
-        }
-
-        public void theFutureMayNotBeMarkedDoneByAnotherResponse() {
-            final Response rsp = Response.valueReturned(2L, "returnvalue");
-            final ClientFuture<?> rcpFuture = (ClientFuture<?>) future;
-            specify(new Block() {
-                public void run() throws Throwable {
-                    rcpFuture.markDone(rsp);
-                }
-            }, should.raise(IllegalArgumentException.class));
         }
     }
 
