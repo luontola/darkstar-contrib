@@ -36,7 +36,6 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -117,7 +116,7 @@ public abstract class FutureManagerSpecTemplate<T extends FutureManager> extends
                 public void run() throws Throwable {
                     future.get(0, TimeUnit.MILLISECONDS);
                 }
-            }, should.raise(TimeoutException.class));
+            }, should.raise(Exception.class));
         }
 
         public void futureMayBeCancelled() {
