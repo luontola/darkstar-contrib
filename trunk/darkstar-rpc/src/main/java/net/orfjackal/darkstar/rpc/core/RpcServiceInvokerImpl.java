@@ -48,35 +48,44 @@ public class RpcServiceInvokerImpl implements RpcServiceInvoker, MessageReciever
         this.futureManager = futureManager;
     }
 
+    private synchronized long nextRequestId() {
+        return nextRequestId++;
+    }
+
     public ServiceReference<ServiceLocator> getServiceLocator() {
         return new ServiceReference<ServiceLocator>(ServiceLocator.class, ServiceLocator.SERVICE_ID);
     }
 
     public void remoteInvokeNoResponse(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
-        sendRequest(serviceId, methodName, paramTypes, parameters);
+        sendRequest(new Request(nextRequestId(), serviceId, methodName, paramTypes, parameters));
     }
 
     public <V> Future<V> remoteInvoke(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
-        Request rq = sendRequest(serviceId, methodName, paramTypes, parameters);
-        return futureManager.waitForResponseTo(rq);
+        Request request = new Request(nextRequestId(), serviceId, methodName, paramTypes, parameters);
+        Future<V> future = futureManager.waitForResponseTo(request);
+        try {
+            // FutureManager must be in a waiting state before the request is actually sent,
+            // in order to avoid concurrency problems, if the response arrives before the
+            // control returns to this thread. (This may happen especially in unit tests.)
+            sendRequest(request);
+            return future;
+        } catch (RuntimeException e) {
+            // Sending message failed. Do not wait for a response - cancel the Future.
+            future.cancel(true);
+            throw e;
+        }
     }
 
-    private Request sendRequest(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
-        Request rq = new Request(nextRequestId(), serviceId, methodName, paramTypes, parameters);
+    private void sendRequest(Request request) {
         try {
-            requestSender.send(rq.toBytes());
+            requestSender.send(request.toBytes());
         } catch (IOException e) {
-            throw new RuntimeException("Unable to invoke method " + methodName + " on service " + serviceId, e);
+            throw new RuntimeException("Unable to invoke method " + request.methodName + " on service " + request.serviceId, e);
         }
-        return rq;
     }
 
     public void receivedMessage(byte[] message) {
         futureManager.recievedResponse(Response.fromBytes(message));
-    }
-
-    private synchronized long nextRequestId() {
-        return nextRequestId++;
     }
 
     public int waitingForResponse() {

@@ -26,6 +26,7 @@ package net.orfjackal.darkstar.rpc.comm;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.MockNetwork;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
@@ -53,12 +54,14 @@ public class RpcGatewaySpec extends Specification<Object> {
     private Thread testTimeout;
 
     public void create() throws Exception {
+        MockAppContext.install();
         testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
     }
 
     public void destroy() {
         testTimeout.interrupt();
         shutdownNetwork();
+        MockAppContext.uninstall();
     }
 
     private void shutdownNetwork() {

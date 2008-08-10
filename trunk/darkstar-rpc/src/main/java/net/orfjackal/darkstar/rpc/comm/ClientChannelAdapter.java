@@ -44,13 +44,13 @@ public class ClientChannelAdapter implements ClientChannelListener {
     private static final Logger logger = LoggerFactory.getLogger(ClientChannelAdapter.class);
 
     // client-to-server requests
-    private MessageReciever responseReciever;
+    private volatile MessageReciever responseReciever;
 
     // server-to-client requests
-    private MessageReciever requestReciever;
+    private volatile MessageReciever requestReciever;
 
     private final RpcGateway gateway;
-    private ClientChannel channel;
+    private volatile ClientChannel channel;
 
     public ClientChannelAdapter() {
         gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ClientFutureManager());

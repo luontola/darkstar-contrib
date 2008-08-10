@@ -62,7 +62,7 @@ public class ClientFutureManager implements FutureManager {
         return waitingForResponse.size();
     }
 
-    void doNotWaitForResponse(Request request) {
+    protected void doNotWaitForResponse(Request request) {
         waitingForResponse.remove(request.requestId);
     }
 }
