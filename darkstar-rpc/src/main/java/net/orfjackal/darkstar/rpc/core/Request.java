@@ -31,7 +31,8 @@ import java.util.Arrays;
  * @author Esko Luontola
  * @since 9.6.2008
  */
-public class Request {
+public class Request implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public final long requestId;
     public final long serviceId;

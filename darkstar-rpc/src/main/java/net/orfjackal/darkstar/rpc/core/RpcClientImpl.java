@@ -38,11 +38,10 @@ import java.util.logging.Logger;
  * @since 9.6.2008
  */
 public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
-
     private static final long serialVersionUID = 1L;
     private static final Logger log = Logger.getLogger(RpcClientImpl.class.getName());
 
-    private final Map<Long, RpcFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, RpcFuture<?>>();
+    private final Map<Long, RpcClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, RpcClientFuture<?>>();
     private final MessageSender requestSender;
     private long nextRequestId = 1L;
 
@@ -74,8 +73,8 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
         return rq;
     }
 
-    private <V> RpcFuture<V> waitForResponseTo(Request rq) {
-        RpcFuture<V> f = new RpcFuture<V>(rq);
+    private <V> RpcClientFuture<V> waitForResponseTo(Request rq) {
+        RpcClientFuture<V> f = new RpcClientFuture<V>(rq);
         assert !waitingForResponse.containsKey(rq.requestId);
         waitingForResponse.put(rq.requestId, f);
         return f;
@@ -83,7 +82,7 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
 
     public void receivedMessage(byte[] message) {
         Response rsp = Response.fromBytes(message);
-        RpcFuture<?> f = waitingForResponse.remove(rsp.requestId);
+        RpcClientFuture<?> f = waitingForResponse.remove(rsp.requestId);
         if (f != null) {
             f.markDone(rsp);
         } else {

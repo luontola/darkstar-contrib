@@ -30,7 +30,8 @@ import java.io.*;
  * @author Esko Luontola
  * @since 9.6.2008
  */
-public class Response {
+public class Response implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public final long requestId;
     public final Object value;
