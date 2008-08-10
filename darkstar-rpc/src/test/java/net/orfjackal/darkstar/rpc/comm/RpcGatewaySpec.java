@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -105,7 +106,7 @@ public class RpcGatewaySpec extends Specification<Object> {
         }
 
         public void masterCanFindAllServicesOnSlave() throws Exception {
-            Set<?> onSlave = masterGateway.remoteFindAll().get();
+            Set<?> onSlave = masterGateway.remoteFindAll().get(10, TimeUnit.MILLISECONDS);
             specify(onSlave.size(), should.equal(2));
         }
 
@@ -117,9 +118,9 @@ public class RpcGatewaySpec extends Specification<Object> {
         }
 
         public void masterCanFindServicesOnSlaveByType() throws Exception {
-            Set<Foo> foosOnSlave = masterGateway.remoteFindByType(Foo.class).get();
+            Set<Foo> foosOnSlave = masterGateway.remoteFindByType(Foo.class).get(10, TimeUnit.MILLISECONDS);
             specify(foosOnSlave.size(), should.equal(1));
-            Set<Bar> barsOnSlave = masterGateway.remoteFindByType(Bar.class).get();
+            Set<Bar> barsOnSlave = masterGateway.remoteFindByType(Bar.class).get(10, TimeUnit.MILLISECONDS);
             specify(barsOnSlave.size(), should.equal(0));
         }
 
@@ -137,7 +138,7 @@ public class RpcGatewaySpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(fooOnSlave).serviceMethod();
             }});
-            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get();
+            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get(10, TimeUnit.MILLISECONDS);
             Foo foo = foos.iterator().next();
             foo.serviceMethod();
             shutdownNetwork();
@@ -157,10 +158,10 @@ public class RpcGatewaySpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(fooOnSlave).hello("ping?"); will(returnValue(ServiceHelper.wrap("pong!")));
             }});
-            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get();
+            Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get(10, TimeUnit.MILLISECONDS);
             Foo foo = foos.iterator().next();
             Future<String> future = foo.hello("ping?");
-            specify(future.get(), should.equal("pong!"));
+            specify(future.get(10, TimeUnit.MILLISECONDS), should.equal("pong!"));
         }
     }
 
