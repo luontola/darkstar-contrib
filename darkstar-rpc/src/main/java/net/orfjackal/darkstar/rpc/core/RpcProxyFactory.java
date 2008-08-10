@@ -37,7 +37,6 @@ import java.lang.reflect.Proxy;
  * @since 8.6.2008
  */
 public class RpcProxyFactory implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private final RpcClient connection;
@@ -54,7 +53,6 @@ public class RpcProxyFactory implements Serializable {
     }
 
     private static class RpcInvocationHandler implements InvocationHandler, Serializable {
-
         private static final long serialVersionUID = 1L;
 
         private final RpcClient connection;

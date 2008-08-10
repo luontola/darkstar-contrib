@@ -39,9 +39,8 @@ import java.util.logging.Logger;
  * @since 15.6.2008
  */
 public class ClientChannelAdapter implements ClientChannelListener, Serializable {
-
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(ClientChannelAdapter.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientChannelAdapter.class.getName());
 
     // client-to-server requests
     private MessageReciever responseReciever;
@@ -78,7 +77,7 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
         } else if (header == RpcGateway.RESPONSE_FROM_MASTER) {
             responseReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
         } else {
-            log.warning("Unexpected header " + header + " on channel " + channel);
+            logger.warning("Unexpected header " + header + " on channel " + channel);
         }
     }
 
@@ -90,7 +89,6 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
     }
 
     private class MyRequestSender implements MessageSender, Serializable {
-
         private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {
@@ -107,7 +105,6 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
     }
 
     private class MyResponseSender implements MessageSender, Serializable {
-
         private static final long serialVersionUID = 1L;
 
         public void send(byte[] message) throws IOException {

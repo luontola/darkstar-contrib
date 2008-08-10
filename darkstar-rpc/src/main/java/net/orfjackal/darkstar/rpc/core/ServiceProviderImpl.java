@@ -39,7 +39,6 @@ import java.util.concurrent.Future;
  * @since 14.6.2008
  */
 public class ServiceProviderImpl implements ServiceProvider, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private final RpcServer server;

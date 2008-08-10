@@ -43,9 +43,8 @@ import java.util.logging.Logger;
  * @since 10.6.2008
  */
 public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
-
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(RpcServerImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(RpcServerImpl.class.getName());
 
     private static final long FIRST_SERVICE_ID = 1L;
 
@@ -122,7 +121,7 @@ public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
             return Response.exceptionThrown(rq.requestId, e.getTargetException());
 
         } catch (Exception e) {
-            log.log(Level.WARNING, "Error in handling request: " + rq, e);
+            logger.log(Level.WARNING, "Error in handling request: " + rq, e);
             throw new RuntimeException(e);
         }
     }

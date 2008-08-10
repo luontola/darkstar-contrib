@@ -34,7 +34,6 @@ import java.io.Serializable;
  * @since 11.6.2008
  */
 public final class ServiceReference<T> implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private final Class<T> serviceInterface;
