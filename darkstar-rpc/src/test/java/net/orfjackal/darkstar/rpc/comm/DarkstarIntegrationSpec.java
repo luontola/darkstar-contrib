@@ -182,12 +182,12 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         private RpcGateway initGateway(ClientSession session) {
-            ChannelAdapter adapter = new ChannelAdapter();
+            ServerChannelAdapter adapter = new ServerChannelAdapter();
             rpcChannelForClient(session, adapter);
             return adapter.getGateway();
         }
 
-        private static void rpcChannelForClient(ClientSession session, ChannelAdapter adapter) {
+        private static void rpcChannelForClient(ClientSession session, ServerChannelAdapter adapter) {
             Channel channel = AppContext.getChannelManager()
                     .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
             channel.join(session);

@@ -39,9 +39,9 @@ import java.nio.ByteBuffer;
  * @author Esko Luontola
  * @since 15.6.2008
  */
-public class ChannelAdapter implements ChannelListener, Serializable {
+public class ServerChannelAdapter implements ChannelListener, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(ChannelAdapter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServerChannelAdapter.class);
 
     // server-to-client requests
     private MessageReciever responseReciever;
@@ -52,7 +52,7 @@ public class ChannelAdapter implements ChannelListener, Serializable {
     private final RpcGateway gateway;
     private ManagedReference<Channel> channel;
 
-    public ChannelAdapter() {
+    public ServerChannelAdapter() {
         gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ServerFutureManager());
     }
 

@@ -24,7 +24,7 @@
 
 package net.orfjackal.darkstar.rpc.core;
 
-import net.orfjackal.darkstar.rpc.RpcClient;
+import net.orfjackal.darkstar.rpc.RpcServiceInvoker;
 import net.orfjackal.darkstar.rpc.ServiceReference;
 
 import java.io.Serializable;
@@ -39,9 +39,9 @@ import java.lang.reflect.Proxy;
 public class RpcProxyFactory implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final RpcClient connection;
+    private final RpcServiceInvoker connection;
 
-    public RpcProxyFactory(RpcClient connection) {
+    public RpcProxyFactory(RpcServiceInvoker connection) {
         this.connection = connection;
     }
 
@@ -55,10 +55,10 @@ public class RpcProxyFactory implements Serializable {
     private static class RpcInvocationHandler implements InvocationHandler, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final RpcClient connection;
+        private final RpcServiceInvoker connection;
         private final ServiceReference<?> reference;
 
-        public RpcInvocationHandler(RpcClient connection, ServiceReference<?> reference) {
+        public RpcInvocationHandler(RpcServiceInvoker connection, ServiceReference<?> reference) {
             this.connection = connection;
             this.reference = reference;
         }

@@ -26,7 +26,7 @@ package net.orfjackal.darkstar.rpc.core;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
-import net.orfjackal.darkstar.rpc.RpcClient;
+import net.orfjackal.darkstar.rpc.RpcServiceInvoker;
 import net.orfjackal.darkstar.rpc.ServiceReference;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
@@ -45,11 +45,11 @@ public class RpcProxySpec extends Specification<Object> {
 
     public class TheProxyWillForwardToTheServer {
 
-        private RpcClient connection;
+        private RpcServiceInvoker connection;
         private Foo proxy;
 
         public Object create() {
-            connection = mock(RpcClient.class);
+            connection = mock(RpcServiceInvoker.class);
             RpcProxyFactory factory = new RpcProxyFactory(connection);
             proxy = factory.create(new ServiceReference<Foo>(Foo.class, 1L));
             return null;
@@ -72,12 +72,12 @@ public class RpcProxySpec extends Specification<Object> {
 
     public class TheProxyWillReturnToTheUser {
 
-        private RpcClient connection;
+        private RpcServiceInvoker connection;
         private Bar proxy;
         private Future<String> dummyFuture;
 
         public Object create() {
-            connection = mock(RpcClient.class);
+            connection = mock(RpcServiceInvoker.class);
             RpcProxyFactory factory = new RpcProxyFactory(connection);
             proxy = factory.create(new ServiceReference<Bar>(Bar.class, 2L));
             dummyFuture = new NullFuture<String>() {
@@ -99,16 +99,16 @@ public class RpcProxySpec extends Specification<Object> {
 
     public class MethodsInheritedFromJavaLangObject {
 
-        private RpcClient connection1;
+        private RpcServiceInvoker connection1;
         private Foo proxy;
         private Foo sameService;
         private Foo differentServiceId;
         private Foo differentConnection;
 
         public Object create() {
-            connection1 = mock(RpcClient.class, "RpcClient1");
+            connection1 = mock(RpcServiceInvoker.class, "RpcServiceInvoker1");
             RpcProxyFactory factory1 = new RpcProxyFactory(connection1);
-            RpcClient connection2 = mock(RpcClient.class, "RpcClient2");
+            RpcServiceInvoker connection2 = mock(RpcServiceInvoker.class, "RpcServiceInvoker2");
             RpcProxyFactory factory2 = new RpcProxyFactory(connection2);
 
             proxy = factory1.create(new ServiceReference<Foo>(Foo.class, 1L));

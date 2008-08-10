@@ -38,22 +38,22 @@ import java.util.Set;
  * @since 14.6.2008
  */
 @RunWith(JDaveRunner.class)
-public class ServiceProviderSpec extends Specification<Object> {
+public class ServiceLocatorSpec extends Specification<Object> {
 
     private static final int TIMEOUT = 1000;
 
     private MockNetwork network = new MockNetwork();
     private Thread testTimeout;
 
-    private RpcServer server;
-    private RpcClient client;
+    private RpcServiceRegistry backend;
+    private RpcServiceInvoker frontend;
     private RpcProxyFactory factory;
 
     public void create() {
         testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
-        server = new RpcServerImpl(network.getServerToClient());
-        client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
-        factory = new RpcProxyFactory(client);
+        backend = new RpcServiceRegistryImpl(network.getServerToClient());
+        frontend = new RpcServiceInvokerImpl(network.getClientToServer(), new ClientFutureManager());
+        factory = new RpcProxyFactory(frontend);
     }
 
     public void destroy() {
@@ -62,36 +62,36 @@ public class ServiceProviderSpec extends Specification<Object> {
     }
 
 
-    public class AServiceProvider {
+    public class AServiceLocator {
 
-        private ServiceReference<ServiceProvider> serviceProviderRef;
-        private ServiceProvider serviceProvider;
+        private ServiceReference<ServiceLocator> locatorRef;
+        private ServiceLocator locator;
         private ServiceReference<Foo> foo1Ref;
         private ServiceReference<Foo> foo2Ref;
         private ServiceReference<Bar> bar3Ref;
 
         public Object create() {
-            serviceProviderRef = client.getServiceProvider();
-            serviceProvider = factory.create(serviceProviderRef);
-            foo1Ref = server.registerService(Foo.class, dummy(Foo.class, "foo1"));
-            foo2Ref = server.registerService(Foo.class, dummy(Foo.class, "foo2"));
-            bar3Ref = server.registerService(Bar.class, dummy(Bar.class, "bar3"));
+            locatorRef = frontend.getServiceLocator();
+            locator = factory.create(locatorRef);
+            foo1Ref = backend.registerService(Foo.class, dummy(Foo.class, "foo1"));
+            foo2Ref = backend.registerService(Foo.class, dummy(Foo.class, "foo2"));
+            bar3Ref = backend.registerService(Bar.class, dummy(Bar.class, "bar3"));
             return null;
         }
 
-        public void canBeRetrievedFromTheClient() {
-            specify(serviceProviderRef, isNotNull());
-            specify(serviceProvider, isNotNull());
+        public void canBeRetrievedFromTheFrontend() {
+            specify(locatorRef, isNotNull());
+            specify(locator, isNotNull());
         }
 
         public void findsAllServices() throws Exception {
-            Set<ServiceReference<?>> services = serviceProvider.findAll().get();
-            specify(services, should.containExactly(serviceProviderRef, foo1Ref, foo2Ref, bar3Ref));
+            Set<ServiceReference<?>> services = locator.findAll().get();
+            specify(services, should.containExactly(locatorRef, foo1Ref, foo2Ref, bar3Ref));
         }
 
         public void findsServicesByType() throws Exception {
-            Set<ServiceReference<Foo>> foos = serviceProvider.findByType(Foo.class).get();
-            Set<ServiceReference<Bar>> bars = serviceProvider.findByType(Bar.class).get();
+            Set<ServiceReference<Foo>> foos = locator.findByType(Foo.class).get();
+            Set<ServiceReference<Bar>> bars = locator.findByType(Bar.class).get();
             specify(foos, should.containExactly(foo1Ref, foo2Ref));
             specify(bars, should.containExactly(bar3Ref));
         }

@@ -42,9 +42,9 @@ import java.util.concurrent.TimeUnit;
  * @author Esko Luontola
  * @since 10.6.2008
  */
-public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
+public class RpcServiceRegistryImpl implements RpcServiceRegistry, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(RpcServerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(RpcServiceRegistryImpl.class);
 
     private static final long FIRST_SERVICE_ID = 1L;
 
@@ -52,11 +52,11 @@ public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
     private final MessageSender responseSender;
     private long nextServiceId = FIRST_SERVICE_ID;
 
-    public RpcServerImpl(MessageSender responseSender) {
+    public RpcServiceRegistryImpl(MessageSender responseSender) {
         this(responseSender, new ConcurrentHashMap<Long, ServiceHolder<?>>());
     }
 
-    public RpcServerImpl(MessageSender responseSender, Map<Long, ServiceHolder<?>> backingMap) {
+    public RpcServiceRegistryImpl(MessageSender responseSender, Map<Long, ServiceHolder<?>> backingMap) {
         assert backingMap.size() == 0;
         responseSender.setCallback(this);
         this.services = backingMap;
@@ -69,7 +69,7 @@ public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
     }
 
     private void registerDefaultServices() {
-        registerServiceById(ServiceProvider.class, new ServiceProviderImpl(this), ServiceProvider.SERVICE_ID);
+        registerServiceById(ServiceLocator.class, new ServiceLocatorImpl(this), ServiceLocator.SERVICE_ID);
     }
 
     public <T> ServiceReference<T> registerService(Class<T> serviceInterface, T service) {

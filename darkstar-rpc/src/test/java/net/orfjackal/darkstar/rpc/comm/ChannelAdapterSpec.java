@@ -33,7 +33,7 @@ import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.MockChannel;
-import net.orfjackal.darkstar.rpc.ServiceProvider;
+import net.orfjackal.darkstar.rpc.ServiceLocator;
 import net.orfjackal.darkstar.rpc.ServiceReference;
 import org.junit.runner.RunWith;
 
@@ -74,7 +74,7 @@ public class ChannelAdapterSpec extends Specification<Object> {
         public Object create() {
 
             // initialization on server
-            ChannelAdapter adapterOnServer = new ChannelAdapter();
+            ServerChannelAdapter adapterOnServer = new ServerChannelAdapter();
             gatewayOnServer = adapterOnServer.getGateway();
             mockChannel = new MockChannel(adapterOnServer);
             adapterOnServer.setChannel(mockChannel.getChannel());
@@ -109,17 +109,17 @@ public class ChannelAdapterSpec extends Specification<Object> {
         }
 
         public void ifTheClientLeavesTheChannelAllCommunicationsWillBeCut() throws Exception {
-            final ServiceProvider providerOnClient = gatewayOnClient.remoteFindByType(ServiceProvider.class).get().iterator().next();
-            final ServiceProvider providerOnServer = gatewayOnServer.remoteFindByType(ServiceProvider.class).get().iterator().next();
+            final ServiceLocator locatorOnClient = gatewayOnClient.remoteFindByType(ServiceLocator.class).get().iterator().next();
+            final ServiceLocator locatorOnServer = gatewayOnServer.remoteFindByType(ServiceLocator.class).get().iterator().next();
             mockChannel.leaveAll();
             specify(new Block() {
                 public void run() throws Throwable {
-                    providerOnClient.findAll();
+                    locatorOnClient.findAll();
                 }
             }, should.raise(IllegalStateException.class));
             specify(new Block() {
                 public void run() throws Throwable {
-                    Future<Set<ServiceReference<?>>> f = providerOnServer.findAll();
+                    Future<Set<ServiceReference<?>>> f = locatorOnServer.findAll();
                     f.get(50, TimeUnit.MILLISECONDS);
                 }
             }, should.raise(TimeoutException.class));
