@@ -25,14 +25,10 @@
 package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.*;
-import net.orfjackal.darkstar.rpc.core.futures.ClientFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.orfjackal.darkstar.rpc.core.futures.FutureManager;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -41,15 +37,15 @@ import java.util.concurrent.Future;
  */
 public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(RpcClientImpl.class);
 
-    private final Map<Long, ClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ClientFuture<?>>();
     private final MessageSender requestSender;
+    private final FutureManager futureManager;
     private long nextRequestId = 1L;
 
-    public RpcClientImpl(MessageSender requestSender) {
+    public RpcClientImpl(MessageSender requestSender, FutureManager futureManager) {
         requestSender.setCallback(this);
         this.requestSender = requestSender;
+        this.futureManager = futureManager;
     }
 
     public ServiceReference<ServiceProvider> getServiceProvider() {
@@ -62,7 +58,7 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
 
     public <V> Future<V> remoteInvoke(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
         Request rq = sendRequest(serviceId, methodName, paramTypes, parameters);
-        return waitForResponseTo(rq);
+        return futureManager.waitForResponseTo(rq);
     }
 
     private Request sendRequest(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
@@ -75,21 +71,8 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
         return rq;
     }
 
-    private <V> ClientFuture<V> waitForResponseTo(Request rq) {
-        ClientFuture<V> f = new ClientFuture<V>(rq);
-        assert !waitingForResponse.containsKey(rq.requestId);
-        waitingForResponse.put(rq.requestId, f);
-        return f;
-    }
-
     public void receivedMessage(byte[] message) {
-        Response rsp = Response.fromBytes(message);
-        ClientFuture<?> f = waitingForResponse.remove(rsp.requestId);
-        if (f != null) {
-            f.markDone(rsp);
-        } else {
-            logger.warn("Unexpected response: {}", rsp);
-        }
+        futureManager.recievedResponse(Response.fromBytes(message));
     }
 
     private synchronized long nextRequestId() {
@@ -97,6 +80,6 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
     }
 
     public int waitingForResponse() {
-        return waitingForResponse.size();
+        return futureManager.waitingForResponse();
     }
 }

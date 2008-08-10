@@ -28,6 +28,7 @@ import net.orfjackal.darkstar.rpc.*;
 import net.orfjackal.darkstar.rpc.core.RpcClientImpl;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
 import net.orfjackal.darkstar.rpc.core.RpcServerImpl;
+import net.orfjackal.darkstar.rpc.core.futures.FutureManager;
 import net.orfjackal.darkstar.rpc.core.futures.ProxyGeneratingFuture;
 
 import java.io.Serializable;
@@ -51,9 +52,9 @@ public class RpcGateway implements RpcServer, Serializable {
     private final RpcProxyFactory proxyFactory;
     private final ServiceProvider serviceProvider;
 
-    public RpcGateway(MessageSender requestSender, MessageSender responseSender) {
+    public RpcGateway(MessageSender requestSender, MessageSender responseSender, FutureManager futureManager) {
         server = new RpcServerImpl(responseSender);
-        RpcClient client = new RpcClientImpl(requestSender);
+        RpcClient client = new RpcClientImpl(requestSender, futureManager);
         proxyFactory = new RpcProxyFactory(client);
         serviceProvider = proxyFactory.create(client.getServiceProvider());
     }

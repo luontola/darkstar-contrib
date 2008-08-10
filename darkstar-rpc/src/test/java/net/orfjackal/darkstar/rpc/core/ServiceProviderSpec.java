@@ -27,6 +27,7 @@ package net.orfjackal.darkstar.rpc.core;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.*;
+import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.junit.runner.RunWith;
 
 import java.util.Set;
@@ -48,7 +49,7 @@ public class ServiceProviderSpec extends Specification<Object> {
 
     public void create() {
         server = new RpcServerImpl(network.getServerToClient());
-        client = new RpcClientImpl(network.getClientToServer());
+        client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
         factory = new RpcProxyFactory(client);
     }
 
