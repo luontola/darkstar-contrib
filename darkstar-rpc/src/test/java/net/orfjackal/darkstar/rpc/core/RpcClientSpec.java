@@ -36,11 +36,7 @@ import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Filter;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -126,29 +122,6 @@ public class RpcClientSpec extends Specification<Object> {
         }
     }
 
-    public class WhenTheServerThrowsAnException {
-
-        private Future<String> future;
-
-        public Object create() {
-            future = client.remoteInvoke(42L, "foo", new Class<?>[0], null);
-            Throwable t = new IllegalStateException("exception message");
-            server.callback.receivedMessage(Response.exceptionThrown(1L, t).toBytes());
-            return null;
-        }
-
-        public void theFutureWillProvideTheExceptionThrown() throws Exception {
-            try {
-                future.get();
-                specify(false);
-            } catch (ExecutionException e) {
-                Throwable cause = e.getCause();
-                specify(cause.getClass(), should.equal(IllegalStateException.class));
-                specify(cause.getMessage(), should.equal("exception message"));
-            }
-        }
-    }
-
     public class WhenAVoidMethodIsInvoked {
 
         public Object create() {
@@ -189,32 +162,6 @@ public class RpcClientSpec extends Specification<Object> {
 
         public void theClientWillNotWaitForAResponse() {
             specify(client.waitingForResponse(), should.equal(0));
-        }
-    }
-
-    /**
-     * May happen because of network problems, such as re-sent UDP packages.
-     */
-    public class IfTheServerSendsAnUnexpectedResponse {
-
-        private Logger log;
-
-        public Object create() {
-            log = Logger.getLogger(ClientFutureManager.class.getName());
-            return null;
-        }
-
-        public void destroy() {
-            log.setFilter(null);
-        }
-
-        public void theResponseShouldBeSilentlyIgnored() {
-            final Filter filter = mock(Filter.class);
-            checking(new Expectations() {{
-                one(filter).isLoggable(with(any(LogRecord.class))); will(returnValue(false));
-            }});
-            log.setFilter(filter);
-            server.callback.receivedMessage(Response.valueReturned(1L, "unexpected").toBytes());
         }
     }
 }
