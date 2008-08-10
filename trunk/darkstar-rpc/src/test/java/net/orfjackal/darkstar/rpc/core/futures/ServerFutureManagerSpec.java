@@ -24,33 +24,38 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.concurrent.Future;
+import jdave.Group;
+import jdave.junit4.JDaveRunner;
+import org.junit.runner.RunWith;
 
 /**
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ServerFutureManager implements FutureManager, Serializable {
-    private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class ServerFutureManagerSpec extends FutureManagerSpecTemplate<ServerFutureManager> {
 
-    public <V> Future<V> waitForResponseTo(Request request) {
-        // TODO
-        return null;
+    protected Class<ServerFutureManager> getImplClass() {
+        return ServerFutureManager.class;
     }
 
-    public void recievedResponse(Response response) {
-        // TODO
+    protected ServerFutureManager getImplInstance() {
+        return new ServerFutureManager();
     }
 
-    public int waitingForResponse() {
-        // TODO
-        return 0;
+    public class WhenNoRequestsHaveBeenMade extends FutureManagerSpecTemplate<?>.WhenNoRequestsHaveBeenMade {
+    }
+
+    public class WhenARequestIsMade extends FutureManagerSpecTemplate<?>.WhenARequestIsMade {
+    }
+
+    public class WhenTargetReturnsAValue extends FutureManagerSpecTemplate<?>.WhenTargetReturnsAValue {
+    }
+
+    public class WhenTargetThrowsAnException extends FutureManagerSpecTemplate<?>.WhenTargetThrowsAnException {
+    }
+
+    public class WhenThereAreManyConcurrentRequests extends FutureManagerSpecTemplate<?>.WhenThereAreManyConcurrentRequests {
     }
 }
