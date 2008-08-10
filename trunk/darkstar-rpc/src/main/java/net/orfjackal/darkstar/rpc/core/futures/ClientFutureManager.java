@@ -43,7 +43,7 @@ public class ClientFutureManager implements FutureManager {
     private final Map<Long, ClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ClientFuture<?>>();
 
     public <V> Future<V> waitForResponseTo(Request request) {
-        ClientFuture<V> f = new ClientFuture<V>(request);
+        ClientFuture<V> f = new ClientFuture<V>(request, this);
         assert !waitingForResponse.containsKey(request.requestId);
         waitingForResponse.put(request.requestId, f);
         return f;
@@ -60,5 +60,9 @@ public class ClientFutureManager implements FutureManager {
 
     public int waitingForResponse() {
         return waitingForResponse.size();
+    }
+
+    void doNotWaitForResponse(Request request) {
+        waitingForResponse.remove(request.requestId);
     }
 }

@@ -24,13 +24,18 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
+import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.core.Request;
+import net.orfjackal.darkstar.rpc.core.Response;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -42,10 +47,17 @@ public class ClientFutureManagerSpec extends Specification<Object> {
 
     private FutureManager manager;
     private Request request;
+    private Response responseVal;
+    private Response responseExp;
+    private Response unexpectedResponse;
 
     public void create() throws Exception {
         manager = new ClientFutureManager();
-        request = new Request(1, 2, "foo", new Class<?>[0], new Object[0]);
+        int requestId = 1;
+        request = new Request(requestId, 2, "foo", new Class<?>[0], new Object[0]);
+        responseVal = Response.valueReturned(requestId, "foo!");
+        responseExp = Response.exceptionThrown(requestId, new IllegalArgumentException());
+        unexpectedResponse = Response.valueReturned(requestId + 1, "bar!");
     }
 
 
@@ -75,7 +87,77 @@ public class ClientFutureManagerSpec extends Specification<Object> {
 
         public void futureIsProvided() {
             specify(future, should.not().equal(null));
+        }
+
+        public void futureDoesNotYetHaveAReturnValue() {
             specify(!future.isDone());
+            specify(new Block() {
+                public void run() throws Throwable {
+                    future.get(0, TimeUnit.MILLISECONDS);
+                }
+            }, should.raise(TimeoutException.class));
+        }
+
+        public void futureMayBeCancelled() {
+            specify(!future.isCancelled());
+            specify(future.cancel(true));
+            specify(future.isCancelled());
+            specify(manager.waitingForResponse(), should.equal(0));
+        }
+    }
+
+    public class WhenTargetReturnsAValue {
+
+        private Future<String> future;
+
+        public Object create() {
+            future = manager.waitForResponseTo(request);
+            manager.recievedResponse(responseVal);
+            return null;
+        }
+
+        public void managerStopsWaitingForTheResponse() {
+            specify(manager.waitingForResponse(), should.equal(0));
+        }
+
+        public void futureProvidesTheReturnValue() throws Exception {
+            specify(future.isDone());
+            specify(future.get(), should.equal("foo!"));
+        }
+
+        public void futureCanNotBeCancelled() {
+            specify(!future.isCancelled());
+            specify(!future.cancel(true));
+            specify(!future.isCancelled());
+        }
+    }
+
+    public class WhenTargetThrowsAnException {
+
+        private Future<String> future;
+
+        public Object create() {
+            future = manager.waitForResponseTo(request);
+            manager.recievedResponse(responseExp);
+            return null;
+        }
+
+        public void managerStopsWaitingForTheResponse() {
+            specify(manager.waitingForResponse(), should.equal(0));
+        }
+
+        public void futureProvidesTheException() throws Exception {
+            specify(future.isDone());
+            specify(new Block() {
+                public void run() throws Throwable {
+                    future.get();
+                }
+            }, should.raise(ExecutionException.class, "java.lang.IllegalArgumentException"));
+        }
+
+        public void futureCanNotBeCancelled() {
+            specify(!future.isCancelled());
+            specify(!future.cancel(true));
             specify(!future.isCancelled());
         }
     }
