@@ -28,6 +28,7 @@ import jdave.Block;
 import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.exp.mocks.MockAppContext;
 import net.orfjackal.darkstar.rpc.core.Request;
 import net.orfjackal.darkstar.rpc.core.Response;
 import org.jmock.Expectations;
@@ -61,6 +62,7 @@ public abstract class FutureManagerSpecTemplate<T extends FutureManager> extends
     private Filter logFilter;
 
     public void create() throws Exception {
+        MockAppContext.install();
         log = Logger.getLogger(getImplClass().getName());
         logFilter = mock(Filter.class);
         log.setFilter(logFilter);
@@ -75,6 +77,7 @@ public abstract class FutureManagerSpecTemplate<T extends FutureManager> extends
 
     public void destroy() throws Exception {
         log.setFilter(null);
+        MockAppContext.uninstall();
     }
 
     protected abstract Class<T> getImplClass();

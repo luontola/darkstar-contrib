@@ -24,14 +24,15 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
+import com.sun.sgs.app.AppContext;
+import com.sun.sgs.app.ManagedReference;
+import com.sun.sgs.app.util.ScalableHashMap;
 import net.orfjackal.darkstar.rpc.core.Request;
 import net.orfjackal.darkstar.rpc.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -42,18 +43,21 @@ public class ServerFutureManager implements FutureManager, Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
 
-    private final Map<Long, ServerFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ServerFuture<?>>();
+    private final ManagedReference<ScalableHashMap<Long, ServerFuture<?>>> waitingForResponse;
+
+    public ServerFutureManager() {
+        waitingForResponse = AppContext.getDataManager().createReference(new ScalableHashMap<Long, ServerFuture<?>>());
+    }
 
     public <V> Future<V> waitForResponseTo(Request request) {
         ServerFuture<V> f = new ServerFuture<V>(request, this);
-        assert !waitingForResponse.containsKey(request.requestId);
-        waitingForResponse.put(request.requestId, f);
-        assert waitingForResponse.containsKey(request.requestId);
+        assert !waitingForResponse.get().containsKey(request.requestId);
+        waitingForResponse.get().put(request.requestId, f);
         return f;
     }
 
     public void recievedResponse(Response response) {
-        ServerFuture<?> f = waitingForResponse.remove(response.requestId);
+        ServerFuture<?> f = waitingForResponse.get().remove(response.requestId);
         if (f != null) {
             f.markDone(response);
         } else {
@@ -62,10 +66,10 @@ public class ServerFutureManager implements FutureManager, Serializable {
     }
 
     public int waitingForResponse() {
-        return waitingForResponse.size();
+        return waitingForResponse.get().size();
     }
 
-    void doNotWaitForResponse(Request request) {
-        waitingForResponse.remove(request.requestId);
+    protected void doNotWaitForResponse(Request request) {
+        waitingForResponse.get().remove(request.requestId);
     }
 }

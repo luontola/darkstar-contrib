@@ -24,6 +24,7 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
+import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedObject;
 import net.orfjackal.darkstar.rpc.core.Request;
 import net.orfjackal.darkstar.rpc.core.Response;
@@ -51,7 +52,7 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
         this.manager = manager;
     }
 
-    synchronized void markDone(Response response) {
+    protected synchronized void markDone(Response response) {
         assert response.requestId == request.requestId;
         this.response = response;
         notifyAll();
@@ -61,6 +62,7 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
         if (isDone()) {
             return false;
         }
+        AppContext.getDataManager().removeObject(this);
         manager.doNotWaitForResponse(request);
         cancelled = true;
         return true;
@@ -78,6 +80,7 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
         if (!isDone()) {
             throw new InterruptedException("Not done; Blocking operations are not allowed on Darkstar Server");
         }
+        AppContext.getDataManager().removeObject(this);
         if (response.exception != null) {
             throw new ExecutionException(response.exception);
         } else {

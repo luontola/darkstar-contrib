@@ -28,6 +28,7 @@ import net.orfjackal.darkstar.rpc.ServiceReference;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -75,6 +76,6 @@ public class ProxyGeneratingFuture<T> implements Future<Set<T>>, Serializable {
         for (ServiceReference<T> ref : refs) {
             proxies.add(proxyFactory.create(ref));
         }
-        return proxies;
+        return Collections.unmodifiableSet(proxies);
     }
 }

@@ -44,13 +44,13 @@ public class ServerChannelAdapter implements ChannelListener, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ServerChannelAdapter.class);
 
     // server-to-client requests
-    private MessageReciever responseReciever;
+    private volatile MessageReciever responseReciever;
 
     // client-to-server requests
-    private MessageReciever requestReciever;
+    private volatile MessageReciever requestReciever;
 
     private final RpcGateway gateway;
-    private ManagedReference<Channel> channel;
+    private volatile ManagedReference<Channel> channel;
 
     public ServerChannelAdapter() {
         gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ServerFutureManager());

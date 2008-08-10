@@ -44,7 +44,7 @@ public final class ClientFuture<V> extends FutureTask<V> {
         this.manager = manager;
     }
 
-    void markDone(Response response) {
+    protected void markDone(Response response) {
         assert response.requestId == request.requestId;
         if (response.exception != null) {
             setException(response.exception);
