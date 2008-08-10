@@ -40,9 +40,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
@@ -52,6 +50,7 @@ import java.util.concurrent.TimeoutException;
 public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static final String STARTUP_MSG = "RpcTest has started";
+    private static final byte LOCATE_SERVICE_CMD = 0x01;
     private static final int TIMEOUT = 5000;
 
     public class WhenUsingARealDarkstarServer {
@@ -63,7 +62,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private TempDirectory tempDirectory;
         private Thread testTimeout;
 
-        public Object create() throws TimeoutException {
+        public Object create() throws Exception {
             tempDirectory = new TempDirectory();
             tempDirectory.create();
 
@@ -85,23 +84,6 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
             // needed to avoid blocking on client.events.take()
             testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
-            return null;
-        }
-
-        public void destroy() {
-//            System.out.println("client.events = " + client.events);
-//            System.out.println("client.messages = " + client.messages);
-//            System.out.println("Server Out:");
-//            System.out.println(server.getSystemOut());
-//            System.err.println("Server Log:");
-//            System.err.println(server.getSystemErr());
-            testTimeout.interrupt();
-            client.logout(true);
-            server.shutdown();
-            tempDirectory.dispose();
-        }
-
-        public void rpcMethodsOnServerMayBeCalledFromClient() throws InterruptedException, ExecutionException {
 
             // wait for the client to log in
             client.login();
@@ -112,16 +94,45 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             event = client.events.take();
             specify(event, event.startsWith(DebugClient.JOINED_CHANNEL));
 
-            // locate the RPC service
+            return null;
+        }
+
+        public void destroy() {
+            System.out.println("client.events = " + client.events);
+            System.out.println("client.messages = " + client.messages);
+            System.out.println("Server Out:");
+            System.out.println(server.getSystemOut());
+            System.err.println("Server Log:");
+            System.err.println(server.getSystemErr());
+            testTimeout.interrupt();
+            client.logout(true);
+            server.shutdown();
+            tempDirectory.dispose();
+        }
+
+        public void rpcMethodsOnServerMayBeCalledFromClient() throws Exception {
+
+            // locate the RPC service on server
             Set<Echo> services = gatewayOnClient.remoteFindByType(Echo.class);
             specify(services.size(), should.equal(1));
-            Echo echo = services.iterator().next();
+            Echo echoOnServer = services.iterator().next();
 
             // call methods on the RPC service
-            Future<String> f = echo.echo("hello");
+            Future<String> f = echoOnServer.echo("hello");
             String result = f.get();
             specify(result, should.equal("hello, hello"));
         }
+
+        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
+
+            // command the server to locate the RPC service on the client
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(LOCATE_SERVICE_CMD).flip());
+            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
+
+            // command the server to call methods on the RPC service
+            // TODO
+        }
+
     }
 
     // Interface implementations for connecting to Darkstar
@@ -143,6 +154,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
+        private Set<Echo> echoOnClient;
 
         public RpcTestClientSessionListener(ClientSession session) {
             this.session = AppContext.getDataManager().createReference(session);
@@ -151,7 +163,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         private RpcGateway initGateway(ClientSession session) {
-            ChannelAdapter adapter = new ChannelAdapter();
+            ChannelAdapter adapter = new ChannelAdapter(TIMEOUT / 2);
             rpcChannelForClient(session, adapter);
             return adapter.getGateway();
         }
@@ -164,6 +176,15 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void receivedMessage(ByteBuffer message) {
+            byte command = message.get();
+            if (command == LOCATE_SERVICE_CMD) {
+                System.out.println("command = LOCATE_SERVICE_CMD");
+                echoOnClient = gateway.remoteFindByType(Echo.class);
+                System.out.println("echoOnClient = " + (echoOnClient == null ? "null" : "not null"));
+
+            } else {
+                System.out.println("Unknown command: " + command);
+            }
         }
 
         public void disconnected(boolean graceful) {
