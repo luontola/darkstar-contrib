@@ -24,42 +24,59 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
+import jdave.Group;
+import jdave.Specification;
+import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.runner.RunWith;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ServerFutureManager implements FutureManager, Serializable {
-    private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
+@RunWith(JDaveRunner.class)
+@Group({"fast"})
+public class ClientFutureManagerSpec extends Specification<Object> {
 
-    private transient ClientFutureManager hack = new ClientFutureManager();
+    private FutureManager manager;
+    private Request request;
 
-    public <V> Future<V> waitForResponseTo(Request request) {
-        // TODO
-        return hack.waitForResponseTo(request);
+    public void create() throws Exception {
+        manager = new ClientFutureManager();
+        request = new Request(1, 2, "foo", new Class<?>[0], new Object[0]);
     }
 
-    public void recievedResponse(Response response) {
-        // TODO
-        hack.recievedResponse(response);
+
+    public class WhenNoRequestsHaveBeenMade {
+
+        public Object create() {
+            return null;
+        }
+
+        public void managerIsNotWaitingForResponses() {
+            specify(manager.waitingForResponse(), should.equal(0));
+        }
     }
 
-    public int waitingForResponse() {
-        // TODO
-        return hack.waitingForResponse();
-    }
+    public class WhenARequestIsMade {
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        hack = new ClientFutureManager();
+        private Future<String> future;
+
+        public Object create() {
+            future = manager.waitForResponseTo(request);
+            return null;
+        }
+
+        public void managerWaitsForAResponse() {
+            specify(manager.waitingForResponse(), should.equal(1));
+        }
+
+        public void futureIsProvided() {
+            specify(future, should.not().equal(null));
+            specify(!future.isDone());
+            specify(!future.isCancelled());
+        }
     }
 }
