@@ -98,16 +98,19 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            System.out.println("client.events = " + client.events);
-            System.out.println("client.messages = " + client.messages);
-            System.out.println("Server Out:");
-            System.out.println(server.getSystemOut());
-            System.err.println("Server Log:");
-            System.err.println(server.getSystemErr());
-            testTimeout.interrupt();
-            client.logout(true);
-            server.shutdown();
-            tempDirectory.dispose();
+            try {
+                System.out.println("client.events = " + client.events);
+                System.out.println("client.messages = " + client.messages);
+                System.out.println("Server Out:");
+                System.out.println(server.getSystemOut());
+                System.err.println("Server Log:");
+                System.err.println(server.getSystemErr());
+                testTimeout.interrupt();
+                client.logout(true);
+            } finally {
+                server.shutdown();
+                tempDirectory.dispose();
+            }
         }
 
         public void rpcMethodsOnServerMayBeCalledFromClient() throws Exception {
@@ -123,15 +126,15 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             specify(result, should.equal("hello, hello"));
         }
 
-        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
-
-            // command the server to locate the RPC service on the client
-            client.send((ByteBuffer) ByteBuffer.allocate(1).put(LOCATE_SERVICE_CMD).flip());
-            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
-
-            // command the server to call methods on the RPC service
-            // TODO
-        }
+//        public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
+//
+//            // command the server to locate the RPC service on the client
+//            client.send((ByteBuffer) ByteBuffer.allocate(1).put(LOCATE_SERVICE_CMD).flip());
+//            server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
+//
+//            // command the server to call methods on the RPC service
+//            // TODO
+//        }
 
     }
 
