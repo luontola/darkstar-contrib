@@ -48,8 +48,8 @@ public class EndToEndSpec extends Specification<Object> {
     private MockNetwork network = new MockNetwork();
     private Thread testTimeout;
 
-    private RpcServer server;
-    private RpcClient client;
+    private RpcServiceRegistry backend;
+    private RpcServiceInvoker frontend;
 
     private Foo fooService;
     private ServiceReference<Foo> fooServiceRef;
@@ -58,15 +58,15 @@ public class EndToEndSpec extends Specification<Object> {
     public void create() {
         testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
 
-        server = new RpcServerImpl(network.getServerToClient());
-        client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
+        backend = new RpcServiceRegistryImpl(network.getServerToClient());
+        frontend = new RpcServiceInvokerImpl(network.getClientToServer(), new ClientFutureManager());
 
-        // initialize Foo on server
+        // initialize Foo on backend
         fooService = mock(Foo.class);
-        fooServiceRef = server.registerService(Foo.class, fooService);
+        fooServiceRef = backend.registerService(Foo.class, fooService);
 
-        // initialize Foo on client
-        RpcProxyFactory factory = new RpcProxyFactory(client);
+        // initialize Foo on frontend
+        RpcProxyFactory factory = new RpcProxyFactory(frontend);
         fooProxy = factory.create(fooServiceRef);
     }
 
@@ -86,11 +86,11 @@ public class EndToEndSpec extends Specification<Object> {
             checking(new Expectations() {{
                 one(fooService).voidMethod();
             }});
-            specify(client.waitingForResponse(), should.equal(0));
+            specify(frontend.waitingForResponse(), should.equal(0));
             fooProxy.voidMethod();
-            specify(client.waitingForResponse(), should.equal(1));
+            specify(frontend.waitingForResponse(), should.equal(1));
             network.shutdownAndWait();
-            specify(client.waitingForResponse(), should.equal(1));
+            specify(frontend.waitingForResponse(), should.equal(1));
         }
 
         public void aFutureWillProvideTheReturnValue() throws ExecutionException, InterruptedException, TimeoutException {

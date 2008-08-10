@@ -22,43 +22,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.core;
+package net.orfjackal.darkstar.rpc;
 
-import net.orfjackal.darkstar.rpc.RpcServer;
-import net.orfjackal.darkstar.rpc.ServiceHelper;
-import net.orfjackal.darkstar.rpc.ServiceProvider;
-import net.orfjackal.darkstar.rpc.ServiceReference;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
- * @since 14.6.2008
+ * @since 8.6.2008
  */
-public class ServiceProviderImpl implements ServiceProvider, Serializable {
-    private static final long serialVersionUID = 1L;
+public interface RpcServiceInvoker {
 
-    private final RpcServer server;
+    ServiceReference<ServiceLocator> getServiceLocator();
 
-    public ServiceProviderImpl(RpcServer server) {
-        this.server = server;
-    }
+    void remoteInvokeNoResponse(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters);
 
-    public Future<Set<ServiceReference<?>>> findAll() {
-        Set<ServiceReference<?>> services = new HashSet<ServiceReference<?>>(server.registeredServices().keySet());
-        return ServiceHelper.wrap(services);
-    }
+    <V> Future<V> remoteInvoke(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters);
 
-    public <T> Future<Set<ServiceReference<T>>> findByType(Class<T> serviceInterface) {
-        Set<ServiceReference<T>> services = new HashSet<ServiceReference<T>>();
-        for (ServiceReference<?> ref : server.registeredServices().keySet()) {
-            if (ref.getServiceInterface().equals(serviceInterface)) {
-                services.add((ServiceReference<T>) ref);
-            }
-        }
-        return ServiceHelper.wrap(services);
-    }
+    int waitingForResponse();
 }

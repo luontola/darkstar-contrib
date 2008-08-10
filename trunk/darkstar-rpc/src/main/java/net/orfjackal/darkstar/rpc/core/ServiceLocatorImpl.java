@@ -22,8 +22,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc;
+package net.orfjackal.darkstar.rpc.core;
 
+import net.orfjackal.darkstar.rpc.RpcServiceRegistry;
+import net.orfjackal.darkstar.rpc.ServiceHelper;
+import net.orfjackal.darkstar.rpc.ServiceLocator;
+import net.orfjackal.darkstar.rpc.ServiceReference;
+
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -31,11 +38,27 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 14.6.2008
  */
-public interface ServiceProvider {
+public class ServiceLocatorImpl implements ServiceLocator, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    long SERVICE_ID = 0L;
+    private final RpcServiceRegistry registry;
 
-    Future<Set<ServiceReference<?>>> findAll();
+    public ServiceLocatorImpl(RpcServiceRegistry registry) {
+        this.registry = registry;
+    }
 
-    <T> Future<Set<ServiceReference<T>>> findByType(Class<T> serviceInterface);
+    public Future<Set<ServiceReference<?>>> findAll() {
+        Set<ServiceReference<?>> services = new HashSet<ServiceReference<?>>(registry.registeredServices().keySet());
+        return ServiceHelper.wrap(services);
+    }
+
+    public <T> Future<Set<ServiceReference<T>>> findByType(Class<T> serviceInterface) {
+        Set<ServiceReference<T>> services = new HashSet<ServiceReference<T>>();
+        for (ServiceReference<?> ref : registry.registeredServices().keySet()) {
+            if (ref.getServiceInterface().equals(serviceInterface)) {
+                services.add((ServiceReference<T>) ref);
+            }
+        }
+        return ServiceHelper.wrap(services);
+    }
 }

@@ -28,7 +28,7 @@ import jdave.Block;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.rpc.DummySender;
-import net.orfjackal.darkstar.rpc.RpcServer;
+import net.orfjackal.darkstar.rpc.RpcServiceRegistry;
 import net.orfjackal.darkstar.rpc.ServiceHelper;
 import net.orfjackal.darkstar.rpc.ServiceReference;
 import org.jmock.Expectations;
@@ -44,19 +44,19 @@ import java.util.logging.Logger;
  * @since 10.6.2008
  */
 @RunWith(JDaveRunner.class)
-public class RpcServerSpec extends Specification<Object> {
+public class RpcServiceRegistrySpec extends Specification<Object> {
 
-    private RpcServer server;
-    private DummySender client;
+    private RpcServiceRegistry backend;
+    private DummySender frontend;
 
     private Logger log;
     private Filter filter;
 
     public void create() {
-        client = new DummySender();
-        server = new RpcServerImpl(client);
+        frontend = new DummySender();
+        backend = new RpcServiceRegistryImpl(frontend);
 
-        log = Logger.getLogger(RpcServerImpl.class.getName());
+        log = Logger.getLogger(RpcServiceRegistryImpl.class.getName());
         filter = mock(Filter.class);
         log.setFilter(filter);
     }
@@ -82,7 +82,7 @@ public class RpcServerSpec extends Specification<Object> {
             checking(aMessageIsLogged());
             specify(new Block() {
                 public void run() throws Throwable {
-                    client.callback.receivedMessage(new Request(1L, 1L, "foo", new Class<?>[0], null).toBytes());
+                    frontend.callback.receivedMessage(new Request(1L, 1L, "foo", new Class<?>[0], null).toBytes());
                 }
             }, should.raise(RuntimeException.class));
         }
@@ -95,79 +95,79 @@ public class RpcServerSpec extends Specification<Object> {
 
         public Object create() {
             service = new FooServiceImpl();
-            serviceRef = server.registerService(FooService.class, service);
+            serviceRef = backend.registerService(FooService.class, service);
             return null;
         }
 
         public void serviceMethodsMayBeInvoked() {
-            client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+            frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                     "foo", new Class<?>[0], null).toBytes());
             specify(service.fooCalled, should.equal(1));
         }
 
         public void serviceMethodsMayBeInvokedWithParameters() {
-            client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+            frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                     "foo", new Class<?>[]{String.class}, new Object[]{"hello"}).toBytes());
             specify(service.fooParam, should.equal("hello"));
         }
 
         public void valuesReturnedByTheServiceMethodAreProvided() {
-            client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+            frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                     "foo", new Class<?>[]{String.class}, new Object[]{"hello"}).toBytes());
-            Response response = Response.fromBytes(client.messages.get(0));
+            Response response = Response.fromBytes(frontend.messages.get(0));
             specify(response.requestId, should.equal(1L));
             specify(response.value, should.equal("hello"));
         }
 
         public void exceptionsThrownByTheServiceMethodAreProvided() {
-            client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+            frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                     "exceptionThrower", new Class<?>[0], null).toBytes());
-            Response response = Response.fromBytes(client.messages.get(0));
+            Response response = Response.fromBytes(frontend.messages.get(0));
             specify(response.requestId, should.equal(1L));
             specify(response.exception.getClass(), should.equal(IllegalStateException.class));
             specify(response.exception.getMessage(), should.equal("exception message"));
         }
 
         public void voidServiceMethodsWillNotSendAResponse() {
-            client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+            frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                     "voidMethod", new Class<?>[0], null).toBytes());
             specify(service.voidMethodCalled, should.equal(1));
-            specify(client.messages.size(), should.equal(0));
+            specify(frontend.messages.size(), should.equal(0));
         }
 
         public void allNonVoidServiceMethodsMustReturnAFuture() {
             checking(aMessageIsLogged());
             specify(new Block() {
                 public void run() throws Throwable {
-                    client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+                    frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                             "invalidServiceMethod", new Class<?>[0], null).toBytes());
                 }
             }, should.raise(RuntimeException.class));
             specify(service.invalidServiceMethodCalled, should.equal(0));
-            specify(client.messages.size(), should.equal(0));
+            specify(frontend.messages.size(), should.equal(0));
         }
 
         public void methodsNotPartOfTheServiceInterfaceMayNotBeCalled() {
             checking(aMessageIsLogged());
             specify(new Block() {
                 public void run() throws Throwable {
-                    client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+                    frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                             "notInInterface", new Class<?>[0], null).toBytes());
                 }
             }, should.raise(RuntimeException.class));
             specify(service.notInInterfaceCalled, should.equal(0));
-            specify(client.messages.size(), should.equal(0));
+            specify(frontend.messages.size(), should.equal(0));
         }
 
         public void methodsInheritedFromJavaLangObjectMayNotBeCalled() {
             checking(aMessageIsLogged());
             specify(new Block() {
                 public void run() throws Throwable {
-                    client.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
+                    frontend.callback.receivedMessage(new Request(1L, serviceRef.getServiceId(),
                             "toString", new Class<?>[0], null).toBytes());
                 }
             }, should.raise(RuntimeException.class));
-            specify(client.messages.size(), should.equal(0));
+            specify(frontend.messages.size(), should.equal(0));
         }
     }
 
@@ -181,13 +181,13 @@ public class RpcServerSpec extends Specification<Object> {
         public Object create() {
             service1 = new FooServiceImpl();
             service2 = new FooServiceImpl();
-            serviceRef1 = server.registerService(FooService.class, service1);
-            serviceRef2 = server.registerService(FooService.class, service2);
+            serviceRef1 = backend.registerService(FooService.class, service1);
+            serviceRef2 = backend.registerService(FooService.class, service2);
             return null;
         }
 
         public void allTheServicesAreRegistered() {
-            specify(server.registeredServices().values(), should.containAll(service1, service2));
+            specify(backend.registeredServices().values(), should.containAll(service1, service2));
         }
 
         public void eachServiceWillHaveItsOwnServiceId() {
@@ -195,22 +195,22 @@ public class RpcServerSpec extends Specification<Object> {
         }
 
         public void eachServiceIdWillCallOnlyThatServiceWhoseIdItIs() {
-            client.callback.receivedMessage(
+            frontend.callback.receivedMessage(
                     new Request(1L, serviceRef1.getServiceId(), "foo", new Class<?>[0], null).toBytes());
             specify(service1.fooCalled, should.equal(1));
             specify(service2.fooCalled, should.equal(0));
-            client.callback.receivedMessage(
+            frontend.callback.receivedMessage(
                     new Request(1L, serviceRef2.getServiceId(), "foo", new Class<?>[0], null).toBytes());
             specify(service1.fooCalled, should.equal(1));
             specify(service2.fooCalled, should.equal(1));
         }
 
         public void unregisteringAServiceWillRemoveThatService() {
-            server.unregisterService(serviceRef1);
+            backend.unregisterService(serviceRef1);
             checking(aMessageIsLogged());
             specify(new Block() {
                 public void run() throws Throwable {
-                    client.callback.receivedMessage(
+                    frontend.callback.receivedMessage(
                             new Request(1L, serviceRef1.getServiceId(), "foo", new Class<?>[0], null).toBytes());
                 }
             }, should.raise(RuntimeException.class));
@@ -218,8 +218,8 @@ public class RpcServerSpec extends Specification<Object> {
         }
 
         public void unregisteringAServiceShouldNotAffectOtherServices() {
-            server.unregisterService(serviceRef1);
-            client.callback.receivedMessage(
+            backend.unregisterService(serviceRef1);
+            frontend.callback.receivedMessage(
                     new Request(1L, serviceRef2.getServiceId(), "foo", new Class<?>[0], null).toBytes());
             specify(service2.fooCalled, should.equal(1));
         }

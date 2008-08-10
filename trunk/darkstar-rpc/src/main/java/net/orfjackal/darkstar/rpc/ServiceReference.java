@@ -27,8 +27,8 @@ package net.orfjackal.darkstar.rpc;
 import java.io.Serializable;
 
 /**
- * Identifies a service within a {@link RpcServer}. {@code ServiceReference}s should never be used
- * with another {@link RpcServer} than the one from which the reference originated.
+ * Identifies a service within a {@link RpcServiceRegistry}. {@code ServiceReference}s should never be used
+ * with another {@link RpcServiceRegistry} than the one from which the reference originated.
  *
  * @author Esko Luontola
  * @since 11.6.2008

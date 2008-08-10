@@ -24,19 +24,18 @@
 
 package net.orfjackal.darkstar.rpc;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
- * @since 8.6.2008
+ * @since 14.6.2008
  */
-public interface RpcClient {
+public interface ServiceLocator {
 
-    ServiceReference<ServiceProvider> getServiceProvider();
+    long SERVICE_ID = 0L;
 
-    void remoteInvokeNoResponse(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters);
+    Future<Set<ServiceReference<?>>> findAll();
 
-    <V> Future<V> remoteInvoke(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters);
-
-    int waitingForResponse();
+    <T> Future<Set<ServiceReference<T>>> findByType(Class<T> serviceInterface);
 }

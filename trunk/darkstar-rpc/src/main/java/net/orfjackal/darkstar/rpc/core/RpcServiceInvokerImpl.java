@@ -35,21 +35,21 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 9.6.2008
  */
-public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
+public class RpcServiceInvokerImpl implements RpcServiceInvoker, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final MessageSender requestSender;
     private final FutureManager futureManager;
     private long nextRequestId = 1L;
 
-    public RpcClientImpl(MessageSender requestSender, FutureManager futureManager) {
+    public RpcServiceInvokerImpl(MessageSender requestSender, FutureManager futureManager) {
         requestSender.setCallback(this);
         this.requestSender = requestSender;
         this.futureManager = futureManager;
     }
 
-    public ServiceReference<ServiceProvider> getServiceProvider() {
-        return new ServiceReference<ServiceProvider>(ServiceProvider.class, ServiceProvider.SERVICE_ID);
+    public ServiceReference<ServiceLocator> getServiceLocator() {
+        return new ServiceReference<ServiceLocator>(ServiceLocator.class, ServiceLocator.SERVICE_ID);
     }
 
     public void remoteInvokeNoResponse(long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {

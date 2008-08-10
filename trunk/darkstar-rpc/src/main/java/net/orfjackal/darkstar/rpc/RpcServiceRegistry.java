@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Esko Luontola
  * @since 10.6.2008
  */
-public interface RpcServer {
+public interface RpcServiceRegistry {
 
     <T> ServiceReference<T> registerService(Class<T> serviceInterface, T service);
 

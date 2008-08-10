@@ -25,9 +25,9 @@
 package net.orfjackal.darkstar.rpc.comm;
 
 import net.orfjackal.darkstar.rpc.*;
-import net.orfjackal.darkstar.rpc.core.RpcClientImpl;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
-import net.orfjackal.darkstar.rpc.core.RpcServerImpl;
+import net.orfjackal.darkstar.rpc.core.RpcServiceInvokerImpl;
+import net.orfjackal.darkstar.rpc.core.RpcServiceRegistryImpl;
 import net.orfjackal.darkstar.rpc.core.futures.FutureManager;
 import net.orfjackal.darkstar.rpc.core.futures.ProxyGeneratingFuture;
 
@@ -40,7 +40,7 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 15.6.2008
  */
-public class RpcGateway implements RpcServer, Serializable {
+public class RpcGateway implements RpcServiceRegistry, Serializable {
     private static final long serialVersionUID = 1L;
 
     public static final byte REQUEST_TO_MASTER = 0;
@@ -48,34 +48,34 @@ public class RpcGateway implements RpcServer, Serializable {
     public static final byte REQUEST_TO_SLAVE = 2;
     public static final byte RESPONSE_FROM_SLAVE = 3;
 
-    private final RpcServer server;
+    private final RpcServiceRegistry registry;
     private final RpcProxyFactory proxyFactory;
-    private final ServiceProvider serviceProvider;
+    private final ServiceLocator serviceLocator;
 
     public RpcGateway(MessageSender requestSender, MessageSender responseSender, FutureManager futureManager) {
-        server = new RpcServerImpl(responseSender);
-        RpcClient client = new RpcClientImpl(requestSender, futureManager);
-        proxyFactory = new RpcProxyFactory(client);
-        serviceProvider = proxyFactory.create(client.getServiceProvider());
+        registry = new RpcServiceRegistryImpl(responseSender);
+        RpcServiceInvoker invoker = new RpcServiceInvokerImpl(requestSender, futureManager);
+        proxyFactory = new RpcProxyFactory(invoker);
+        serviceLocator = proxyFactory.create(invoker.getServiceLocator());
     }
 
     public <T> ServiceReference<T> registerService(Class<T> serviceInterface, T service) {
-        return server.registerService(serviceInterface, service);
+        return registry.registerService(serviceInterface, service);
     }
 
     public void unregisterService(ServiceReference<?> serviceRef) {
-        server.unregisterService(serviceRef);
+        registry.unregisterService(serviceRef);
     }
 
     public Map<ServiceReference<?>, Object> registeredServices() {
-        return server.registeredServices();
+        return registry.registeredServices();
     }
 
     public <T> Future<Set<T>> remoteFindByType(Class<T> serviceInterface) {
-        return new ProxyGeneratingFuture<T>(serviceProvider.findByType(serviceInterface), proxyFactory);
+        return new ProxyGeneratingFuture<T>(serviceLocator.findByType(serviceInterface), proxyFactory);
     }
 
     public Future<Set<?>> remoteFindAll() {
-        return new ProxyGeneratingFuture(serviceProvider.findAll(), proxyFactory);
+        return new ProxyGeneratingFuture(serviceLocator.findAll(), proxyFactory);
     }
 }
