@@ -79,11 +79,11 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     public void destroy() throws Exception {
         try {
+            testTimeout.interrupt();
             System.out.println("Server Out:");
             System.out.println(server.getSystemOut());
             System.err.println("Server Log:");
             System.err.println(server.getSystemErr());
-            testTimeout.interrupt();
         } finally {
             server.shutdown();
             tempDirectory.dispose();

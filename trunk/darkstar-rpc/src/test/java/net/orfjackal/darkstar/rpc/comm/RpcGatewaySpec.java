@@ -37,7 +37,6 @@ import org.junit.runner.RunWith;
 
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -151,7 +150,7 @@ public class RpcGatewaySpec extends Specification<Object> {
             Set<Foo> foos = slaveGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             Future<String> future = foo.hello("ping?");
-            specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("pong!"));
+            specify(future.get(), should.equal("pong!"));
         }
 
         public void masterGetsResponsesFromSlave() throws Exception {
@@ -161,7 +160,7 @@ public class RpcGatewaySpec extends Specification<Object> {
             Set<Foo> foos = masterGateway.remoteFindByType(Foo.class).get();
             Foo foo = foos.iterator().next();
             Future<String> future = foo.hello("ping?");
-            specify(future.get(100, TimeUnit.MILLISECONDS), should.equal("pong!"));
+            specify(future.get(), should.equal("pong!"));
         }
     }
 

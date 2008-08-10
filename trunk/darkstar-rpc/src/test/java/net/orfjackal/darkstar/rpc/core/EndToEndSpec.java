@@ -26,6 +26,7 @@ package net.orfjackal.darkstar.rpc.core;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.*;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.jmock.Expectations;
@@ -33,7 +34,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -43,7 +43,10 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class EndToEndSpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 1000;
+
     private MockNetwork network = new MockNetwork();
+    private Thread testTimeout;
 
     private RpcServer server;
     private RpcClient client;
@@ -53,6 +56,8 @@ public class EndToEndSpec extends Specification<Object> {
     private Foo fooProxy;
 
     public void create() {
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
+
         server = new RpcServerImpl(network.getServerToClient());
         client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
 
@@ -66,6 +71,7 @@ public class EndToEndSpec extends Specification<Object> {
     }
 
     public void destroy() {
+        testTimeout.interrupt();
         network.shutdown();
     }
 
@@ -92,8 +98,7 @@ public class EndToEndSpec extends Specification<Object> {
                 one(fooService).ping("ping?"); will(returnValue(ServiceHelper.wrap("pong!")));
             }});
             Future<String> f = fooProxy.ping("ping?");
-            String value = f.get(100, TimeUnit.MILLISECONDS);
-            specify(value, should.equal("pong!"));
+            specify(f.get(), should.equal("pong!"));
         }
 
         public void aFutureWillProvideTheException() throws TimeoutException, InterruptedException {
@@ -102,7 +107,7 @@ public class EndToEndSpec extends Specification<Object> {
             }});
             Future<String> f = fooProxy.ping("ping?");
             try {
-                f.get(100, TimeUnit.MILLISECONDS);
+                f.get();
                 specify(false);
             } catch (ExecutionException e) {
                 specify(e.getCause().getClass(), should.equal(IllegalStateException.class));

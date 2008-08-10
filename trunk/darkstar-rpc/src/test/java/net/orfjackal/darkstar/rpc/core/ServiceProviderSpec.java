@@ -26,13 +26,12 @@ package net.orfjackal.darkstar.rpc.core;
 
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
+import net.orfjackal.darkstar.integration.util.TimedInterrupt;
 import net.orfjackal.darkstar.rpc.*;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
 import org.junit.runner.RunWith;
 
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -41,19 +40,24 @@ import java.util.concurrent.TimeUnit;
 @RunWith(JDaveRunner.class)
 public class ServiceProviderSpec extends Specification<Object> {
 
+    private static final int TIMEOUT = 1000;
+
     private MockNetwork network = new MockNetwork();
+    private Thread testTimeout;
 
     private RpcServer server;
     private RpcClient client;
     private RpcProxyFactory factory;
 
     public void create() {
+        testTimeout = TimedInterrupt.startOnCurrentThread(TIMEOUT);
         server = new RpcServerImpl(network.getServerToClient());
         client = new RpcClientImpl(network.getClientToServer(), new ClientFutureManager());
         factory = new RpcProxyFactory(client);
     }
 
     public void destroy() {
+        testTimeout.interrupt();
         network.shutdown();
     }
 
@@ -81,14 +85,13 @@ public class ServiceProviderSpec extends Specification<Object> {
         }
 
         public void findsAllServices() throws Exception {
-            Future<Set<ServiceReference<?>>> f = serviceProvider.findAll();
-            Set<ServiceReference<?>> services = f.get(100, TimeUnit.MILLISECONDS);
+            Set<ServiceReference<?>> services = serviceProvider.findAll().get();
             specify(services, should.containExactly(serviceProviderRef, foo1Ref, foo2Ref, bar3Ref));
         }
 
         public void findsServicesByType() throws Exception {
-            Set<ServiceReference<Foo>> foos = serviceProvider.findByType(Foo.class).get(100, TimeUnit.MILLISECONDS);
-            Set<ServiceReference<Bar>> bars = serviceProvider.findByType(Bar.class).get(100, TimeUnit.MILLISECONDS);
+            Set<ServiceReference<Foo>> foos = serviceProvider.findByType(Foo.class).get();
+            Set<ServiceReference<Bar>> bars = serviceProvider.findByType(Bar.class).get();
             specify(foos, should.containExactly(foo1Ref, foo2Ref));
             specify(bars, should.containExactly(bar3Ref));
         }
