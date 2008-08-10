@@ -26,13 +26,14 @@ package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.*;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger(RpcClientImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RpcClientImpl.class);
 
     private final Map<Long, ClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ClientFuture<?>>();
     private final MessageSender requestSender;
@@ -87,7 +88,7 @@ public class RpcClientImpl implements RpcClient, MessageReciever, Serializable {
         if (f != null) {
             f.markDone(rsp);
         } else {
-            logger.warning("Unexpected response: " + rsp);
+            logger.warn("Unexpected response: {}", rsp);
         }
     }
 

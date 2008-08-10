@@ -25,6 +25,8 @@
 package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,8 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger(RpcServerImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RpcServerImpl.class);
 
     private static final long FIRST_SERVICE_ID = 1L;
 
@@ -121,7 +121,7 @@ public class RpcServerImpl implements RpcServer, MessageReciever, Serializable {
             return Response.exceptionThrown(rq.requestId, e.getTargetException());
 
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error in handling request: " + rq, e);
+            logger.warn("Exception in handling request: " + rq, e);
             throw new RuntimeException(e);
         }
     }

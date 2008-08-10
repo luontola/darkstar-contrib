@@ -28,11 +28,12 @@ import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.MessageSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.logging.Logger;
 
 /**
  * @author Esko Luontola
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class ClientChannelAdapter implements ClientChannelListener, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger(ClientChannelAdapter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ClientChannelAdapter.class);
 
     // client-to-server requests
     private MessageReciever responseReciever;
@@ -77,7 +78,7 @@ public class ClientChannelAdapter implements ClientChannelListener, Serializable
         } else if (header == RpcGateway.RESPONSE_FROM_MASTER) {
             responseReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
         } else {
-            logger.warning("Unexpected header " + header + " on channel " + channel);
+            logger.warn("Unexpected header {} on channel {}", header, channel);
         }
     }
 
