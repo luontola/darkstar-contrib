@@ -43,7 +43,7 @@ To use the RPC library in a Maven project, add the following dependency to your 
         <dependency>
             <groupId>net.orfjackal.darkstar-contrib</groupId>
             <artifactId>darkstar-rpc</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 }}}
