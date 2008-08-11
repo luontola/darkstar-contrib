@@ -28,48 +28,30 @@ import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.util.ScalableHashMap;
 import net.orfjackal.darkstar.rpc.core.protocol.Request;
-import net.orfjackal.darkstar.rpc.core.protocol.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ServerFutureManager implements FutureManager, Serializable {
+public class ServerFutureManager extends AbstractFutureManager implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
 
-    private final ManagedReference<ScalableHashMap<Long, ServerFuture<?>>> waitingForResponse;
+    private final ManagedReference<ScalableHashMap<Long, RpcFuture<?>>> requestMap
+            = AppContext.getDataManager().createReference(new ScalableHashMap<Long, RpcFuture<?>>());
 
-    public ServerFutureManager() {
-        waitingForResponse = AppContext.getDataManager().createReference(new ScalableHashMap<Long, ServerFuture<?>>());
+    protected Map<Long, RpcFuture<?>> requestMap() {
+        return requestMap.get();
     }
 
-    public <V> Future<V> waitForResponseTo(Request request) {
-        ServerFuture<V> f = new ServerFuture<V>(request, this);
-        assert !waitingForResponse.get().containsKey(request.requestId);
-        waitingForResponse.get().put(request.requestId, f);
-        return new WrappedManagedFuture<V>(AppContext.getDataManager().createReference(f));
+    protected <V> RpcFuture<V> newFuture(Request request) {
+        return new ServerFuture<V>(request, this);
     }
 
-    public void cancelWaitingForResponseTo(Request request) {
-        waitingForResponse.get().remove(request.requestId);
-    }
-
-    public void recievedResponse(Response response) {
-        ServerFuture<?> f = waitingForResponse.get().remove(response.requestId);
-        if (f != null) {
-            f.markDone(response);
-        } else {
-            logger.warn("Unexpected response: {}", response);
-        }
-    }
-
-    public int waitingForResponse() {
-        return waitingForResponse.get().size();
+    protected <V> Future<V> returnFuture(RpcFuture<V> future) {
+        return new WrappedManagedFuture<V>(AppContext.getDataManager().createReference(future));
     }
 }

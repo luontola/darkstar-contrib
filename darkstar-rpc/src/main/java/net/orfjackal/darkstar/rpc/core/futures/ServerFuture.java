@@ -31,7 +31,6 @@ import net.orfjackal.darkstar.rpc.core.protocol.Response;
 
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeoutException;
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
+public class ServerFuture<V> implements RpcFuture<V>, ManagedObject, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Request request;
@@ -52,7 +51,7 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
         this.manager = manager;
     }
 
-    protected synchronized void markDone(Response response) {
+    public synchronized void markDone(Response response) {
         assert response.requestId == request.requestId;
         this.response = response;
         notifyAll();
@@ -62,9 +61,9 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
         if (isDone()) {
             return false;
         }
-        AppContext.getDataManager().removeObject(this);
         manager.cancelWaitingForResponseTo(request);
         cancelled = true;
+        AppContext.getDataManager().removeObject(this);
         return true;
     }
 

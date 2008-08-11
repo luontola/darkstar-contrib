@@ -24,43 +24,15 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
-import net.orfjackal.darkstar.rpc.core.protocol.Request;
 import net.orfjackal.darkstar.rpc.core.protocol.Response;
 
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
- * @since 10.6.2008
+ * @since 11.8.2008
  */
-public final class ClientFuture<V> extends FutureTask<V> implements RpcFuture<V> {
+public interface RpcFuture<V> extends Future<V> {
 
-    private final Request request;
-    private final FutureManager manager;
-
-    public ClientFuture(Request request, FutureManager manager) {
-        super(new NullRunnable(), null);
-        this.request = request;
-        this.manager = manager;
-    }
-
-    public void markDone(Response response) {
-        assert response.requestId == request.requestId;
-        if (response.exception != null) {
-            setException(response.exception);
-        } else {
-            set((V) response.value);
-        }
-    }
-
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        manager.cancelWaitingForResponseTo(request);
-        return super.cancel(mayInterruptIfRunning);
-    }
-
-    private static class NullRunnable implements Runnable {
-        public void run() {
-            throw new UnsupportedOperationException();
-        }
-    }
+    void markDone(Response response);
 }

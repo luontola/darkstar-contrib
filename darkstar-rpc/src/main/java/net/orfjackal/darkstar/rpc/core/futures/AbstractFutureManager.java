@@ -26,41 +26,46 @@ package net.orfjackal.darkstar.rpc.core.futures;
 
 import net.orfjackal.darkstar.rpc.core.protocol.Request;
 import net.orfjackal.darkstar.rpc.core.protocol.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.FutureTask;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * @author Esko Luontola
- * @since 10.6.2008
+ * @since 11.8.2008
  */
-public final class ClientFuture<V> extends FutureTask<V> implements RpcFuture<V> {
+public abstract class AbstractFutureManager implements FutureManager {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractFutureManager.class);
 
-    private final Request request;
-    private final FutureManager manager;
-
-    public ClientFuture(Request request, FutureManager manager) {
-        super(new NullRunnable(), null);
-        this.request = request;
-        this.manager = manager;
+    public <V> Future<V> waitForResponseTo(Request request) {
+        RpcFuture<V> f = newFuture(request);
+        assert !requestMap().containsKey(request.requestId);
+        requestMap().put(request.requestId, f);
+        return returnFuture(f);
     }
 
-    public void markDone(Response response) {
-        assert response.requestId == request.requestId;
-        if (response.exception != null) {
-            setException(response.exception);
+    public void cancelWaitingForResponseTo(Request request) {
+        requestMap().remove(request.requestId);
+    }
+
+    public void recievedResponse(Response response) {
+        RpcFuture<?> f = requestMap().remove(response.requestId);
+        if (f != null) {
+            f.markDone(response);
         } else {
-            set((V) response.value);
+            logger.warn("Unexpected response: {}", response);
         }
     }
 
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        manager.cancelWaitingForResponseTo(request);
-        return super.cancel(mayInterruptIfRunning);
+    public int waitingForResponse() {
+        return requestMap().size();
     }
 
-    private static class NullRunnable implements Runnable {
-        public void run() {
-            throw new UnsupportedOperationException();
-        }
-    }
+    protected abstract Map<Long, RpcFuture<?>> requestMap();
+
+    protected abstract <V> RpcFuture<V> newFuture(Request request);
+
+    protected abstract <V> Future<V> returnFuture(RpcFuture<V> future);
 }
