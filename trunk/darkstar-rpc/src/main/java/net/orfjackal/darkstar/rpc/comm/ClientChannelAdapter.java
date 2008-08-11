@@ -53,7 +53,7 @@ public class ClientChannelAdapter implements ClientChannelListener {
     private volatile ClientChannel channel;
 
     public ClientChannelAdapter() {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ClientFutureManager());
+        gateway = new RpcGatewayImpl(new MyRequestSender(), new MyResponseSender(), new ClientFutureManager());
     }
 
     public RpcGateway getGateway() {
@@ -73,9 +73,9 @@ public class ClientChannelAdapter implements ClientChannelListener {
 
     public void receivedMessage(ClientChannel channel, ByteBuffer message) {
         byte header = message.get();
-        if (header == RpcGateway.REQUEST_TO_SLAVE) {
+        if (header == RpcGatewayImpl.REQUEST_TO_CLIENT) {
             requestReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
-        } else if (header == RpcGateway.RESPONSE_FROM_MASTER) {
+        } else if (header == RpcGatewayImpl.RESPONSE_FROM_SERVER) {
             responseReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
         } else {
             logger.warn("Unexpected header {} on channel {}", header, channel);
@@ -94,7 +94,7 @@ public class ClientChannelAdapter implements ClientChannelListener {
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
-            buf.put(RpcGateway.REQUEST_TO_MASTER);
+            buf.put(RpcGatewayImpl.REQUEST_TO_SERVER);
             buf.put(message);
             buf.flip();
             sendToChannel(buf);
@@ -110,7 +110,7 @@ public class ClientChannelAdapter implements ClientChannelListener {
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
-            buf.put(RpcGateway.RESPONSE_FROM_SLAVE);
+            buf.put(RpcGatewayImpl.RESPONSE_FROM_CLIENT);
             buf.put(message);
             buf.flip();
             sendToChannel(buf);

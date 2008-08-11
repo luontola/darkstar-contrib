@@ -24,8 +24,11 @@
 
 package net.orfjackal.darkstar.rpc.comm;
 
-import net.orfjackal.darkstar.rpc.RpcServiceRegistry;
+import com.sun.sgs.app.ManagedObject;
+import net.orfjackal.darkstar.rpc.ServiceReference;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -33,9 +36,32 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 11.8.2008
  */
-public interface RpcGateway extends RpcServiceRegistry {
+public class ManagedRpcGateway implements RpcGateway, ManagedObject, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    <T> Future<Set<T>> remoteFindByType(Class<T> serviceInterface);
+    private final RpcGateway gateway;
 
-    Future<Set<?>> remoteFindAll();
+    public ManagedRpcGateway(RpcGateway gateway) {
+        this.gateway = gateway;
+    }
+
+    public <T> ServiceReference<T> registerService(Class<T> serviceInterface, T service) {
+        return gateway.registerService(serviceInterface, service);
+    }
+
+    public void unregisterService(ServiceReference<?> serviceRef) {
+        gateway.unregisterService(serviceRef);
+    }
+
+    public Map<ServiceReference<?>, Object> registeredServices() {
+        return gateway.registeredServices();
+    }
+
+    public <T> Future<Set<T>> remoteFindByType(Class<T> serviceInterface) {
+        return gateway.remoteFindByType(serviceInterface);
+    }
+
+    public Future<Set<?>> remoteFindAll() {
+        return gateway.remoteFindAll();
+    }
 }

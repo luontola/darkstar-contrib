@@ -80,8 +80,8 @@ public class RpcGatewaySpec extends Specification<Object> {
         private ServiceReference<Foo> fooOnSlaveRef;
 
         public Object create() {
-            slaveGateway = new RpcGateway(toMaster.getClientToServer(), toSlave.getServerToClient(), new ClientFutureManager());
-            masterGateway = new RpcGateway(toSlave.getClientToServer(), toMaster.getServerToClient(), new ServerFutureManager());
+            slaveGateway = new RpcGatewayImpl(toMaster.getClientToServer(), toSlave.getServerToClient(), new ClientFutureManager());
+            masterGateway = new RpcGatewayImpl(toSlave.getClientToServer(), toMaster.getServerToClient(), new ServerFutureManager());
             fooOnSlave = mock(Foo.class, "fooOnSlave");
             fooOnMaster = mock(Foo.class, "fooOnMaster");
             barOnMaster = mock(Bar.class, "barOnMaster");
