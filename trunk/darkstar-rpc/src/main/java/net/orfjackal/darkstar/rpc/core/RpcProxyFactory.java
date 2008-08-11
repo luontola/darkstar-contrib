@@ -86,7 +86,7 @@ public class RpcProxyFactory implements Serializable {
         }
 
         public String toString() {
-            return "RpcProxy[" + connection + "," + reference + "]";
+            return "RpcProxy[reference=" + reference + ",connection=" + connection + "]";
         }
     }
 }
