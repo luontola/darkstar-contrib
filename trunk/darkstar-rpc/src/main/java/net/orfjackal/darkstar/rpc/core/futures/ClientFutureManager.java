@@ -24,8 +24,8 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

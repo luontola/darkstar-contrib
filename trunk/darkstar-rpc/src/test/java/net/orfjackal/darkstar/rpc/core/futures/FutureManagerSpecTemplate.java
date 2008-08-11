@@ -29,8 +29,8 @@ import jdave.Group;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import net.orfjackal.darkstar.exp.mocks.MockAppContext;
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 

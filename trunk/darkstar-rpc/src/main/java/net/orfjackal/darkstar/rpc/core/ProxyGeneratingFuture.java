@@ -22,10 +22,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.core.futures;
+package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.ServiceReference;
-import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
 
 import java.io.Serializable;
 import java.util.Collections;

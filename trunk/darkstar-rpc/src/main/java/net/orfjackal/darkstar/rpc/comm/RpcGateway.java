@@ -25,11 +25,11 @@
 package net.orfjackal.darkstar.rpc.comm;
 
 import net.orfjackal.darkstar.rpc.*;
+import net.orfjackal.darkstar.rpc.core.ProxyGeneratingFuture;
 import net.orfjackal.darkstar.rpc.core.RpcProxyFactory;
 import net.orfjackal.darkstar.rpc.core.RpcServiceInvokerImpl;
 import net.orfjackal.darkstar.rpc.core.RpcServiceRegistryImpl;
 import net.orfjackal.darkstar.rpc.core.futures.FutureManager;
-import net.orfjackal.darkstar.rpc.core.futures.ProxyGeneratingFuture;
 
 import java.io.Serializable;
 import java.util.Map;

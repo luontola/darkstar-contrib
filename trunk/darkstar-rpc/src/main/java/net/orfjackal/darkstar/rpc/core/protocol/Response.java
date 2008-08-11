@@ -22,30 +22,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.orfjackal.darkstar.rpc.core;
+package net.orfjackal.darkstar.rpc.core.protocol;
 
 import java.io.*;
-import java.util.Arrays;
 
 /**
  * @author Esko Luontola
  * @since 9.6.2008
  */
-public class Request implements Serializable {
+public class Response implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public final long requestId;
-    public final long serviceId;
-    public final String methodName;
-    public final Class<?>[] paramTypes;
-    public final Object[] parameters;
+    public final Object value;
+    public final Throwable exception;
 
-    public Request(long requestId, long serviceId, String methodName, Class<?>[] paramTypes, Object[] parameters) {
+    public static Response valueReturned(long requestId, Object value) {
+        return new Response(requestId, value, null);
+    }
+
+    public static Response exceptionThrown(long requestId, Throwable exception) {
+        return new Response(requestId, null, exception);
+    }
+
+    private Response(long requestId, Object value, Throwable exception) {
         this.requestId = requestId;
-        this.serviceId = serviceId;
-        this.methodName = methodName;
-        this.paramTypes = paramTypes;
-        this.parameters = parameters;
+        this.value = value;
+        this.exception = exception;
     }
 
     public byte[] toBytes() {
@@ -53,10 +56,8 @@ public class Request implements Serializable {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(bytes);
             out.writeLong(requestId);
-            out.writeLong(serviceId);
-            out.writeUTF(methodName);
-            out.writeObject(paramTypes);
-            out.writeObject(parameters);
+            out.writeObject(value);
+            out.writeObject(exception);
             out.close();
             return bytes.toByteArray();
 
@@ -65,16 +66,14 @@ public class Request implements Serializable {
         }
     }
 
-    public static Request fromBytes(byte[] message) {
+    public static Response fromBytes(byte[] message) {
         try {
             ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(message));
             long requestId = in.readLong();
-            long serviceId = in.readLong();
-            String methodName = in.readUTF();
-            Class<?>[] paramTypes = (Class<?>[]) in.readObject();
-            Object[] parameters = (Object[]) in.readObject();
+            Object value = in.readObject();
+            Throwable exception = (Throwable) in.readObject();
             in.close();
-            return new Request(requestId, serviceId, methodName, paramTypes, parameters);
+            return new Response(requestId, value, exception);
 
         } catch (IOException e) {                   // should never happen
             throw new RuntimeException(e);
@@ -84,7 +83,6 @@ public class Request implements Serializable {
     }
 
     public String toString() {
-        return "Request[" + requestId + "," + serviceId + "," + methodName +
-                "," + Arrays.toString(paramTypes) + "," + Arrays.toString(parameters) + "]";
+        return "Response[" + requestId + "," + value + "," + exception + "]";
     }
 }
