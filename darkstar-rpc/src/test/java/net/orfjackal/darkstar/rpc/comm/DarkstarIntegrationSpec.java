@@ -100,6 +100,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
             final ClientChannelAdapter adapter = new ClientChannelAdapter();
             gatewayOnClient = adapter.getGateway();
+            gatewayOnClient.registerService(Echo.class, new EchoImpl());
             client = new DebugClient("localhost", server.getPort()) {
                 public ClientChannelListener joinedChannel(ClientChannel channel) {
                     return adapter.joinedChannel(channel);
@@ -139,14 +140,14 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
 
-            // TODO: Getting this test to pass seems to require ridiculous amounts of ManagedReference management,
-            // which would also infect the client-side implementation with calls to AppContext.getDataManager(),
-            // so it might be best to just require the library to use Darkstar EXP with TransparentReferences.
-
             // command the server to locate the RPC service on the client
             client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
             server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
 
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
+            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = false", TIMEOUT);
+
+            Thread.sleep(100);
             client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
             server.waitUntilSystemOutContains("echoOnClientPending.isDone() = true", TIMEOUT);
             server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
