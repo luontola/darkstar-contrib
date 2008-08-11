@@ -159,6 +159,11 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
             Thread.sleep(100);
             client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_RETURN_VALUE).flip());
             server.waitUntilSystemOutContains("echo = foo, foo", TIMEOUT);
+
+            // calling Future.get() a second time should throw an exception
+            // because the Future is automatically removed from data store after use
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_RETURN_VALUE).flip());
+            server.waitUntilSystemOutContains("ObjectNotFoundException was thrown", TIMEOUT);
         }
     }
 
@@ -179,7 +184,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
     private static class RpcTestClientSessionListener implements ClientSessionListener, ManagedObject, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final ManagedReference<ClientSession> session;
+        //private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
 
         private Future<Set<Echo>> echoOnClientFuture;
@@ -187,7 +192,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private Future<String> echoFuture;
 
         public RpcTestClientSessionListener(ClientSession session) {
-            this.session = AppContext.getDataManager().createReference(session);
+            //this.session = AppContext.getDataManager().createReference(session);
             gateway = initGateway(session);
             gateway.registerService(Echo.class, new EchoImpl());
         }
@@ -236,9 +241,13 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
                 System.out.println("echoFuture = " + (echoFuture == null ? "null" : "not null"));
 
             } else if (command == RECIEVE_RETURN_VALUE) {
-                assert echoFuture.isDone();
-                String echo = echoFuture.get();
-                System.out.println("echo = " + echo);
+                try {
+                    assert echoFuture.isDone();
+                    String echo = echoFuture.get();
+                    System.out.println("echo = " + echo);
+                } catch (ObjectNotFoundException e) {
+                    System.out.println("ObjectNotFoundException was thrown");
+                }
 
             } else {
                 throw new IllegalArgumentException("Unknown command: " + command);
