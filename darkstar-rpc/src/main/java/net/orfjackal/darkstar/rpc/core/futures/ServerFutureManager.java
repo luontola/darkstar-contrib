@@ -27,8 +27,8 @@ package net.orfjackal.darkstar.rpc.core.futures;
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.util.ScalableHashMap;
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

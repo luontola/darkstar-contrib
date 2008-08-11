@@ -26,6 +26,8 @@ package net.orfjackal.darkstar.rpc.core;
 
 import net.orfjackal.darkstar.rpc.*;
 import net.orfjackal.darkstar.rpc.core.futures.FutureManager;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -26,8 +26,8 @@ package net.orfjackal.darkstar.rpc.core.futures;
 
 import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedObject;
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;

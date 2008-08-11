@@ -32,6 +32,8 @@ import net.orfjackal.darkstar.rpc.DummySender;
 import net.orfjackal.darkstar.rpc.MessageReciever;
 import net.orfjackal.darkstar.rpc.RpcServiceInvoker;
 import net.orfjackal.darkstar.rpc.core.futures.ClientFutureManager;
+import net.orfjackal.darkstar.rpc.core.protocol.Request;
+import net.orfjackal.darkstar.rpc.core.protocol.Response;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 
