@@ -41,7 +41,7 @@ import java.util.concurrent.TimeoutException;
  * @since 10.6.2008
  */
 @RunWith(JDaveRunner.class)
-public class EndToEndSpec extends Specification<Object> {
+public class EndToEndServiceInvocationSpec extends Specification<Object> {
 
     private static final int TIMEOUT = 1000;
 
