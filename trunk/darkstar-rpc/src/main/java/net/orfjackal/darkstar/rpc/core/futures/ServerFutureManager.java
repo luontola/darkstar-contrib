@@ -56,6 +56,10 @@ public class ServerFutureManager implements FutureManager, Serializable {
         return new WrappedManagedFuture<V>(AppContext.getDataManager().createReference(f));
     }
 
+    public void cancelWaitingForResponseTo(Request request) {
+        waitingForResponse.get().remove(request.requestId);
+    }
+
     public void recievedResponse(Response response) {
         ServerFuture<?> f = waitingForResponse.get().remove(response.requestId);
         if (f != null) {
@@ -67,9 +71,5 @@ public class ServerFutureManager implements FutureManager, Serializable {
 
     public int waitingForResponse() {
         return waitingForResponse.get().size();
-    }
-
-    protected void doNotWaitForResponse(Request request) {
-        waitingForResponse.get().remove(request.requestId);
     }
 }

@@ -36,9 +36,9 @@ import java.util.concurrent.FutureTask;
 public final class ClientFuture<V> extends FutureTask<V> {
 
     private final Request request;
-    private final ClientFutureManager manager;
+    private final FutureManager manager;
 
-    public ClientFuture(Request request, ClientFutureManager manager) {
+    public ClientFuture(Request request, FutureManager manager) {
         super(new NullRunnable(), null);
         this.request = request;
         this.manager = manager;
@@ -54,7 +54,7 @@ public final class ClientFuture<V> extends FutureTask<V> {
     }
 
     public boolean cancel(boolean mayInterruptIfRunning) {
-        manager.doNotWaitForResponse(request);
+        manager.cancelWaitingForResponseTo(request);
         return super.cancel(mayInterruptIfRunning);
     }
 

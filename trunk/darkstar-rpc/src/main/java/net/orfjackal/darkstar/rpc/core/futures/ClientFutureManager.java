@@ -49,6 +49,10 @@ public class ClientFutureManager implements FutureManager {
         return f;
     }
 
+    public void cancelWaitingForResponseTo(Request request) {
+        waitingForResponse.remove(request.requestId);
+    }
+
     public void recievedResponse(Response response) {
         ClientFuture<?> f = waitingForResponse.remove(response.requestId);
         if (f != null) {
@@ -60,9 +64,5 @@ public class ClientFutureManager implements FutureManager {
 
     public int waitingForResponse() {
         return waitingForResponse.size();
-    }
-
-    protected void doNotWaitForResponse(Request request) {
-        waitingForResponse.remove(request.requestId);
     }
 }

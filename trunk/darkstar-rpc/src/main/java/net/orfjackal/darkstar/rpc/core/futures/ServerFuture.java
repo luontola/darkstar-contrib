@@ -42,12 +42,12 @@ import java.util.concurrent.TimeoutException;
 public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
     private static final long serialVersionUID = 1L;
 
-    private final ServerFutureManager manager;
     private final Request request;
+    private final FutureManager manager;
     private volatile Response response;
     private volatile boolean cancelled = false;
 
-    public ServerFuture(Request request, ServerFutureManager manager) {
+    public ServerFuture(Request request, FutureManager manager) {
         this.request = request;
         this.manager = manager;
     }
@@ -63,7 +63,7 @@ public class ServerFuture<V> implements Future<V>, Serializable, ManagedObject {
             return false;
         }
         AppContext.getDataManager().removeObject(this);
-        manager.doNotWaitForResponse(request);
+        manager.cancelWaitingForResponseTo(request);
         cancelled = true;
         return true;
     }
