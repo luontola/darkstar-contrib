@@ -36,6 +36,7 @@ import java.net.PasswordAuthentication;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Esko Luontola
@@ -101,9 +102,16 @@ public class GameClient {
     }
 
     public NumberGuessGameService getGame() {
-        Set<NumberGuessGameService> games = getGateway().remoteFindByType(NumberGuessGameService.class);
-        assert games.size() == 1;
-        return games.iterator().next();
+        try {
+            Set<NumberGuessGameService> games = getGateway()
+                    .remoteFindByType(NumberGuessGameService.class)
+                    .get(TIMEOUT, TimeUnit.MILLISECONDS);
+            assert games.size() == 1;
+            return games.iterator().next();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private class MySimpleClientListener implements SimpleClientListener {
