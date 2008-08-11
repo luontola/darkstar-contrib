@@ -37,6 +37,8 @@ public interface FutureManager {
 
     <V> Future<V> waitForResponseTo(Request request);
 
+    void cancelWaitingForResponseTo(Request request);
+
     void recievedResponse(Response response);
 
     int waitingForResponse();
