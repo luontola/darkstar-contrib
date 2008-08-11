@@ -49,11 +49,12 @@ public class ServerChannelAdapter implements ChannelListener, Serializable {
     // client-to-server requests
     private volatile MessageReciever requestReciever;
 
-    private final RpcGateway gateway;
+    private final ManagedReference<? extends RpcGateway> gateway;
     private volatile ManagedReference<Channel> channel;
 
     public ServerChannelAdapter() {
-        gateway = new RpcGateway(new MyRequestSender(), new MyResponseSender(), new ServerFutureManager());
+        RpcGateway gateway = new RpcGatewayImpl(new MyRequestSender(), new MyResponseSender(), new ServerFutureManager());
+        this.gateway = AppContext.getDataManager().createReference(new ManagedRpcGateway(gateway));
     }
 
     public void setChannel(Channel channel) {
@@ -61,14 +62,14 @@ public class ServerChannelAdapter implements ChannelListener, Serializable {
     }
 
     public RpcGateway getGateway() {
-        return gateway;
+        return gateway.get();
     }
 
     public void receivedMessage(Channel channel, ClientSession sender, ByteBuffer message) {
         byte header = message.get();
-        if (header == RpcGateway.REQUEST_TO_MASTER) {
+        if (header == RpcGatewayImpl.REQUEST_TO_SERVER) {
             requestReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
-        } else if (header == RpcGateway.RESPONSE_FROM_SLAVE) {
+        } else if (header == RpcGatewayImpl.RESPONSE_FROM_CLIENT) {
             responseReciever.receivedMessage(ByteBufferUtils.asByteArray(message));
         } else {
             logger.warn("Unexpected header {} on channel {} from sender {}", new Object[]{header, channel, sender});
@@ -87,7 +88,7 @@ public class ServerChannelAdapter implements ChannelListener, Serializable {
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
-            buf.put(RpcGateway.REQUEST_TO_SLAVE);
+            buf.put(RpcGatewayImpl.REQUEST_TO_CLIENT);
             buf.put(message);
             buf.flip();
             sendToChannel(buf);
@@ -103,7 +104,7 @@ public class ServerChannelAdapter implements ChannelListener, Serializable {
 
         public void send(byte[] message) throws IOException {
             ByteBuffer buf = ByteBuffer.allocate(message.length + 1);
-            buf.put(RpcGateway.RESPONSE_FROM_MASTER);
+            buf.put(RpcGatewayImpl.RESPONSE_FROM_SERVER);
             buf.put(message);
             buf.flip();
             sendToChannel(buf);

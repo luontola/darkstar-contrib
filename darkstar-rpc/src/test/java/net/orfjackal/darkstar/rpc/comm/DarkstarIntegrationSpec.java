@@ -191,7 +191,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private static final long serialVersionUID = 1L;
 
         //private final ManagedReference<ClientSession> session;
-        private final RpcGateway gateway;
+        private final ManagedReference<RpcGateway> gateway;
 
         private Future<Set<Echo>> echoOnClientFuture;
         private Echo echoOnClient;
@@ -199,8 +199,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public RpcTestClientSessionListener(ClientSession session) {
             //this.session = AppContext.getDataManager().createReference(session);
-            gateway = initGateway(session);
+            RpcGateway gateway = initGateway(session);
             gateway.registerService(Echo.class, new EchoImpl());
+            this.gateway = AppContext.getDataManager().createReference(gateway);
         }
 
         private RpcGateway initGateway(ClientSession session) {
@@ -232,7 +233,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private void processCommand(byte command) throws ExecutionException, InterruptedException {
             if (command == SEND_FIND_SERVICE) {
-                echoOnClientFuture = gateway.remoteFindByType(Echo.class);
+                echoOnClientFuture = gateway.get().remoteFindByType(Echo.class);
                 System.out.println("echoOnClientFuture = " + (echoOnClientFuture == null ? "null" : "not null"));
 
             } else if (command == RECIEVE_FOUND_SERVICE) {
