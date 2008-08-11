@@ -55,7 +55,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
     private static final byte RECIEVE_FOUND_SERVICE = 0x02;
     private static final byte SEND_METHOD_CALL = 0x03;
     private static final byte RECIEVE_RETURN_VALUE = 0x04;
+
     private static final int TIMEOUT = 5000;
+    private static final boolean DEBUG = false;
 
     private DarkstarServer server;
     private TempDirectory tempDirectory;
@@ -80,10 +82,12 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
     public void destroy() throws Exception {
         try {
             testTimeout.interrupt();
-            System.out.println("Server Out:");
-            System.out.println(server.getSystemOut());
-            System.err.println("Server Log:");
-            System.err.println(server.getSystemErr());
+            if (DEBUG) {
+                System.out.println("Server Out:");
+                System.out.println(server.getSystemOut());
+                System.err.println("Server Log:");
+                System.err.println(server.getSystemErr());
+            }
         } finally {
             server.shutdown();
             tempDirectory.dispose();
@@ -120,8 +124,10 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         }
 
         public void destroy() {
-            System.out.println("client.events = " + client.events);
-            System.out.println("client.messages = " + client.messages);
+            if (DEBUG) {
+                System.out.println("client.events = " + client.events);
+                System.out.println("client.messages = " + client.messages);
+            }
             client.logout(true);
         }
 
