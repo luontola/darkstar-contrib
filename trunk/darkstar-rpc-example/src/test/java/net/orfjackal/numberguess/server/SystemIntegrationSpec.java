@@ -45,6 +45,7 @@ import java.util.concurrent.TimeoutException;
 public class SystemIntegrationSpec extends Specification<Object> {
 
     private static final int TIMEOUT = 5000;
+    private static final boolean DEBUG = false;
 
     private DarkstarServer server;
     private TempDirectory tempDirectory;
@@ -65,8 +66,10 @@ public class SystemIntegrationSpec extends Specification<Object> {
     }
 
     public void destroy() throws Exception {
-//        System.out.println(server.getSystemOut());
-//        System.err.println(server.getSystemErr());
+        if (DEBUG) {
+            System.out.println(server.getSystemOut());
+            System.err.println(server.getSystemErr());
+        }
         testTimeout.interrupt();
         server.shutdown();
         tempDirectory.dispose();

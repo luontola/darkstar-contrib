@@ -25,8 +25,8 @@
 package net.orfjackal.numberguess.server;
 
 import com.sun.sgs.app.*;
-import net.orfjackal.darkstar.rpc.comm.ChannelAdapter;
 import net.orfjackal.darkstar.rpc.comm.RpcGateway;
+import net.orfjackal.darkstar.rpc.comm.ServerChannelAdapter;
 import net.orfjackal.numberguess.game.NumberGuessGameImpl;
 import net.orfjackal.numberguess.game.NumberGuessGameService;
 
@@ -44,28 +44,28 @@ public class GameClientSessionListener implements ClientSessionListener, Managed
     private static final Logger logger = Logger.getLogger(GameClientSessionListener.class.getName());
 
     private final ManagedReference<ClientSession> session;
-    private final RpcGateway gateway;
+    private final ManagedReference<RpcGateway> gateway;
     private final ManagedReference<NumberGuessGameImpl> game;
 
     public GameClientSessionListener(ClientSession session) {
         this.session = AppContext.getDataManager().createReference(session);
         this.game = AppContext.getDataManager().createReference(new NumberGuessGameImpl());
-        this.gateway = initGateway(session);
+        this.gateway = AppContext.getDataManager().createReference(initGateway(session));
         registerServices();
     }
 
     private void registerServices() {
-        gateway.registerService(NumberGuessGameService.class,
+        gateway.get().registerService(NumberGuessGameService.class,
                 new NumberGuessGameServiceImpl(game.get()));
     }
 
     private RpcGateway initGateway(ClientSession session) {
-        ChannelAdapter adapter = new ChannelAdapter();
+        ServerChannelAdapter adapter = new ServerChannelAdapter();
         createRpcChannelForClient(session, adapter);
         return adapter.getGateway();
     }
 
-    private static void createRpcChannelForClient(ClientSession session, ChannelAdapter adapter) {
+    private static void createRpcChannelForClient(ClientSession session, ServerChannelAdapter adapter) {
         Channel channel = AppContext.getChannelManager()
                 .createChannel("RpcChannel:" + session.getName(), adapter, Delivery.RELIABLE);
         channel.join(session);
