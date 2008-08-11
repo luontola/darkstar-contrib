@@ -63,11 +63,11 @@ public abstract class FutureManagerSpecTemplate<T extends FutureManager> extends
 
     public void create() throws Exception {
         MockAppContext.install();
-        log = Logger.getLogger(getImplClass().getName());
+        log = Logger.getLogger(AbstractFutureManager.class.getName());
         logFilter = mock(Filter.class);
         log.setFilter(logFilter);
 
-        manager = getImplInstance();
+        manager = newFutureManager();
         request = new Request(1, SERVICE_ID, "foo", new Class<?>[0], new Object[0]);
         request2 = new Request(2, SERVICE_ID, "foo", new Class<?>[0], new Object[0]);
         responseVal = Response.valueReturned(1, "foo!");
@@ -80,9 +80,7 @@ public abstract class FutureManagerSpecTemplate<T extends FutureManager> extends
         MockAppContext.uninstall();
     }
 
-    protected abstract Class<T> getImplClass();
-
-    protected abstract T getImplInstance();
+    protected abstract T newFutureManager();
 
 
     public class WhenNoRequestsHaveBeenMade {

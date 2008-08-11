@@ -25,9 +25,6 @@
 package net.orfjackal.darkstar.rpc.core.futures;
 
 import net.orfjackal.darkstar.rpc.core.protocol.Request;
-import net.orfjackal.darkstar.rpc.core.protocol.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,32 +34,19 @@ import java.util.concurrent.Future;
  * @author Esko Luontola
  * @since 10.8.2008
  */
-public class ClientFutureManager implements FutureManager {
-    private static final Logger logger = LoggerFactory.getLogger(ClientFutureManager.class);
+public class ClientFutureManager extends AbstractFutureManager {
 
-    private final Map<Long, ClientFuture<?>> waitingForResponse = new ConcurrentHashMap<Long, ClientFuture<?>>();
+    private final Map<Long, RpcFuture<?>> requestMap = new ConcurrentHashMap<Long, RpcFuture<?>>();
 
-    public <V> Future<V> waitForResponseTo(Request request) {
-        ClientFuture<V> f = new ClientFuture<V>(request, this);
-        assert !waitingForResponse.containsKey(request.requestId);
-        waitingForResponse.put(request.requestId, f);
-        return f;
+    protected Map<Long, RpcFuture<?>> requestMap() {
+        return requestMap;
     }
 
-    public void cancelWaitingForResponseTo(Request request) {
-        waitingForResponse.remove(request.requestId);
+    protected <V> RpcFuture<V> newFuture(Request request) {
+        return new ClientFuture<V>(request, this);
     }
 
-    public void recievedResponse(Response response) {
-        ClientFuture<?> f = waitingForResponse.remove(response.requestId);
-        if (f != null) {
-            f.markDone(response);
-        } else {
-            logger.warn("Unexpected response: {}", response);
-        }
-    }
-
-    public int waitingForResponse() {
-        return waitingForResponse.size();
+    protected <V> Future<V> returnFuture(RpcFuture<V> future) {
+        return future;
     }
 }

@@ -36,11 +36,7 @@ import org.junit.runner.RunWith;
 @Group({"fast"})
 public class ServerFutureManagerSpec extends FutureManagerSpecTemplate<ServerFutureManager> {
 
-    protected Class<ServerFutureManager> getImplClass() {
-        return ServerFutureManager.class;
-    }
-
-    protected ServerFutureManager getImplInstance() {
+    protected ServerFutureManager newFutureManager() {
         return new ServerFutureManager();
     }
 
