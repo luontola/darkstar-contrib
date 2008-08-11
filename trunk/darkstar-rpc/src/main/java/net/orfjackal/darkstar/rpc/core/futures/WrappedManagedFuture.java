@@ -24,52 +24,44 @@
 
 package net.orfjackal.darkstar.rpc.core.futures;
 
-import com.sun.sgs.app.AppContext;
 import com.sun.sgs.app.ManagedReference;
-import com.sun.sgs.app.util.ScalableHashMap;
-import net.orfjackal.darkstar.rpc.core.Request;
-import net.orfjackal.darkstar.rpc.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Esko Luontola
- * @since 10.8.2008
+ * @since 11.8.2008
  */
-public class ServerFutureManager implements FutureManager, Serializable {
+public class WrappedManagedFuture<V> implements Future<V>, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(ServerFutureManager.class);
 
-    private final ManagedReference<ScalableHashMap<Long, ServerFuture<?>>> waitingForResponse;
+    private final ManagedReference<? extends Future<V>> future;
 
-    public ServerFutureManager() {
-        waitingForResponse = AppContext.getDataManager().createReference(new ScalableHashMap<Long, ServerFuture<?>>());
+    public WrappedManagedFuture(ManagedReference<? extends Future<V>> future) {
+        this.future = future;
     }
 
-    public <V> Future<V> waitForResponseTo(Request request) {
-        ServerFuture<V> f = new ServerFuture<V>(request, this);
-        assert !waitingForResponse.get().containsKey(request.requestId);
-        waitingForResponse.get().put(request.requestId, f);
-        return new WrappedManagedFuture<V>(AppContext.getDataManager().createReference(f));
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return future.get().cancel(mayInterruptIfRunning);
     }
 
-    public void recievedResponse(Response response) {
-        ServerFuture<?> f = waitingForResponse.get().remove(response.requestId);
-        if (f != null) {
-            f.markDone(response);
-        } else {
-            logger.warn("Unexpected response: {}", response);
-        }
+    public boolean isCancelled() {
+        return future.get().isCancelled();
     }
 
-    public int waitingForResponse() {
-        return waitingForResponse.get().size();
+    public boolean isDone() {
+        return future.get().isDone();
     }
 
-    protected void doNotWaitForResponse(Request request) {
-        waitingForResponse.get().remove(request.requestId);
+    public V get() throws InterruptedException, ExecutionException {
+        return future.get().get();
+    }
+
+    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return future.get().get(timeout, unit);
     }
 }
