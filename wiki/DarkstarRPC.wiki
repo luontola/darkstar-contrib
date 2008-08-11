@@ -49,6 +49,15 @@ To use the RPC library in a Maven project, add the following dependency to your 
 }}}
 
 
+== Version History ==
+
+Version 1.0.1 (2008-08-11)
+  * Fixed calling client-side RPC services from the server-side
+
+Version 1.0 (2008-07-13)
+  * Initial release
+
+
 == Links ==
 
   * Darkstar RPC SVN: http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-rpc/
