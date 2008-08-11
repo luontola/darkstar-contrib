@@ -139,6 +139,10 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         public void rpcMethodsOnClientMayBeCalledFromServer() throws Exception {
 
+            // TODO: Getting this test to pass seems to require ridiculous amounts of ManagedReference management,
+            // which would also infect the client-side implementation with calls to AppContext.getDataManager(),
+            // so it might be best to just require the library to use Darkstar EXP with TransparentReferences.
+
             // command the server to locate the RPC service on the client
             client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
             server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
@@ -172,7 +176,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
 
-        private Future<Set<Echo>> echoOnClientPending;
+        private ManagedReference<Future<Set<Echo>>> echoOnClientPending;
         private Echo echoOnClient;
 
         public RpcTestClientSessionListener(ClientSession session) {
@@ -210,13 +214,13 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private void processCommand(byte command) throws ExecutionException, InterruptedException {
             if (command == SEND_FIND_SERVICE) {
-                echoOnClientPending = gateway.remoteFindByType(Echo.class);
+                echoOnClientPending = AppContext.getDataManager().createReference(gateway.remoteFindByType(Echo.class));
                 System.out.println("echoOnClientPending = " + (echoOnClientPending == null ? "null" : "not null"));
 
             } else if (command == RECIEVE_FIND_SERVICE) {
-                System.out.println("echoOnClientPending.isDone() = " + echoOnClientPending.isDone());
-                if (echoOnClientPending.isDone()) {
-                    echoOnClient = echoOnClientPending.get().iterator().next();
+                System.out.println("echoOnClientPending.isDone() = " + echoOnClientPending.get().isDone());
+                if (echoOnClientPending.get().isDone()) {
+                    echoOnClient = echoOnClientPending.get().get().iterator().next();
                     System.out.println("echoOnClient = " + (echoOnClient == null ? "null" : "not null"));
                 }
 
