@@ -52,7 +52,7 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
     private static final String STARTUP_MSG = "RpcTest has started";
     private static final byte SEND_FIND_SERVICE = 0x01;
-    private static final byte RECIEVE_FIND_SERVICE = 0x02;
+    private static final byte RECIEVE_FOUND_SERVICE = 0x02;
     private static final byte SEND_METHOD_CALL = 0x03;
     private static final byte RECIEVE_RETURN_VALUE = 0x04;
     private static final int TIMEOUT = 5000;
@@ -142,18 +142,23 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
             // command the server to locate the RPC service on the client
             client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_FIND_SERVICE).flip());
-            server.waitUntilSystemOutContains("echoOnClientPending = not null", TIMEOUT);
+            server.waitUntilSystemOutContains("echoOnClientFuture = not null", TIMEOUT);
 
-            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
-            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = false", TIMEOUT);
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FOUND_SERVICE).flip());
+            server.waitUntilSystemOutContains("echoOnClientFuture.isDone() = false", TIMEOUT);
 
             Thread.sleep(100);
-            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FIND_SERVICE).flip());
-            server.waitUntilSystemOutContains("echoOnClientPending.isDone() = true", TIMEOUT);
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_FOUND_SERVICE).flip());
+            server.waitUntilSystemOutContains("echoOnClientFuture.isDone() = true", TIMEOUT);
             server.waitUntilSystemOutContains("echoOnClient = not null", TIMEOUT);
 
             // command the server to call methods on the RPC service
-            // TODO
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(SEND_METHOD_CALL).flip());
+            server.waitUntilSystemOutContains("echoFuture = not null", TIMEOUT);
+
+            Thread.sleep(100);
+            client.send((ByteBuffer) ByteBuffer.allocate(1).put(RECIEVE_RETURN_VALUE).flip());
+            server.waitUntilSystemOutContains("echo = foo, foo", TIMEOUT);
         }
     }
 
@@ -177,8 +182,9 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
         private final ManagedReference<ClientSession> session;
         private final RpcGateway gateway;
 
-        private Future<Set<Echo>> echoOnClientPending;
+        private Future<Set<Echo>> echoOnClientFuture;
         private Echo echoOnClient;
+        private Future<String> echoFuture;
 
         public RpcTestClientSessionListener(ClientSession session) {
             this.session = AppContext.getDataManager().createReference(session);
@@ -215,21 +221,24 @@ public class DarkstarIntegrationSpec extends Specification<Object> {
 
         private void processCommand(byte command) throws ExecutionException, InterruptedException {
             if (command == SEND_FIND_SERVICE) {
-                echoOnClientPending = gateway.remoteFindByType(Echo.class);
-                System.out.println("echoOnClientPending = " + (echoOnClientPending == null ? "null" : "not null"));
+                echoOnClientFuture = gateway.remoteFindByType(Echo.class);
+                System.out.println("echoOnClientFuture = " + (echoOnClientFuture == null ? "null" : "not null"));
 
-            } else if (command == RECIEVE_FIND_SERVICE) {
-                System.out.println("echoOnClientPending.isDone() = " + echoOnClientPending.isDone());
-                if (echoOnClientPending.isDone()) {
-                    echoOnClient = echoOnClientPending.get().iterator().next();
+            } else if (command == RECIEVE_FOUND_SERVICE) {
+                System.out.println("echoOnClientFuture.isDone() = " + echoOnClientFuture.isDone());
+                if (echoOnClientFuture.isDone()) {
+                    echoOnClient = echoOnClientFuture.get().iterator().next();
                     System.out.println("echoOnClient = " + (echoOnClient == null ? "null" : "not null"));
                 }
 
             } else if (command == SEND_METHOD_CALL) {
-                // TODO
+                echoFuture = echoOnClient.echo("foo");
+                System.out.println("echoFuture = " + (echoFuture == null ? "null" : "not null"));
 
             } else if (command == RECIEVE_RETURN_VALUE) {
-                // TODO
+                assert echoFuture.isDone();
+                String echo = echoFuture.get();
+                System.out.println("echo = " + echo);
 
             } else {
                 throw new IllegalArgumentException("Unknown command: " + command);
