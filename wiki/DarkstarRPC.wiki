@@ -14,7 +14,7 @@ On Darkstar's server-side, the !RpcGateway and Future implementations are !Manag
 
 Because of Darkstar's transaction model, it is not possible nor sensible to block on the Future.get() method. Always check Future.isDone() first and if it is not done, try again later in another task. _(TODO: It might be useful to be able to register a callback which is called when the Future becomes done.)_
 
-The server-side Futures will remove themselves from the data store on get() and cancel(). Do not use the Future after you have retrieved its value or after you have cancelled it. Also, you should *always* use either get() or cancel() in order to free the data store space.
+The server-side Futures will remove themselves from the data store on get() and cancel(). Do not use the Future after you have retrieved its value or after you have cancelled it. Also, you should *always* call either the get() or the cancel() method of a Future, in order to free the data store space taken by the Future.
 
 On both client and server, the resources reserved by the Futures are *not* freed automatically if the request gets no response. That's why all RPC channels should use RELIABLE delivery requirement, unless the return types of all RPC services on that channel are void (and even then the RPC service lookups have a return value). Memory leaks (because of Futures waiting indefinitely for a response) should not happen under normal circumstances, but in case they do, a cleanup mechanism might be necessary (please submit a bug report if you experience memory leaks).
 
