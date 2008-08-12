@@ -12,7 +12,7 @@ All method calls are handled asynchronously. If the method needs to return a val
 
 On Darkstar's server-side, the !RpcGateway and Future implementations are !ManagedObjects. Use !ManagedReferences as needed.
 
-Because of Darkstar's transaction model, it is not possible nor sensible to block on the Future.get() method. Always check Future.isDone() first and if it is not done, try again later in another task.
+Because of Darkstar's transaction model, it is not possible nor sensible to block on the Future.get() method. Always check Future.isDone() first and if it is not done, try again later in another task. _(TODO: It might be useful to be able to register a callback which is called when the Future becomes done.)_
 
 The server-side Futures will remove themselves from the data store on get() and cancel(). Do not use the Future after you have retrieved its value, or after you have cancelled it. Also, you should always use get() or cancel() to free the data store space.
 
