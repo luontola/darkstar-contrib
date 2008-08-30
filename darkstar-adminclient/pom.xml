@@ -3,7 +3,7 @@
 
 	<groupId>com.gamalocus.darkstar-contrib</groupId>
 	<artifactId>darkstar-adminclient</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Darkstar Admin Client</name>
@@ -29,9 +29,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-adminclient-1.0.2</connection>
-		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-adminclient-1.0.2</developerConnection>
-		<url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-adminclient-1.0.2</url>
+		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-adminclient</connection>
+		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-adminclient</developerConnection>
+		<url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-adminclient</url>
 	</scm>
 
 	<distributionManagement>
