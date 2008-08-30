@@ -3,7 +3,7 @@
 
 	<groupId>com.gamalocus.darkstar-contrib</groupId>
 	<artifactId>darkstar-service-appprofiling</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>AppProfiling</name>
@@ -34,9 +34,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-service-appprofiling</connection>
-		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-service-appprofiling</developerConnection>
-		<url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-service-appprofiling</url>
+		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-service-appprofiling-1.0.2</connection>
+		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-service-appprofiling-1.0.2</developerConnection>
+		<url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-service-appprofiling-1.0.2</url>
 	</scm>
 
 	<distributionManagement>
