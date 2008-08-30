@@ -5,8 +5,8 @@ import java.util.logging.Logger;
 
 import com.sun.sgs.profile.ProfileConsumer;
 import com.sun.sgs.profile.ProfileOperation;
-import com.sun.sgs.profile.ProfileProducer;
 import com.sun.sgs.profile.ProfileRegistrar;
+import com.sun.sgs.profile.ProfileCollector.ProfileLevel;
 
 /**
  * The manager for MySQL lazy synchronization.
@@ -14,7 +14,7 @@ import com.sun.sgs.profile.ProfileRegistrar;
  * @author Emanuel Greisen
  * 
  */
-public class AppProfilingManager implements ProfileProducer
+public class AppProfilingManager /*implements ProfileProducer*/
 {
 	private final static Logger logger = Logger.getLogger(AppProfilingManager.class.getName());
 	public static boolean is_enabled = false;
@@ -51,7 +51,7 @@ public class AppProfilingManager implements ProfileProducer
 		{
 			if (consumer != null)
 			{
-				op = consumer.registerOperation(opName);
+				op = consumer.registerOperation(opName, ProfileLevel.MEDIUM);
 				knownOpNames.put(opName, op);
 			}
 		}
@@ -70,7 +70,7 @@ public class AppProfilingManager implements ProfileProducer
 	public void setProfileRegistrar(ProfileRegistrar profileRegistrar)
 	{
 		consumer =
-            profileRegistrar.registerProfileProducer(this);
+            profileRegistrar.registerProfileProducer(this.getClass().getCanonicalName());
 
 		/*
 		if (consumer != null)
