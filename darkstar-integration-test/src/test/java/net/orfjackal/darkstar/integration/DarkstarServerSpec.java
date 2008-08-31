@@ -46,7 +46,7 @@ import java.util.concurrent.TimeoutException;
 @RunWith(JDaveRunner.class)
 public class DarkstarServerSpec extends Specification<Object> {
 
-    private static final int TIMEOUT = 10000;
+    private static final int TIMEOUT = 5000;
 
     private TempDirectory tempDirectory;
 
