@@ -1,0 +1,8 @@
+
+    DARKSTAR RPC CHANGELOG
+
+Version 1.0.1 (2008-08-11)
+  * Fixed calling client-side RPC services from the server-side
+
+Version 1.0 (2008-07-13)
+  * Initial release
