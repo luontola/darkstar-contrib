@@ -3,7 +3,7 @@
 
     <groupId>net.orfjackal.darkstar-contrib</groupId>
     <artifactId>darkstar-integration-test</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Darkstar Integration Test</name>
@@ -27,9 +27,9 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/tags/darkstar-integration-test-1.0.1</connection>
-        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/tags/darkstar-integration-test-1.0.1</developerConnection>
-        <url>http://code.google.com/p/darkstar-contrib/source/browse/tags/darkstar-integration-test-1.0.1</url>
+        <connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test</connection>
+        <developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/darkstar-integration-test</developerConnection>
+        <url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test</url>
     </scm>
 
     <distributionManagement>
