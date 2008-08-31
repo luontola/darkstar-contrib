@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -39,6 +40,10 @@ import java.util.Properties;
  */
 @RunWith(JDaveRunner.class)
 public class JavaProcessExecutorSpec extends Specification<Object> {
+
+    private static String fromEnd(List<String> x, int i) {
+        return x.get(x.size() - i);
+    }
 
     public class InTheCommandForLaunchingTheChildJavaProcess {
 
@@ -53,54 +58,57 @@ public class JavaProcessExecutorSpec extends Specification<Object> {
 
         public void theSpecifiedMainClassIsUsed() {
             javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.endsWith(" " + HelloWorld.class.getName()));
+            specify(fromEnd(dummyExecutor.lastCommand, 1).equals(HelloWorld.class.getName()));
         }
 
         public void theSpecifiedProgramArgumentsAreUsed() {
             javaExecutor.exec(HelloWorld.class, "foo", "bar");
-            specify(dummyExecutor.lastCommand.endsWith(" \"foo\" \"bar\""));
+            specify(fromEnd(dummyExecutor.lastCommand, 2).equals("foo"));
+            specify(fromEnd(dummyExecutor.lastCommand, 1).equals("bar"));
         }
 
         public void jreIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String javaHome = System.getProperty("java.home");
             String sep = System.getProperty("file.separator");
-            specify(dummyExecutor.lastCommand.startsWith("\"" + javaHome + sep + "bin" + sep + "java\" "));
+            specify(dummyExecutor.lastCommand.get(0), should.equal(javaHome + sep + "bin" + sep + "java"));
         }
 
         public void classpathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String classpath = System.getProperty("java.class.path");
-            specify(dummyExecutor.lastCommand.contains(" -classpath \"" + classpath + "\" "));
+            specify(dummyExecutor.lastCommand, should.containInPartialOrder("-classpath", classpath));
         }
 
         public void libraryPathIsTheSameAsInTheParent() {
             javaExecutor.exec(HelloWorld.class);
             String libraryPath = System.getProperty("java.library.path");
-            specify(dummyExecutor.lastCommand.contains(" -Djava.library.path=\"" + libraryPath + "\" "));
+            specify(dummyExecutor.lastCommand, should.contain("-Djava.library.path=" + libraryPath));
         }
 
         public void vmOptionsMayBeSpecified() {
             javaExecutor.exec(HelloWorld.class);
-            specify(!dummyExecutor.lastCommand.contains("-ea -server"));
-            specify(!dummyExecutor.lastCommand.contains("null"));
+            specify(dummyExecutor.lastCommand, should.not().contain("-ea"));
+            specify(dummyExecutor.lastCommand, should.not().contain("-server"));
+            specify(dummyExecutor.lastCommand, should.not().contain("null"));
 
-            javaExecutor.setVmOptions("-ea -server");
+            javaExecutor.setVmOptions("-ea", "-server");
             javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.contains(" -ea -server "));
-            specify(javaExecutor.getVmOptions(), should.equal("-ea -server"));
+            specify(dummyExecutor.lastCommand, should.contain("-ea"));
+            specify(dummyExecutor.lastCommand, should.contain("-server"));
+            specify(javaExecutor.getVmOptions(), should.containInOrder("-ea", "-server"));
         }
 
         public void tempDirectoryMayBeSpecified() {
             File dir = new File(System.getProperty("java.io.tmpdir"), "CustomTemp.tmp");
 
             javaExecutor.exec(HelloWorld.class);
-            specify(!dummyExecutor.lastCommand.contains("CustomTemp.tmp"));
-            specify(!dummyExecutor.lastCommand.contains("null"));
+            specify(dummyExecutor.lastCommand, should.not().contain("CustomTemp.tmp"));
+            specify(dummyExecutor.lastCommand, should.not().contain("null"));
 
             javaExecutor.setTempDirectory(dir);
             javaExecutor.exec(HelloWorld.class);
-            specify(dummyExecutor.lastCommand.contains(" -Djava.io.tmpdir=\"" + dir + "\" "));
+            specify(dummyExecutor.lastCommand, should.contain("-Djava.io.tmpdir=" + dir));
             specify(javaExecutor.getTempDirectory(), should.equal(dir));
         }
     }
