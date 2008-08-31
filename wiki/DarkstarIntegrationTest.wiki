@@ -68,7 +68,7 @@ To use darkstar-integration-test in a Maven project, add the following dependenc
         <dependency>
             <groupId>net.orfjackal.darkstar-contrib</groupId>
             <artifactId>darkstar-integration-test</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
