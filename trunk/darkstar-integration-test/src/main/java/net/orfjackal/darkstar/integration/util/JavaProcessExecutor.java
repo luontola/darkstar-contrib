@@ -90,6 +90,7 @@ public class JavaProcessExecutor {
     }
 
     private String java_library_path() {
+    	// TODO: escaping seems to go wrong if (on windows) the path ends with \
         return " -Djava.library.path=" + quote(LIBRARY_PATH);
     }
 
