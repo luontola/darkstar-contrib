@@ -26,6 +26,9 @@ package net.orfjackal.darkstar.integration.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Esko Luontola
@@ -38,7 +41,7 @@ public class JavaProcessExecutor {
     private static final String LIBRARY_PATH = System.getProperty("java.library.path");
 
     private final ProcessExecutor executor;
-    private String vmOptions;
+    private String[] vmOptions = new String[0];
     private File tempDirectory;
 
     public JavaProcessExecutor() {
@@ -49,11 +52,14 @@ public class JavaProcessExecutor {
         this.executor = executor;
     }
 
-    public String getVmOptions() {
+    public String[] getVmOptions() {
         return vmOptions;
     }
 
-    public void setVmOptions(String vmOptions) {
+    public void setVmOptions(String... vmOptions) {
+        if (vmOptions == null) {
+            throw new NullPointerException("vmOptions is null");
+        }
         this.vmOptions = vmOptions;
     }
 
@@ -68,52 +74,48 @@ public class JavaProcessExecutor {
     public ProcessHolder exec(Class<?> mainClass, String... args) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        Process process = executor.exec(commandFor(mainClass, args).trim(), out, err);
+        Process process = executor.exec(commandFor(mainClass, args), out, err);
         return new ProcessHolder(process, out, err);
     }
 
-    private String commandFor(Class<?> mainClass, String[] args) {
-        return java()
-                + optional(vmOptions)
-                + optional(java_io_tmpdir())
-                + java_library_path()
-                + classpath()
-                + " " + mainClass.getName() + " " + quoteAll(args);
+    private String[] commandFor(Class<?> mainClass, String[] args) {
+        return combinedArray(
+                java(), vmOptions, java_io_tmpdir(), java_library_path(), classpath(),
+                mainClass.getName(), args);
     }
 
     private String java() {
-        return quote(new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath());
+        return new File(new File(JAVA_HOME, "bin"), "java").getAbsolutePath();
     }
 
-    private String classpath() {
-        return " -classpath " + quote(CLASSPATH);
+    private String[] classpath() {
+        return new String[]{"-classpath", CLASSPATH};
     }
 
     private String java_library_path() {
-    	// TODO: escaping seems to go wrong if (on windows) the path ends with \
-        return " -Djava.library.path=" + quote(LIBRARY_PATH);
+        return "-Djava.library.path=" + LIBRARY_PATH;
     }
 
     private String java_io_tmpdir() {
         if (tempDirectory == null) {
             return null;
         }
-        return " -Djava.io.tmpdir=" + quote(tempDirectory.getAbsolutePath());
+        return "-Djava.io.tmpdir=" + tempDirectory.getAbsolutePath();
     }
 
-    private static String optional(String s) {
-        return (s != null ? " " + s.trim() : "");
-    }
-
-    private static String quote(String s) {
-        return '"' + s + '"';
-    }
-
-    private String quoteAll(String[] strings) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : strings) {
-            sb.append(quote(s)).append(" ");
+    private String[] combinedArray(Object... elements) {
+        List<String> result = new ArrayList<String>();
+        for (Object o : elements) {
+            if (o instanceof String) {
+                result.add((String) o);
+            } else if (o instanceof String[]) {
+                result.addAll(Arrays.asList((String[]) o));
+            } else if (o == null) {
+                // NOOP: do not add empty elements
+            } else {
+                throw new IllegalArgumentException("Element of wrong type: " + o + " (" + o.getClass() + ")");
+            }
         }
-        return sb.toString();
+        return result.toArray(new String[result.size()]);
     }
 }

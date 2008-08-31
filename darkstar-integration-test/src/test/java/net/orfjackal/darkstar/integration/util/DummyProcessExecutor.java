@@ -26,6 +26,8 @@ package net.orfjackal.darkstar.integration.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * For debugging purposes, does not execute anything - only prints the command.
@@ -38,7 +40,7 @@ public class DummyProcessExecutor implements ProcessExecutor {
     private static final int LINE_LENGTH = 120;
 
     private final boolean printCommand;
-    public String lastCommand;
+    public List<String> lastCommand;
 
     public DummyProcessExecutor() {
         this(false);
@@ -48,16 +50,16 @@ public class DummyProcessExecutor implements ProcessExecutor {
         this.printCommand = printCommand;
     }
 
-    public Process exec(String command) {
-        lastCommand = command;
+    public Process exec(String... command) {
+        lastCommand = Arrays.asList(command);
         if (printCommand) {
             System.out.println(DummyProcessExecutor.class.getName() + ".execute(), command:");
-            System.out.print(lineWrap(command));
+            System.out.print(lineWrap(Arrays.toString(command)));
         }
         return new DummyProcess();
     }
 
-    public Process exec(String command, OutputStream stdout, OutputStream stderr) {
+    public Process exec(String[] command, OutputStream stdout, OutputStream stderr) {
         exec(command);
         return new DummyProcess();
     }

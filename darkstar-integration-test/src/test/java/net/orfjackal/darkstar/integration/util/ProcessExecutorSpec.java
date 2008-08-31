@@ -54,7 +54,7 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
         public void shouldExecuteTheSystemCommand() throws InterruptedException {
             File f = new File("testExecuter.tmp");
             specify(!f.exists());
-            Process p = executor.exec("cmd /c mkdir testExecuter.tmp");
+            Process p = executor.exec("cmd", "/c", "mkdir", "testExecuter.tmp");
             p.waitFor();
             specify(f.exists());
             specify(f.isDirectory());
@@ -63,22 +63,22 @@ public class ProcessExecutorSpec extends Specification<ProcessExecutor> {
 
         public void shouldRedirectStdout() throws InterruptedException {
             // "cmd /c" is required by Windows because "echo" is not a file (unlike in Linux) but a shell command
-            Process p = executor.exec("cmd /c echo foo", stdout, stderr);
+            Process p = executor.exec(new String[]{"cmd", "/c", "echo", "foo"}, stdout, stderr);
             p.waitFor();
             specify(stdout.toString(), should.equal("foo\r\n"));
             specify(stderr.toString(), should.equal(""));
         }
 
         public void shouldRedirectStderr() throws InterruptedException {
-            Process p = executor.exec("cmd /c echo bar>&2", stdout, stderr);
+            Process p = executor.exec(new String[]{"cmd", "/c", "echo", "bar>&2"}, stdout, stderr);
             p.waitFor();
             specify(stdout.toString(), should.equal(""));
             specify(stderr.toString(), should.equal("bar\r\n"));
         }
 
         public void shouldReturnTheExitValue() throws InterruptedException {
-            int ok = executor.exec("cmd /c echo foo", stdout, stderr).waitFor();
-            int fail = executor.exec("cmd /c dir doesNotExist", stdout, stderr).waitFor();
+            int ok = executor.exec(new String[]{"cmd", "/c", "echo", "foo"}, stdout, stderr).waitFor();
+            int fail = executor.exec(new String[]{"cmd", "/c", "dir", "doesNotExist"}, stdout, stderr).waitFor();
             specify(ok, should.equal(0));
             specify(fail, should.equal(1));
         }
