@@ -70,9 +70,21 @@
 			<version>0.9.7</version>
 		</dependency>
 		<dependency>
+			<groupId>com.projectdarkstar.server</groupId>
+			<artifactId>sgs-server</artifactId>
+			<version>0.9.7</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.projectdarkstar.client</groupId>
 			<artifactId>sgs-client-api</artifactId>
 			<version>0.9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.projectdarkstar.client</groupId>
+			<artifactId>sgs-client</artifactId>
+			<version>0.9.7</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.gamalocus.darkstar-contrib</groupId>

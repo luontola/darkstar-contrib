@@ -14,7 +14,7 @@ import com.sun.sgs.profile.ProfileCollector.ProfileLevel;
  * @author Emanuel Greisen
  * 
  */
-public class AppProfilingManager /*implements ProfileProducer*/
+public class AppProfilingManager/* implements ProfileProducer*/
 {
 	private final static Logger logger = Logger.getLogger(AppProfilingManager.class.getName());
 	public static boolean is_enabled = false;
@@ -36,6 +36,7 @@ public class AppProfilingManager /*implements ProfileProducer*/
 	public AppProfilingManager(AppProfilingService service)
 	{
 		this.service = service;
+		setProfileRegistrar(service.registrar);
 	}
 	
 	
@@ -46,17 +47,14 @@ public class AppProfilingManager /*implements ProfileProducer*/
 	 */
 	public static void reportOperation(String opName)
 	{
-		ProfileOperation op = knownOpNames.get(opName);
-		if(op == null)
+		if(consumer != null)
 		{
-			if (consumer != null)
+			ProfileOperation op = knownOpNames.get(opName);
+			if(op == null)
 			{
-				op = consumer.registerOperation(opName, ProfileLevel.MEDIUM);
+				op = consumer.registerOperation(opName, ProfileLevel.MAX);
 				knownOpNames.put(opName, op);
 			}
-		}
-		if(op != null)
-		{
 			op.report();			
 		}
 		else

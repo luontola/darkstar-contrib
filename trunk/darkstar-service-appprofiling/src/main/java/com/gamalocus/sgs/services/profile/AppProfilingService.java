@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.sun.sgs.impl.sharedutil.PropertiesWrapper;
 import com.sun.sgs.kernel.ComponentRegistry;
+import com.sun.sgs.profile.ProfileRegistrar;
 import com.sun.sgs.service.DataService;
 import com.sun.sgs.service.Service;
 import com.sun.sgs.service.TransactionProxy;
@@ -21,6 +22,7 @@ public class AppProfilingService implements Service
 	static final String CLASSNAME = AppProfilingService.class.getName();
 	/** the logger. */
 	private final static Logger logger = Logger.getLogger(AppProfilingService.class.getName());
+	ProfileRegistrar registrar;
 	
 	/**
 	 * The constructor as it is called from SGS.
@@ -36,6 +38,8 @@ public class AppProfilingService implements Service
 	{
 		// Read properties
 		PropertiesWrapper wrappedProps = new PropertiesWrapper(properties);
+		registrar = 
+			componentRegistry.getComponent(ProfileRegistrar.class);
 	}
 
 	/**
