@@ -1,4 +1,4 @@
-package com.gamalocus.sgs.guiclient.names;
+package com.gamalocus.sgs.guiclient.panels;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;

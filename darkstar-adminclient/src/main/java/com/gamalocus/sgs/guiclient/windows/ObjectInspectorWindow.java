@@ -66,7 +66,7 @@ public class ObjectInspectorWindow<T> extends JFrame {
 	
 	public ObjectInspectorWindow(T obj)
 	{
-		super("Show: "+obj);
+		super("Show: "+(obj != null ? obj.getClass()+"@"+System.identityHashCode(obj) : "null"));
 		setSize(800, 400);
 		
 		add(new JScrollPane(grid = new JPanel()));
