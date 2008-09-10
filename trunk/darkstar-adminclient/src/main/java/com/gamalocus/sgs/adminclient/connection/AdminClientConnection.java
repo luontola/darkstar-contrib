@@ -21,10 +21,13 @@ import com.gamalocus.sgs.adminclient.messages.CallMethodOnManagedObjectAdminMess
 import com.gamalocus.sgs.adminclient.messages.ReturnValueContainer;
 import com.gamalocus.sgs.adminclient.serialization.AdminClientAssembler;
 import com.gamalocus.sgs.adminclient.serialization.ManagedReferenceImpl;
+import com.sun.sgs.app.AppContext;
 import com.sun.sgs.client.ClientChannel;
 import com.sun.sgs.client.ClientChannelListener;
 import com.sun.sgs.client.simple.SimpleClient;
 import com.sun.sgs.client.simple.SimpleClientListener;
+import com.sun.sgs.impl.kernel.AdminClientKernelContext;
+import com.sun.sgs.impl.kernel.ContextResolver;
 
 /**
  * Admin client side of the admin client-server connection.
@@ -104,6 +107,9 @@ public class AdminClientConnection implements SimpleClientListener, Serializable
 			new AdminClientAssembler<ReturnValueContainer<Serializable>>(classLoader, this);
 
 		setHostAndPort(host, port);
+		
+		// Hack the AppContext to work out our "DataManager"
+		AdminClientKernelContext.initKernelContext(this);
 		
 		// Put in some class-swaps
 		//packet_assembler.addClassReplacement("com.sun.sgs.impl.service.data.ManagedReferenceImpl", "net.gamalocus.cotwl2.hallserver.adminmessages.ManagedReferenceImpl");
