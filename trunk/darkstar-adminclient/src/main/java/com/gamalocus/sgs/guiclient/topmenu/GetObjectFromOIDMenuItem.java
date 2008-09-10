@@ -29,22 +29,27 @@ public class GetObjectFromOIDMenuItem extends JMenuItem {
 					{
 						try
 						{
-							long oid = Long.parseLong(reply);
-							try
+							String parts[] = reply.replaceAll("\n", ",").replaceAll(" ", ",").split(",");
+							for(String part : parts)
 							{
-								ManagedReferenceCapsule<ManagedObject> ref = GuiAdminClient.getInstance().getConnection().sendSync(new GetManagedObjectFromOID(oid));
-								if(ref != null && ref.reference != null)
+								//System.out.println("part:"+part);
+								long oid = Long.parseLong(part);
+								try
 								{
-									new ObjectInspectorWindow<ManagedObject>(ref.reference.get()).setVisible(true);
+									ManagedReferenceCapsule<ManagedObject> ref = GuiAdminClient.getInstance().getConnection().sendSync(new GetManagedObjectFromOID(oid));
+									if(ref != null && ref.reference != null)
+									{
+										new ObjectInspectorWindow<ManagedObject>(ref.reference.get()).setVisible(true);
+									}
+									else
+									{
+										throw new RuntimeException("Capsule or Reference was null");
+									}
 								}
-								else
+								catch(Throwable t)
 								{
-									throw new RuntimeException("Capsule or Reference was null");
+									JOptionPane.showMessageDialog(null, t.getMessage());
 								}
-							}
-							catch(Throwable t)
-							{
-								JOptionPane.showMessageDialog(null, t.getMessage());
 							}
 							return;
 						}
