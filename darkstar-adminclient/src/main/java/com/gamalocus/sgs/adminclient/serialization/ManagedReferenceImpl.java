@@ -157,7 +157,7 @@ public class ManagedReferenceImpl<T extends ManagedObject> implements ManagedRef
     	this.id = BigInteger.valueOf(oid);
     }
 
-    /**
+	/**
      * Will "flush" the local java-reference, forcing a new fetch when the reference is de-referenced.
      */
     public void flush()
@@ -186,9 +186,11 @@ public class ManagedReferenceImpl<T extends ManagedObject> implements ManagedRef
 				if(status == Status.NOT_FETCHED || status == Status.FAILED)
 				{
 					status = Status.FETCHING;
+					/*
 					logger.log(Level.WARNING, 
 							String.format("Fetch triggered by ManagedObject.get(), id: %d.", id),
 							new Throwable());
+					*/
 					try
 					{
 						object = getConnection().sendSync(
