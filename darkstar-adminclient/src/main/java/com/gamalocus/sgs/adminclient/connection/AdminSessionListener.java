@@ -105,31 +105,12 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 		message.get(tmp);
 		packet_assembler.append(tmp);
 		if (packet_assembler.isComplete()) {
+			//recievedMessage(packet_assembler);
 			AbstractAdminMessage<?> clientMessage = null;
 			ReturnValueContainer<?> returnValue = null; 
 			try {
 				clientMessage = packet_assembler.poll();
-				log.info("Received admin message: " + clientMessage.getClass());
-
-				try {
-					if(hasAdminLevel(clientMessage.getAdminLevels()))
-					{
-						returnValue = new ReturnValueContainer<Serializable>(
-								clientMessage.executeOnServer(this, server), 
-								clientMessage.getRequestId());
-					}
-					else
-					{
-						throw new RuntimeException("You did not have any of the required AdminLevels: "+clientMessage.getAdminLevels());
-					}
-				} catch (Throwable t) {
-					if (t instanceof ExceptionRetryStatus) {
-						// This is a retryable exception; let SGS try again.
-						throw (RuntimeException)t;
-					}
-					returnValue = new ReturnValueContainer<Serializable>(
-							t, clientMessage.getRequestId());
-				}
+				returnValue = receivedMessage(clientMessage);
 			} catch (IOException ioe) {
 				log.log(Level.WARNING, "Received broken packetized object.", ioe);
 				returnValue = new ReturnValueContainer<Serializable>(ioe, 
@@ -144,6 +125,31 @@ public class AdminSessionListener implements ClientSessionListener, Serializable
 		}
 	}
 	
+	protected ReturnValueContainer<?> receivedMessage(
+			AbstractAdminMessage<?> clientMessage) {
+		log.info("Received admin message: " + clientMessage.getClass());
+
+		try {
+			if(hasAdminLevel(clientMessage.getAdminLevels()))
+			{
+				return new ReturnValueContainer<Serializable>(
+						clientMessage.executeOnServer(this, server), 
+						clientMessage.getRequestId());
+			}
+			else
+			{
+				throw new RuntimeException("You did not have any of the required AdminLevels: "+clientMessage.getAdminLevels());
+			}
+		} catch (Throwable t) {
+			if (t instanceof ExceptionRetryStatus) {
+				// This is a retryable exception; let SGS try again.
+				throw (RuntimeException)t;
+			}
+			return new ReturnValueContainer<Serializable>(
+					t, clientMessage.getRequestId());
+		}
+	}
+
 	public EnumSet<AdminLevel> getAdminLevels()
 	{
 		return admin_levels;

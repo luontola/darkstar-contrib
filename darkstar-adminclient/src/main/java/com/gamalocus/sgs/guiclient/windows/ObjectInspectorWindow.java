@@ -107,7 +107,8 @@ public class ObjectInspectorWindow<T> extends JFrame {
 			JComponent editor;
 			if(f.getType().isEnum())
 			{
-				editor = new JComboBox(new Object[]{ "enum1", "enum2" } );
+				editor = new JComboBox( f.getType().getEnumConstants() );
+				((JComboBox)editor).setSelectedItem(value);
 			}
 			else if(f.getType().isPrimitive() || f.getType().equals(String.class))
 			{
