@@ -15,7 +15,7 @@ import com.gamalocus.sgs.adminclient.connection.AdminClientConnectionFactory;
 import com.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import com.gamalocus.sgs.adminclient.messages.AbstractAdminMessage;
 import com.gamalocus.sgs.adminclient.messages.GetNameBindings;
-import com.gamalocus.sgs.guiclient.names.BoundNamesPanel;
+import com.gamalocus.sgs.guiclient.panels.BoundNamesPanel;
 import com.gamalocus.sgs.guiclient.topmenu.TopMenuBar;
 import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ManagedReference;

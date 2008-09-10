@@ -1,4 +1,4 @@
-package com.gamalocus.sgs.guiclient.names;
+package com.gamalocus.sgs.guiclient.panels;
 
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;

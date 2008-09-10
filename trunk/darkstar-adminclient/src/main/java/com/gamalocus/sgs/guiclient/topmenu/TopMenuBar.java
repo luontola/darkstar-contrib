@@ -14,10 +14,14 @@ import com.gamalocus.sgs.guiclient.GuiAdminClient;
 public class TopMenuBar extends JMenuBar{
 
 	private JMenu server_menu;
+	private JMenu object_menu;
 
 	public TopMenuBar()
 	{
 		add(server_menu = new JMenu("Server"));
 		server_menu.add(new ConnectDisconnectMenuItem());
+		
+		add(object_menu = new JMenu("Objects"));
+		object_menu.add(new GetObjectFromOIDMenuItem());
 	}
 }

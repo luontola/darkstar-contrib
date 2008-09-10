@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import com.gamalocus.sgs.adminclient.connection.AdminSessionListener;
 import com.gamalocus.sgs.services.datainspector.DataInspectorManager;
 import com.sun.sgs.app.AppContext;
+import com.sun.sgs.app.AppListener;
 import com.sun.sgs.app.ManagedObject;
 import com.sun.sgs.app.ManagedReference;
 import com.sun.sgs.app.ObjectNotFoundException;
@@ -51,7 +52,7 @@ public class GetManagedObjectFromReference extends AbstractAdminMessage<ManagedO
 	}
 
 	@Override
-	public ManagedObjectCapsule executeOnServer(AdminSessionListener connection, ManagedReference server) 
+	public ManagedObjectCapsule executeOnServer(AdminSessionListener connection, ManagedReference<AppListener> server) 
 		throws IOException, NoSuchFieldException, IllegalAccessException
 	{
 		ManagedObjectCapsule result = new ManagedObjectCapsule();
