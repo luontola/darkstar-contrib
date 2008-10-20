@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.gamalocus.darkstar-contrib</groupId>
@@ -29,9 +31,15 @@
 	</developers>
 
 	<scm>
-		<connection>scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/datastructures</connection>
-		<developerConnection>scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/datastructures</developerConnection>
-		<url>http://code.google.com/p/darkstar-contrib/source/browse/trunk/datastructures</url>
+		<connection>
+			scm:svn:http://darkstar-contrib.googlecode.com/svn/trunk/datastructures
+		</connection>
+		<developerConnection>
+			scm:svn:https://darkstar-contrib.googlecode.com/svn/trunk/datastructures
+		</developerConnection>
+		<url>
+			http://code.google.com/p/darkstar-contrib/source/browse/trunk/datastructures
+		</url>
 	</scm>
 
 	<distributionManagement>
@@ -64,10 +72,34 @@
 		<dependency>
 			<groupId>com.projectdarkstar.server</groupId>
 			<artifactId>sgs-server-api</artifactId>
-			<version>0.9.7</version>
+			<version>0.9.8-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.projectdarkstar.server</groupId>
+			<artifactId>sgs-server</artifactId>
+			<version>0.9.8-SNAPSHOT</version>
+			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.projectdarkstar.server</groupId>
+					<artifactId>sgs-server-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.projectdarkstar.ext.berkeleydb</groupId>
+			<artifactId>je</artifactId>
+			<version>3.2.23</version>
+			<scope>runtime</scope>
+		</dependency>		
+		<dependency>
+			<groupId>com.gamalocus.sgs</groupId>
+			<artifactId>darkstar-profiler-listener</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>		
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 
